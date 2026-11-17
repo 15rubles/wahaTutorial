@@ -26,5 +26,7 @@ export const ERROR_TEXT: Record<RuleErrorCode, string> = {
   NOT_CLOSER: 'Every model that moves has to end closer to the enemy.',
   NOT_ALL_TARGETS_ENGAGED: 'The charge has to end engaged with every target.',
   ENGAGED_NON_TARGET: 'The charge cannot end engaged with a unit you did not charge.',
+  NOT_ENOUGH_CP: 'You do not have enough command points.',
+  STRATAGEM_USED: 'That stratagem (or a stratagem on that unit) was already used this phase.',
   GAME_OVER: 'The game is over.',
 };

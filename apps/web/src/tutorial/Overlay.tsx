@@ -25,8 +25,9 @@ export function TutorialOverlay({ nextLessonId }: { nextLessonId?: string | unde
   const openRule = useRulePopup((s) => s.open);
   const step = lesson && runner ? currentStep(lesson, runner) : undefined;
   const [rects, setRects] = useState<Rect[]>([]);
+  const free = !!step?.free;
   const selectors =
-    step?.focus && ctx
+    !free && step?.focus && ctx
       ? step.focus.map((f) => selectorFor(f, ctx.units)).filter((s): s is string => !!s)
       : [];
   const key = selectors.join('|');
@@ -58,7 +59,7 @@ export function TutorialOverlay({ nextLessonId }: { nextLessonId?: string | unde
 
   // Block clicks and drags outside the focused elements, the tutorial box and the rule popup.
   useEffect(() => {
-    if (!step || runner?.done) return;
+    if (!step || runner?.done || free) return;
     const allowedTargets = () => [
       ...selectors.flatMap((s) => [...document.querySelectorAll(s)]),
       ...document.querySelectorAll('[data-tutorial-box], dialog[open]'),
@@ -75,7 +76,7 @@ export function TutorialOverlay({ nextLessonId }: { nextLessonId?: string | unde
     types.forEach((ty) => document.addEventListener(ty, guard, true));
     return () => types.forEach((ty) => document.removeEventListener(ty, guard, true));
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [key, step, runner?.done, input]);
+  }, [key, step, runner?.done, input, free]);
 
   if (!lesson || !ctx || !runner) return null;
   const total = lesson.steps.length;
@@ -85,7 +86,7 @@ export function TutorialOverlay({ nextLessonId }: { nextLessonId?: string | unde
 
   return (
     <>
-      {!runner.done && (
+      {!runner.done && !free && (
         <svg className="tutorial-dim" aria-hidden="true">
           <defs>
             <mask id="tutorial-holes">

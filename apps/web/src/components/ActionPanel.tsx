@@ -7,6 +7,7 @@ import {
   canPileIn,
   checkTarget,
   closeTo,
+  formation,
   consolidationMode,
   eligibleMoveTypes,
   eligibleShootingTypes,
@@ -229,6 +230,7 @@ function ChargeControls({ state, unit }: { state: GameState; unit: UnitState }) 
             className="primary"
             onClick={() => tryCharge(t.id)}
             data-tutorial-id={`charge-${t.id}`}
+            data-testid="charge-target"
           >
             Charge {t.name}
           </button>
@@ -322,10 +324,78 @@ function FightControls({ state, unit }: { state: GameState; unit: UnitState }) {
   );
 }
 
+function DeploymentControls({ state }: { state: GameState }) {
+  const act = useGame((s) => s.act);
+  const pending = Object.values(state.units).filter(
+    (u) =>
+      u.player === 'p1' && aliveModels(u).length > 0 && !aliveModels(u).some((m) => m.position),
+  );
+  const zone = state.battlefield.deploymentZones.find((z) => z.player === 'p1');
+  const place = (unit: UnitState): boolean => {
+    if (!zone) return false;
+    const ys = zone.polygon.map((p) => p.y);
+    const y = (Math.min(...ys) + Math.max(...ys)) / 2;
+    for (let i = 0; i < 24; i++) {
+      const x = ((((i * 7) % 23) + 1) / 24) * state.battlefield.width;
+      const positions = formation(unit, { x, y });
+      const current = useGame.getState().history?.current ?? state;
+      if (apply(current, { type: 'deploy', unitId: unit.id, positions }).ok)
+        return act({ type: 'deploy', unitId: unit.id, positions });
+    }
+    return false;
+  };
+  return (
+    <div className="controls">
+      <h4>Deployment</h4>
+      {pending.length === 0 ? (
+        <p className="small">All your units are deployed. Start the battle when ready.</p>
+      ) : (
+        <>
+          <p className="small">
+            Set up each unit in your zone. The opponent deploys after each of yours.
+          </p>
+          <ul className="deploy-list">
+            {pending.map((u) => (
+              <li key={u.id}>
+                {u.name}{' '}
+                <button type="button" onClick={() => place(u)}>
+                  Deploy
+                </button>
+              </li>
+            ))}
+          </ul>
+          <button
+            type="button"
+            className="primary"
+            data-tutorial-id="deploy-all"
+            data-testid="deploy-all"
+            onClick={() => {
+              for (const u of pending) {
+                const s = useGame.getState().history?.current;
+                const fresh = s?.units[u.id];
+                if (fresh && !aliveModels(fresh).some((m) => m.position)) place(fresh);
+              }
+            }}
+          >
+            Deploy all
+          </button>
+        </>
+      )}
+    </div>
+  );
+}
+
 export function ActionPanel({ state }: { state: GameState }) {
   const { selectedUnitId, lastError } = useGame();
   const unit = selectedUnitId ? state.units[selectedUnitId] : undefined;
   const yours = unit?.player === 'p1';
+  if (state.phase === 'deployment')
+    return (
+      <section className="action-panel" data-testid="action-panel" data-tutorial-id="action-panel">
+        {lastError && <p className="error">{ERROR_TEXT[lastError.code]}</p>}
+        <DeploymentControls state={state} />
+      </section>
+    );
   return (
     <section className="action-panel" data-testid="action-panel" data-tutorial-id="action-panel">
       {lastError && (

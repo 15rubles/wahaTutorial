@@ -775,3 +775,28 @@ a.button.primary {
 .rule-popup {
   z-index: 70;
 }
+
+.stratagem-panel ul,
+.army-rules ul,
+.deploy-list {
+  list-style: none;
+  padding: 0;
+  margin: 0.25rem 0;
+}
+
+.stratagem {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 0.5rem;
+  border-top: 1px solid var(--line);
+  padding: 0.35rem 0;
+}
+
+.stratagem details {
+  flex: 1;
+}
+
+.army-rules h4 {
+  margin: 0.75rem 0 0.25rem;
+}

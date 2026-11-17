@@ -4,7 +4,7 @@ import {
   aliveModels,
   eligibleMoveTypes,
 } from '@battle-drill/engine';
-import { useMemo } from 'react';
+import { type ReactNode, useMemo } from 'react';
 import { useData } from '../data/store.js';
 import { useGame } from '../game/store.js';
 import { ActionPanel } from './ActionPanel.js';
@@ -50,7 +50,7 @@ export function describeEvent(e: GameEvent, state: GameState): string | null {
 }
 
 /** Phase bar, battlefield, controls, dice and unit card: shared by the sandbox and lessons. */
-export function GameView({ state }: { state: GameState }) {
+export function GameView({ state, extra }: { state: GameState; extra?: ReactNode }) {
   const { datasheets } = useData();
   const { selectedUnitId, select, lastEvents, dragMode } = useGame();
   const selected = selectedUnitId ? state.units[selectedUnitId] : undefined;
@@ -100,6 +100,7 @@ export function GameView({ state }: { state: GameState }) {
         </div>
         <aside className="side">
           <ActionPanel state={state} />
+          {extra}
           <DiceTray events={lastEvents} />
           {selected && (
             <UnitCard

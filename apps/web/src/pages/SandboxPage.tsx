@@ -1,6 +1,7 @@
 import { useEffect } from 'react';
 import { useArmy } from '../army/store.js';
 import { GameView } from '../components/GameView.js';
+import { StratagemPanel } from '../components/StratagemPanel.js';
 import { useData } from '../data/store.js';
 import { armyUnits, sandboxGame } from '../game/buildGame.js';
 import { useGame } from '../game/store.js';
@@ -52,7 +53,7 @@ export function SandboxPage() {
   if (!state || !isSandbox) return <p className="muted">Setting up the battlefield...</p>;
   return (
     <section className="sandbox">
-      <GameView state={state} />
+      <GameView state={state} extra={<StratagemPanel state={state} />} />
       <button type="button" className="link" onClick={newGame}>
         Start a new sandbox game
       </button>

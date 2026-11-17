@@ -8,7 +8,9 @@ import {
 } from '@battle-drill/tutorial';
 import { useEffect, useMemo } from 'react';
 import { useArmy } from '../army/store.js';
+import { ArmyRulesPanel } from '../components/ArmyRulesPanel.js';
 import { GameView } from '../components/GameView.js';
+import { StratagemPanel } from '../components/StratagemPanel.js';
 import { useData } from '../data/store.js';
 import { armyUnits } from '../game/buildGame.js';
 import { useRulePopup } from '../game/rulePopup.js';
@@ -143,7 +145,15 @@ export function LessonPage({ lessonId }: { lessonId: string }) {
   const idx = LESSONS.findIndex((l) => l.id === lesson.id);
   return (
     <section className="sandbox lesson">
-      <GameView state={history.current} />
+      <GameView
+        state={history.current}
+        extra={
+          <>
+            {lesson.panels?.includes('stratagems') && <StratagemPanel state={history.current} />}
+            {lesson.panels?.includes('army-rules') && <ArmyRulesPanel />}
+          </>
+        }
+      />
       <TutorialOverlay nextLessonId={LESSONS[idx + 1]?.id} />
     </section>
   );
