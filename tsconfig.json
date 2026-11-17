@@ -1,8 +1,17 @@
 {
   "files": [],
   "references": [
-    { "path": "packages/data" },
-    { "path": "packages/engine" },
-    { "path": "packages/tutorial" }
+    {
+      "path": "packages/data"
+    },
+    {
+      "path": "packages/engine"
+    },
+    {
+      "path": "packages/tutorial"
+    },
+    {
+      "path": "packages/roster"
+    }
   ]
 }

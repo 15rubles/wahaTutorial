@@ -1,0 +1,19 @@
+{
+  "name": "@battle-drill/roster",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "default": "./dist/index.js"
+    }
+  },
+  "dependencies": {
+    "@battle-drill/data": "0.0.0",
+    "fast-xml-parser": "^5.12.1",
+    "fflate": "^0.8.3"
+  }
+}
