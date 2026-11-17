@@ -51,12 +51,18 @@ export interface Step {
   /** Dice to use for the next rolls in this step (to show a specific result). */
   readonly dice?: readonly number[];
   readonly setup?: (s: GameState, ctx: LessonContext) => GameState;
+  /** Free play: nothing is dimmed or blocked during this step. */
+  readonly free?: boolean;
 }
 
 export interface LessonUnitSpec {
   readonly role: Role;
   readonly at: { readonly x: number; readonly y: number };
+  /** Instead of `at.y`: place this unit `gap` inches (edge to edge) beyond the named role's unit. */
+  readonly near?: { readonly role: Role; readonly gap: number };
 }
+
+export type LessonPanel = 'stratagems' | 'army-rules';
 
 export interface Lesson {
   readonly id: string;
@@ -64,6 +70,17 @@ export interface Lesson {
   readonly summary: string;
   /** Roles placed on the board (player roles are p1, `target` / `enemyMelee` are p2). */
   readonly units: readonly LessonUnitSpec[];
+  /**
+   * 'roles' (default): only the role units, already placed. 'full': the whole army plus `units` as
+   * enemies, starting in deployment (or auto-deployed when `deployment` is false).
+   */
+  readonly army?: 'roles' | 'full';
+  readonly deployment?: boolean;
+  readonly battleRounds?: number;
+  /** CP each player starts with (drills hand out a few to practise with). */
+  readonly startCp?: number;
+  /** Extra side panels the lesson needs. */
+  readonly panels?: readonly LessonPanel[];
   /** Phase (of player 1, round 1) the lesson starts in. */
   readonly startPhase?: Phase;
   readonly seed?: number;

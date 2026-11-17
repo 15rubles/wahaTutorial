@@ -4,7 +4,7 @@
  */
 export * from './types.js';
 export { pickRoles, standIn } from './roles.js';
-export { buildLessonGame, fillText } from './buildLesson.js';
+export { buildLessonGame, fillText, autoDeploy } from './buildLesson.js';
 export {
   runStep,
   startRunner,

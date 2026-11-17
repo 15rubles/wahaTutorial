@@ -116,3 +116,32 @@ describe('progress', () => {
     expect(parseProgress(JSON.stringify(p))).toEqual({ completed: ['demo'] });
   });
 });
+
+describe('campaign lessons', () => {
+  it('place engaged units for the melee lesson', async () => {
+    const { meleeLesson } = await import('./lessons/l02-melee.js');
+    const { eligibleToFight } = await import('@battle-drill/engine');
+    const { state, ctx } = buildLessonGame(meleeLesson, fixtureArmy());
+    expect(state.phase).toBe('fight');
+    expect(eligibleToFight(state, ctx.units.character!)).toBe(true);
+  });
+
+  it('start full army lessons in deployment, or deployed', async () => {
+    const { battleRoundLesson } = await import('./lessons/l09-battle-round.js');
+    const { graduationLesson } = await import('./lessons/l10-graduation.js');
+    const a = buildLessonGame(battleRoundLesson, fixtureArmy());
+    expect(a.state.phase).toBe('deployment');
+    expect(Object.values(a.state.units).filter((u) => u.player === 'p1')).toHaveLength(5);
+    const b = buildLessonGame(graduationLesson, fixtureArmy());
+    expect([b.state.phase, b.state.battleRound, b.state.mission.battleRounds]).toEqual([
+      'command',
+      1,
+      2,
+    ]);
+  });
+
+  it('every lesson builds with an empty army (stand-ins)', async () => {
+    const { LESSONS } = await import('./lessons/index.js');
+    for (const lesson of LESSONS) expect(() => buildLessonGame(lesson, [])).not.toThrow();
+  });
+});

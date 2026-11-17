@@ -21,7 +21,8 @@
     "e2e": "playwright test --trace off",
     "data:sync": "tsx packages/data/src/cli.ts sync",
     "data:build": "tsx packages/data/src/cli.ts build",
-    "fixtures:build": "node scripts/make-fixtures.mjs && tsx packages/data/src/cli.ts build --fixture --raw-dir fixtures/wahapedia --out-dir fixtures/normalized"
+    "fixtures:build": "node scripts/make-fixtures.mjs && tsx packages/data/src/cli.ts build --fixture --raw-dir fixtures/wahapedia --out-dir fixtures/normalized",
+    "rules:check": "tsx scripts/check-rule-refs.ts"
   },
   "devDependencies": {
     "@eslint/js": "^10.0.1",
