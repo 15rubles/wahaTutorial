@@ -1,0 +1,35 @@
+﻿datasheet_id|keyword|model|is_faction_keyword|
+900000001|Infantry||false|
+900000001|Character||false|
+900000001|Grenades||false|
+900000001|Pilgrim Scrapwarden||false|
+900000001|Rust Pilgrims||true|
+900000002|Infantry||false|
+900000002|Battleline||false|
+900000002|Rustbound Devotees||false|
+900000002|Rust Pilgrims||true|
+900000003|Mounted||false|
+900000003|Cinder Lancers||false|
+900000003|Rust Pilgrims||true|
+900000004|Vehicle||false|
+900000004|Walker||false|
+900000004|Furnace Walker||false|
+900000004|Rust Pilgrims||true|
+900000005|Infantry||false|
+900000005|Gutter Marksman||false|
+900000005|Rust Pilgrims||true|
+900000011|Infantry||false|
+900000011|Character||false|
+900000011|Choir Precentor||false|
+900000011|Glass Choir||true|
+900000012|Infantry||false|
+900000012|Battleline||false|
+900000012|Glass Wardens||false|
+900000012|Glass Choir||true|
+900000013|Vehicle||false|
+900000013|Prism Engine||false|
+900000013|Glass Choir||true|
+900000014|Mounted||false|
+900000014|Fly||false|
+900000014|Echo Skimmers||false|
+900000014|Glass Choir||true|

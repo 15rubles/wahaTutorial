@@ -1,0 +1,5 @@
+﻿faction_id|name|id|type|cp_cost|legend|turn|phase|detachment|detachment_id|description|
+|STEADY HANDS|900000601|Core - Battle Tactic Stratagem|1|Invented flavour line.|Your turn|Shooting phase|||<b>WHEN:</b> Shooting phase.<br><br><b>EFFECT:</b> Invented fixture text: add 1 to one hit roll.|
+RP|RIVET STORM|900000602|Scrap Procession - Battle Tactic Stratagem|1|Invented flavour line.|Your turn|Shooting phase|Scrap Procession|900000801|<b>WHEN:</b> Shooting phase.<br><br><b>EFFECT:</b> Invented fixture text: ranged weapons gain an extra attack.|
+RP|HOLD THE ROAD|900000603|Scrap Procession - Strategic Ploy Stratagem|2|Invented flavour line.|Either player's turn|Command phase|Scrap Procession|900000801|<b>WHEN:</b> Command phase.<br><br><b>EFFECT:</b> Invented fixture text: one unit counts as controlling its objective.|
+GC|SHATTER NOTE|900000604|Shard Cantata - Battle Tactic Stratagem|1|Invented flavour line.|Your turn|Fight phase|Shard Cantata|900000802|<b>WHEN:</b> Fight phase.<br><br><b>EFFECT:</b> Invented fixture text: melee attacks improve AP by 1.|

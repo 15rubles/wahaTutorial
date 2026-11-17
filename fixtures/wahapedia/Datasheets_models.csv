@@ -1,0 +1,10 @@
+﻿datasheet_id|line|name|M|T|Sv|inv_sv|inv_sv_descr|W|Ld|OC|base_size|base_size_descr|
+900000001|1|Pilgrim Scrapwarden|6"|4|3+|5||5|6+|1|40mm||
+900000002|1|Rustbound Devotee|6"|3|5+|-||1|7+|2|28mm||
+900000003|1|Cinder Lancer|12"|5|4+|-||3|7+|2|60mm||
+900000004|1|Furnace Walker|8"|9|3+|-||10|7+|3|90mm||
+900000005|1|Gutter Marksman|6"|3|5+|-||2|7+|1|28mm||
+900000011|1|Choir Precentor|7"|4|4+|4||4|6+|1|32mm||
+900000012|1|Glass Warden|6"|4|3+|-||2|6+|2|32mm||
+900000013|1|Prism Engine|10"|10|3+|5||12|7+|3|Use model||
+900000014|1|Echo Skimmer|14"|4|4+|-||2|7+|1|60mm oval||

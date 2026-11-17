@@ -1,0 +1,4 @@
+﻿faction_id|name|id|cost|detachment|detachment_id|upgrade|legend|description|support_leader|
+RP|Lantern of Last Miles|900000501|15|Scrap Procession|900000801|false||Invented fixture text: the bearer adds 1 to its Move.||
+RP|Saint-Forged Maul|900000502|25|Scrap Procession|900000801|false||Invented fixture text: replaces the bearer melee weapon.||
+GC|Tuning Fork Crown|900000503|20|Shard Cantata|900000802|false||Invented fixture text: the bearer has a 4+ invulnerable save.||
