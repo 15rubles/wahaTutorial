@@ -12,6 +12,13 @@ Rules, datasheets, stratagems and ability text are Games Workshop IP. This repo 
 They are fetched on demand by `npm run data:sync` into `./data-cache/`, which is gitignored.
 Tests use the invented "Rust Pilgrims" faction in `fixtures/`.
 
+## What you can do
+
+- `#/import`: import a BattleScribe / New Recruit roster (`.ros`, `.rosz`) or a text export; fix unknown units
+- `#/learn`: ten guided lessons using your own units, from reading a datasheet to a full game
+- `#/sandbox`: play turns against practice dummies with the full rules engine
+- `#/rules` and the "Quick rules" drawer: the core rules from your local cache
+
 ## Layout
 
 | Path                | What                                                       |
@@ -35,6 +42,8 @@ npm run e2e          # Playwright end-to-end tests (fixture data only)
 npm run data:sync    # fetch Wahapedia data into ./data-cache (manual, rate limited)
 npm run data:build   # normalize raw cache -> data-cache/normalized
 npm run fixtures:build # regenerate the invented fixture data
+npm run rules:check  # every rule id used in code exists in your cache
+npm run check:no-gw-text # no cache text copied into the repo
 ```
 
 Requires Node 20 or newer (`.nvmrc` pins 22). For `npm run e2e` on a new machine, run

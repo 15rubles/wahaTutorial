@@ -37,8 +37,6 @@ rules, then record the resolution here.
 - Current interpretation: the target qualifies if it has any of the listed keywords.
 - Status: open
 
-### RQ-3: "each model in that unit is a MONSTER/VEHICLE model" for hazard rolls
-
 - Rule ref: `core.other-concepts.hazard-rolls`
 - Question: the engine tracks keywords per unit, not per model (attached units can mix).
 - Current interpretation: 3 mortal wounds per failed roll if the unit has MONSTER or VEHICLE.
@@ -56,7 +54,7 @@ rules, then record the resolution here.
 ### RQ-5: Selecting the next fighter after the Fights First units are used up
 
 - Rule ref: `core.fight-phase.fight-step`
-- Question: "starting with the player who just moved this sequence onto this step" is modelled as
+- Question: who picks first once the Fights First units are done is modelled as
   "the player after the one who fought last".
 - Current interpretation: `nextFightSelector()` alternates; a player with no eligible unit passes.
 - Status: open

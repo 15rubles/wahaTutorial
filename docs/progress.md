@@ -138,6 +138,18 @@ phase and making your first move.
 **Demo:** `#/learn` lists the campaign; each lesson highlights what to click, blocks everything else,
 shows the cached rule text for the step and saves progress.
 
-## M10 - Polish
+## M10 - Polish - DONE
 
-- [ ] Quick-reference mode, "What can I do now?" helper, data freshness banner, accessibility pass
+- [x] Quick-reference mode: "Quick rules" drawer available on every page
+- [x] "What can I do now?" helper listing legal actions for the selected unit (engine `legalActions`)
+- [x] Data freshness banner (cache older than 30 days, with the sync command)
+- [x] Accessibility: keyboard selection and keyboard moves, visible focus, Okabe-Ito colours, axe checks with no serious findings
+- [x] Hard rule 1 check (`npm run check:no-gw-text`) passes
+
+**Demo:** press "Quick rules" anywhere; in the sandbox select a unit and press "What can I do now?";
+Tab to a unit, Enter, then arrow keys and Enter to move it.
+
+## Still open for the owner
+
+- Manual run of the campaign with your real roster (see M9).
+- Open rules questions in `docs/rules-questions.md` (RQ-1 to RQ-5).

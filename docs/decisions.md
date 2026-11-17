@@ -268,3 +268,18 @@ ones with no faction and a type starting with "Core".
 - `npm run rules:check` verifies every engine and lesson rule id against the local cache (180 refs,
   all resolve on the real data).
 - E2E can run against your own cache: `E2E_DATA=cache E2E_ROSTER=/path/roster npm run e2e`.
+
+## D-037 (M10) Polish choices
+
+- Quick reference: a "Quick rules" drawer in the header on every page (search + rule view).
+- "What can I do now?": engine `legalActions(state, unitId)` returns option codes; the web app words
+  them. Lesson 10 points to it.
+- Freshness banner when the cache is older than 30 days (`meta.json` `rawFetchedAt`); never for demo data.
+- Keyboard: Tab to a unit, Enter selects; in the movement phase arrow keys nudge the pending move by 1"
+  (clamped to the move's limit), Enter confirms, Escape cancels or deselects.
+- Accessibility: axe checks (no serious or critical findings) on home, rules, army, sandbox and a
+  lesson. The battlefield SVG is a `group` of unit buttons; warning text uses a darker vermillion.
+- `npm run check:no-gw-text` compares 8-word sequences of every tracked file with the raw cache
+  (headings, CSV headers, rule ids and number runs excluded). It found three engine comments and two
+  doc lines worded too close to the rules; they were rewritten, plus template wording in a fixture
+  column. Now clean.
