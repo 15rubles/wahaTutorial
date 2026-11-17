@@ -15,6 +15,19 @@ import { create } from 'zustand';
 
 export type DragMode = 'normal' | 'advance' | 'fall-back';
 
+/** What a listener (the tutorial) hears after each attempted action. */
+export type GameNotice =
+  | { readonly kind: 'applied'; readonly events: readonly GameEvent[]; readonly state: GameState }
+  | { readonly kind: 'rejected'; readonly error: RuleError }
+  | { readonly kind: 'blocked'; readonly action: GameAction };
+
+const listeners = new Set<(n: GameNotice) => void>();
+export function onGameNotice(fn: (n: GameNotice) => void): () => void {
+  listeners.add(fn);
+  return () => listeners.delete(fn);
+}
+const notify = (n: GameNotice) => listeners.forEach((fn) => fn(n));
+
 interface GameUiState {
   history: History | null;
   selectedUnitId: string | null;
@@ -25,6 +38,12 @@ interface GameUiState {
   lastError: RuleError | null;
   /** Bumped each time dice are rolled, to replay the dice tray animation. */
   rollId: number;
+  /** Tutorial guard: returns false to block an action. */
+  guard: ((action: GameAction) => boolean) | null;
+  /** Forced dice for the next action that rolls (tutorial). */
+  dice: readonly number[] | null;
+  setGuard(fn: ((action: GameAction) => boolean) | null): void;
+  setDice(values: readonly number[] | null): void;
   start(state: GameState): void;
   act(action: GameAction): boolean;
   undo(): void;
@@ -61,6 +80,14 @@ export const useGame = create<GameUiState>((set, get) => ({
   lastEvents: [],
   lastError: null,
   rollId: 0,
+  guard: null,
+  dice: null,
+  setGuard(guard) {
+    set({ guard });
+  },
+  setDice(dice) {
+    set({ dice });
+  },
   start(state) {
     set({
       history: startHistory(state),
@@ -71,11 +98,16 @@ export const useGame = create<GameUiState>((set, get) => ({
     });
   },
   act(action) {
-    const { history } = get();
+    const { history, guard, dice } = get();
     if (!history) return false;
-    const { history: next, result } = record(history, action);
+    if (guard && !guard(action)) {
+      notify({ kind: 'blocked', action });
+      return false;
+    }
+    const { history: next, result } = record(history, action, dice ?? undefined);
     if (!result.ok) {
       set({ lastError: result.error });
+      notify({ kind: 'rejected', error: result.error });
       return false;
     }
     const opp = runOpponent(next);
@@ -93,7 +125,9 @@ export const useGame = create<GameUiState>((set, get) => ({
       lastError: null,
       pending: null,
       rollId: rolled ? s.rollId + 1 : s.rollId,
+      dice: rolled ? null : s.dice,
     }));
+    notify({ kind: 'applied', events, state: opp.history.current });
     return true;
   },
   undo() {

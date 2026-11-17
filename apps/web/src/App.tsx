@@ -3,6 +3,7 @@ import { RulePopup } from './components/RulePopup.js';
 import { useData } from './data/store.js';
 import { ArmyPage } from './pages/ArmyPage.js';
 import { ImportPage } from './pages/ImportPage.js';
+import { LessonList, LessonPage } from './pages/LearnPage.js';
 import { RulesPage } from './pages/RulesPage.js';
 import { SandboxPage } from './pages/SandboxPage.js';
 import { UnitPage } from './pages/UnitPage.js';
@@ -15,6 +16,9 @@ function Home() {
       <ul>
         <li>
           <a href={href('import')}>Import your army</a>
+        </li>
+        <li>
+          <a href={href('learn')}>Start the tutorial</a>
         </li>
         <li>
           <a href={href('sandbox')}>Sandbox: play a turn against practice dummies</a>
@@ -55,6 +59,7 @@ export function App() {
           <a href={href()}>Battle Drill</a>
         </h1>
         <nav aria-label="Main">
+          <a href={href('learn')}>Learn</a>
           <a href={href('army')}>Army</a>
           <a href={href('sandbox')}>Sandbox</a>
           <a href={href('rules')}>Rules</a>
@@ -73,6 +78,10 @@ export function App() {
         ) : page === 'army' ? (
           <DataGate>
             <ArmyPage />
+          </DataGate>
+        ) : page === 'learn' ? (
+          <DataGate>
+            {rest[0] ? <LessonPage key={rest[0]} lessonId={rest[0]} /> : <LessonList />}
           </DataGate>
         ) : page === 'sandbox' ? (
           <DataGate>
