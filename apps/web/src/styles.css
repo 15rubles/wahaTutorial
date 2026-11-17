@@ -226,3 +226,90 @@ pre {
   border-top: 1px solid var(--line);
   padding-top: 0.75rem;
 }
+
+.button-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  align-items: center;
+  margin: 0.5rem 0;
+}
+
+.panel + .panel {
+  margin-top: 1rem;
+}
+
+textarea,
+select,
+input[type='search'] {
+  font: inherit;
+  padding: 0.4rem;
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  background: var(--panel);
+  color: var(--fg);
+}
+
+textarea {
+  width: 100%;
+  font-family: ui-monospace, monospace;
+  margin: 0.5rem 0;
+}
+
+.error {
+  color: var(--bad);
+}
+
+.warn {
+  color: var(--bad);
+}
+
+.army-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+.unit-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 1rem;
+  background: var(--panel);
+}
+
+.unit-table th,
+.unit-table td {
+  text-align: left;
+  border-bottom: 1px solid var(--line);
+  padding: 0.5rem;
+  vertical-align: top;
+}
+
+.tag {
+  display: inline-block;
+  font-size: 0.75rem;
+  margin-left: 0.4rem;
+  padding: 0 0.4rem;
+  border-radius: 999px;
+  border: 1px solid var(--accent-2);
+}
+
+.fixme-panel ul {
+  list-style: none;
+  padding: 0;
+}
+
+.fixme {
+  border-top: 1px solid var(--line);
+  padding: 0.5rem 0;
+}
+
+.picker {
+  list-style: none;
+  padding: 0;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+}

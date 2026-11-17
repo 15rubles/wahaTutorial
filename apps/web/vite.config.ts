@@ -13,6 +13,7 @@ export default defineConfig({
     alias: {
       '@battle-drill/data': src('data'),
       '@battle-drill/engine': src('engine'),
+      '@battle-drill/roster': src('roster'),
       '@battle-drill/tutorial': src('tutorial'),
     },
   },

@@ -2,6 +2,7 @@
  * Dev / preview server plugin that serves the local data cache to the browser.
  *   /data/*          -> BATTLE_DRILL_DATA_DIR (default data-cache/normalized), the user's own cache
  *   /fixture-data/*  -> fixtures/normalized, invented demo data
+ *   /fixture-rosters/* -> fixtures/rosters, invented demo rosters
  * Nothing from the cache is bundled into the build output.
  */
 import { createReadStream, existsSync, statSync } from 'node:fs';
@@ -10,6 +11,8 @@ import { join, normalize, resolve, sep } from 'node:path';
 import type { Plugin } from 'vite';
 
 const REPO_ROOT = resolve(import.meta.dirname, '../..');
+
+const ALLOWED = /\.(json|ros|rosz|txt)$/i;
 
 function handler(mounts: Record<string, string>) {
   return (req: IncomingMessage, res: ServerResponse, next: () => void) => {
@@ -20,7 +23,7 @@ function handler(mounts: Record<string, string>) {
       const file = join(dir, rel);
       if (
         !file.startsWith(dir + sep) ||
-        !rel.endsWith('.json') ||
+        !ALLOWED.test(rel) ||
         !existsSync(file) ||
         !statSync(file).isFile()
       ) {
@@ -29,7 +32,10 @@ function handler(mounts: Record<string, string>) {
         res.end(JSON.stringify({ error: 'not found', path: url.pathname }));
         return;
       }
-      res.setHeader('content-type', 'application/json; charset=utf-8');
+      res.setHeader(
+        'content-type',
+        rel.endsWith('.json') ? 'application/json; charset=utf-8' : 'application/octet-stream',
+      );
       res.setHeader('cache-control', 'no-cache');
       createReadStream(file).pipe(res);
       return;
@@ -43,7 +49,11 @@ export function dataPlugin(): Plugin {
     REPO_ROOT,
     process.env['BATTLE_DRILL_DATA_DIR'] ?? 'data-cache/normalized',
   );
-  const mounts = { '/data': dataDir, '/fixture-data': resolve(REPO_ROOT, 'fixtures/normalized') };
+  const mounts = {
+    '/data': dataDir,
+    '/fixture-data': resolve(REPO_ROOT, 'fixtures/normalized'),
+    '/fixture-rosters': resolve(REPO_ROOT, 'fixtures/rosters'),
+  };
   return {
     name: 'battle-drill-data',
     configureServer(server) {

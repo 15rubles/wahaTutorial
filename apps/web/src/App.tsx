@@ -1,5 +1,7 @@
 import { DataGate } from './components/DataGate.js';
 import { useData } from './data/store.js';
+import { ArmyPage } from './pages/ArmyPage.js';
+import { ImportPage } from './pages/ImportPage.js';
 import { RulesPage } from './pages/RulesPage.js';
 import { href, useRoute } from './router.js';
 
@@ -8,6 +10,9 @@ function Home() {
     <section>
       <p>An interactive core rules tutorial that uses your own army.</p>
       <ul>
+        <li>
+          <a href={href('import')}>Import your army</a>
+        </li>
         <li>
           <a href={href('rules')}>Rules browser</a>
         </li>
@@ -44,6 +49,7 @@ export function App() {
           <a href={href()}>Battle Drill</a>
         </h1>
         <nav aria-label="Main">
+          <a href={href('army')}>Army</a>
           <a href={href('rules')}>Rules</a>
         </nav>
         <DataSourceBadge />
@@ -52,6 +58,14 @@ export function App() {
         {page === 'rules' ? (
           <DataGate>
             <RulesPage {...(rest[0] ? { selectedId: rest[0] } : {})} />
+          </DataGate>
+        ) : page === 'import' ? (
+          <DataGate>
+            <ImportPage />
+          </DataGate>
+        ) : page === 'army' ? (
+          <DataGate>
+            <ArmyPage />
           </DataGate>
         ) : (
           <Home />
