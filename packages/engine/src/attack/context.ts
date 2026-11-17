@@ -25,6 +25,8 @@ export interface AttackContext {
   readonly skillWorsened: number;
   /** Character model ids visible to the attackers (precision). */
   readonly visibleCharacterIds: readonly string[];
+  /** Unmodified hit rolls up to this value fail (1 normally; indirect fire raises it, 10.07). */
+  readonly hitFailsUpTo: number;
   /** Lethal hits: auto wound on a critical hit (true), or roll to wound to fish for criticals. */
   readonly lethalHitsAutoWound: 'always' | 'unless-better-on-critical-wound';
 }
@@ -49,6 +51,7 @@ export function defaultContext(
     woundModifier: 0,
     skillWorsened: 0,
     visibleCharacterIds: [],
+    hitFailsUpTo: 1,
     lethalHitsAutoWound: 'unless-better-on-critical-wound',
     ...overrides,
   };

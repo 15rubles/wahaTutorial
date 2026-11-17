@@ -156,6 +156,13 @@ function ShootingControls({ state, unit }: { state: GameState; unit: UnitState }
           </select>
         </label>
       )}
+      {current === 'indirect' && (
+        <p className="small" data-testid="indirect-hint">
+          Indirect shooting: indirect fire weapons may target units out of sight. Those attacks
+          always give the target cover, and an unmodified hit roll of 1-5 fails (1-3 if this unit
+          remained stationary and a friendly unit can see the target).
+        </p>
+      )}
       <table className="fire-table">
         <tbody>
           {weapons.map((w) => (

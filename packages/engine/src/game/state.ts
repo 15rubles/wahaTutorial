@@ -9,7 +9,7 @@ export type Phase =
   'deployment' | 'command' | 'movement' | 'shooting' | 'charge' | 'fight' | 'game-over';
 export type FightStep = 'pile-in' | 'fight' | 'consolidate';
 export type MoveType = 'stationary' | 'normal' | 'advance' | 'fall-back' | 'ingress';
-export type ShootingType = 'normal' | 'assault' | 'close-quarters';
+export type ShootingType = 'normal' | 'assault' | 'close-quarters' | 'indirect';
 
 /** Per unit flags that reset every turn (or phase, where noted). */
 export interface UnitStatus {

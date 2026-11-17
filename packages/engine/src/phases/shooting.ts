@@ -21,13 +21,16 @@ export const ruleRefs = [
   'core.shooting-phase.normal-shooting',
   'core.shooting-phase.assault-shooting',
   'core.shooting-phase.close-quarters-shooting',
+  'core.shooting-phase.indirect-shooting',
+  'core.core-abilities.indirect-fire',
+  'core.core-abilities.one-shot',
   'core.making-attacks.select-weapons',
   'core.making-attacks.select-targets',
 ];
 
 const isBig = (u: UnitState) => u.keywords.includes('MONSTER') || u.keywords.includes('VEHICLE');
 
-/** Shooting types the unit is eligible for (10.04 - 10.06). Indirect shooting is not simulated. */
+/** Shooting types the unit is eligible for (10.04 - 10.07). */
 export function eligibleShootingTypes(state: GameState, unitId: string): ShootingType[] {
   const unit = state.units[unitId];
   const st = state.status[unitId];
@@ -45,11 +48,14 @@ export function eligibleShootingTypes(state: GameState, unitId: string): Shootin
     (ranged.some((w) => weaponHasFlag(w, 'close-quarters')) || isBig(unit))
   )
     out.push('close-quarters');
+  if (!engaged && !advanced && ranged.some((w) => weaponHasFlag(w, 'indirect')))
+    out.push('indirect');
   return out;
 }
 
 export function weaponAllowed(unit: UnitState, weapon: Weapon, type: ShootingType): boolean {
   if (weapon.type !== 'ranged') return false;
+  if (weaponHasFlag(weapon, 'one-shot') && unit.spentWeapons?.includes(weapon.name)) return false;
   if (type === 'assault') return weaponHasFlag(weapon, 'assault');
   if (type === 'close-quarters' && !isBig(unit)) return weaponHasFlag(weapon, 'close-quarters');
   return true;
@@ -61,24 +67,31 @@ export interface ShooterGroup {
   readonly cover: boolean;
 }
 
+/** An indirect fire weapon used in indirect shooting may target units it cannot see (10.07). */
+const firesBlind = (weapon: Weapon, type: ShootingType | undefined) =>
+  type === 'indirect' && weaponHasFlag(weapon, 'indirect');
+
 /** Models that can fire `weapon` at `target`: visible and in range, grouped by half range and cover. */
 export function shooters(
   state: GameState,
   unit: UnitState,
   weapon: Weapon,
   target: UnitState,
+  type?: ShootingType,
 ): ShooterGroup[] {
   const groups = new Map<string, ShooterGroup>();
+  const blind = firesBlind(weapon, type);
   for (const m of aliveModels(unit)) {
     if (!m.weapons.includes(weapon.name) || !m.position) continue;
     const enemies = aliveModels(target).filter((t) => t.position);
     const visible = enemies.filter((t) => modelVisible(state.battlefield, m, t));
-    if (visible.length === 0) continue;
+    if (visible.length === 0 && !blind) continue;
     const range = weapon.range ?? 0;
     const nearest = Math.min(...enemies.map((t) => modelDistance(m, t)));
     if (!within(nearest, range)) continue;
     const halfRange = within(nearest, range / 2);
-    const cover = hasBenefitOfCover(state.battlefield, m, target);
+    // Indirect fire attacks always give the target the benefit of cover (10.07).
+    const cover = blind || hasBenefitOfCover(state.battlefield, m, target);
     const key = `${halfRange}:${cover}`;
     const g = groups.get(key) ?? { models: [], halfRange, cover };
     g.models.push(m);
@@ -112,10 +125,26 @@ export function checkTarget(
       m.position &&
       aliveModels(target).some((t) => modelVisible(state.battlefield, m, t)),
   );
-  if (!visibleAny) return err('NOT_VISIBLE', target.id);
-  if (shooters(state, unit, weapon, target).length === 0)
+  if (!visibleAny && !firesBlind(weapon, type)) return err('NOT_VISIBLE', target.id);
+  if (shooters(state, unit, weapon, target, type).length === 0)
     return err('OUT_OF_RANGE', `${weapon.name} -> ${target.id}`);
   return null;
+}
+
+/**
+ * Any model of a friendly unit (of the attacker's side) can see the target.
+ * RULES-QUESTION: RQ-8 the shooting unit itself counts as one of those friendly units here.
+ */
+function seenByFriends(state: GameState, attacker: UnitState, target: UnitState): boolean {
+  return Object.values(state.units).some(
+    (u) =>
+      u.player === attacker.player &&
+      aliveModels(u).some(
+        (m) =>
+          m.position &&
+          aliveModels(target).some((t) => t.position && modelVisible(state.battlefield, m, t)),
+      ),
+  );
 }
 
 export function shoot(
@@ -153,7 +182,8 @@ export function shoot(
       const target = next.units[targetId]!;
       if (aliveModels(target).length === 0) break;
       const weapon = attacker.weapons.find((w) => w.name === weaponName)!;
-      for (const group of shooters(next, attacker, weapon, target)) {
+      const indirect = firesBlind(weapon, type);
+      for (const group of shooters(next, attacker, weapon, target, type)) {
         // Close-quarters shooting by MONSTER / VEHICLE models: -1 to hit unless a close-quarters
         // weapon targets a unit it is engaged with (10.06).
         const cqPenalty =
@@ -167,6 +197,12 @@ export function shoot(
           withinHalfRange: group.halfRange,
           targetHasCover: group.cover,
           attackerBraced: braced,
+          // 10.07: unmodified 1-5 fail, or 1-3 when the unit stayed still and a friendly unit sees the target.
+          hitFailsUpTo: indirect
+            ? st.moved === 'stationary' && seenByFriends(next, attacker, target)
+              ? 3
+              : 5
+            : 1,
           attackerCharged: st.charged,
           visibleCharacterIds: aliveModels(target)
             .filter(
@@ -180,6 +216,14 @@ export function shoot(
         events.push(...(r.events as AttackEvent[]));
       }
     }
+  }
+  const spent = entries
+    .map(([w]) => unit.weapons.find((x) => x.name === w)!)
+    .filter((w) => weaponHasFlag(w, 'one-shot'))
+    .map((w) => w.name);
+  if (spent.length > 0) {
+    const u = next.units[unitId]!;
+    next = withUnit(next, { ...u, spentWeapons: [...(u.spentWeapons ?? []), ...spent] });
   }
   next = withStatus(next, unitId, { shot: true });
   events.unshift({ type: 'UnitShot', unitId, shootingType: type, targetIds: [...byTarget.keys()] });

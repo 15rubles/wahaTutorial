@@ -80,6 +80,15 @@ rules, then record the resolution here.
   is a support unit (`canAttach` in packages/roster/src/attachments.ts).
 - Status: open (simplification)
 
+### RQ-8: Indirect shooting spotter
+
+- Rule ref: `core.shooting-phase.indirect-shooting`
+- Question: the better hit roll needs the target to be visible to "one or more friendly units". It is
+  not clear whether the shooting unit itself counts.
+- Current interpretation: it counts (`seenByFriends` in phases/shooting.ts). Re-roll limits and the
+  "not eligible to start an action" part are not modelled (the engine has no hit re-rolls or actions).
+- Status: open
+
 ## Resolved
 
 None yet.

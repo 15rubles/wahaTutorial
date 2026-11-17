@@ -353,3 +353,15 @@ demands a placement that does not exist, but it can miss one (a curved path arou
 on the lenient side. A greedy helper (`chargePositions`) packs models into such spots; the AI and the
 UI charge buttons use it. Measured on the real cache: the AI completed the same number of charges with
 the check on as off.
+
+## D-045 Indirect shooting and one-shot weapons
+
+Both keywords were registered but their flags were not read anywhere, so they counted as simulated
+while doing nothing. Now: indirect shooting is a fourth shooting type (unengaged, did not advance,
+has an indirect fire weapon). Its indirect fire weapons may target units no model can see, those
+attacks always give the target cover, and unmodified hit rolls of 1-5 fail (1-3 when the unit remained
+stationary and a friendly unit sees the target), through a new `hitFailsUpTo` in the attack context.
+Other weapons still need visible targets. One-shot weapons are recorded on the unit
+(`spentWeapons`) when fired and cannot be selected again that battle. Every weapon ability still
+unsimulated in the real cache is one the core rules do not define (the most common is on 9 weapons);
+those stay marked "not simulated" on the datasheet.

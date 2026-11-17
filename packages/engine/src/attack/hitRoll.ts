@@ -64,7 +64,7 @@ export function rollHits(ctx: WeaponContext, dice: number, roller: Roller): HitR
     }
     const roll = roller.d6();
     let outcome: HitOutcome;
-    if (roll === 1) outcome = 'fail';
+    if (roll <= Math.max(1, ctx.hitFailsUpTo) && roll < p.criticalOn) outcome = 'fail';
     else if (roll >= p.criticalOn) outcome = 'critical';
     else outcome = modifiedRoll(roll, modifier) >= target! ? 'hit' : 'fail';
     rolls.push({ roll, outcome });

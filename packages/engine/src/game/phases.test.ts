@@ -276,6 +276,88 @@ describe('shooting', () => {
     );
     expect(s.log.length).toBeGreaterThan(r.events.length);
   });
+
+  const mortar = weapon({
+    name: 'Mortar',
+    range: 36,
+    attacks: flat(6),
+    skill: 3,
+    keywords: [{ id: 'indirect-fire' }, { id: 'one-shot' }],
+  });
+  const walledGame = (moveFirst: boolean) => {
+    const a = squad('a', 'p1', { x: 10, y: 8 });
+    const gunners = {
+      ...a,
+      weapons: [...a.weapons, mortar],
+      models: a.models.map((m) => ({ ...m, weapons: [...m.weapons, 'Mortar'] })),
+    };
+    const g = createGame({
+      seed: 1,
+      battlefield: {
+        ...trainingGround(),
+        terrain: [{ id: 'w', name: 'Wall', polygon: rect(0, 12, 44, 2), categories: ['dense'] }],
+      },
+      units: [gunners, squad('b', 'p2', { x: 10, y: 18 })],
+    });
+    let s = run(g, { type: 'endPhase' }, { type: 'endPhase' });
+    if (!moveFirst) s = run(s, { type: 'move', unitId: 'a', moveType: 'stationary' });
+    return run(s, { type: 'endPhase' });
+  };
+
+  it('indirect fire hits unseen targets, which always get cover; 1-5 fail without a spotter', () => {
+    const s = walledGame(false);
+    expectError(
+      s,
+      { type: 'shoot', unitId: 'a', shootingType: 'normal', targets: { Mortar: 'b' } },
+      'NOT_VISIBLE',
+    );
+    // Rifles cannot shoot blind even in indirect shooting.
+    expectError(
+      s,
+      { type: 'shoot', unitId: 'a', shootingType: 'indirect', targets: { Rifle: 'b' } },
+      'NOT_VISIBLE',
+    );
+    const r = apply(
+      s,
+      { type: 'shoot', unitId: 'a', shootingType: 'indirect', targets: { Mortar: 'b' } },
+      scriptedRoller(
+        [
+          5, 5, 5, 5, 5, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6,
+          6, 6, 6, 6, 6, 6,
+        ],
+        createRng(1),
+      ),
+    );
+    expect(r.ok).toBe(true);
+    if (!r.ok) return;
+    const hits = r.events.filter((e) => e.type === 'HitRolled');
+    const rolls = hits.flatMap((e) => (e.type === 'HitRolled' ? e.rolls : []));
+    // Fives fail; sixes hit.
+    expect(rolls.filter((x) => x.roll === 5).every((x) => x.outcome === 'fail')).toBe(true);
+    expect(rolls.filter((x) => x.roll === 6).every((x) => x.outcome === 'critical')).toBe(true);
+  });
+
+  it('one-shot weapons fire once per battle', () => {
+    const s = walledGame(false);
+    const r = apply(s, {
+      type: 'shoot',
+      unitId: 'a',
+      shootingType: 'indirect',
+      targets: { Mortar: 'b' },
+    });
+    expect(r.ok).toBe(true);
+    if (!r.ok) return;
+    expect(r.state.units['a']!.spentWeapons).toEqual(['Mortar']);
+    const again = {
+      ...r.state,
+      status: { ...r.state.status, a: { ...r.state.status['a']!, shot: false } },
+    };
+    expectError(
+      again,
+      { type: 'shoot', unitId: 'a', shootingType: 'indirect', targets: { Mortar: 'b' } },
+      'WEAPON_NOT_ALLOWED',
+    );
+  });
 });
 
 describe('charge and fight', () => {

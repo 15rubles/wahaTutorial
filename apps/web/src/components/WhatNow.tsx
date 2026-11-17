@@ -12,6 +12,7 @@ const SHOOT: Record<string, string> = {
   normal: 'shoot normally',
   assault: 'shoot its assault weapons',
   'close-quarters': 'shoot close-quarters weapons at enemies it is fighting',
+  indirect: 'use indirect shooting: indirect fire weapons can target units they cannot see',
 };
 
 export function describeOption(o: LegalOption, state: GameState): string {
