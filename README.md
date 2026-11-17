@@ -26,6 +26,9 @@ still starts and offers invented demo data.
 Behind a proxy that intercepts TLS, give the build its CA certificate:
 `docker build --secret id=ca,src=/path/to/ca.crt -t battle-drill .`
 
+If the container ever fails to start, it stops (no restart loop): read the log, then
+`docker compose down` and `docker compose up --build` again.
+
 To refresh the rules data, restart the container after a day, or wipe the volume:
 `docker compose down -v`.
 

@@ -291,3 +291,11 @@ plugin). The rules data is downloaded at container start into a named volume, ne
 image, so the image itself holds no GW content. Restarts make no requests thanks to the sync freshness
 window. If the sync fails the app still starts with demo data. The container runs as the `node` user.
 An optional `ca` build secret supports TLS-intercepting proxies.
+
+## D-039 Docker on Windows checkouts
+
+Git on Windows can check files out with CRLF, which turns the entrypoint's shebang into `/bin/sh\r`
+("exec docker/entrypoint.sh: no such file or directory"). Fixed three ways: `.gitattributes` forces
+LF (raw fixtures excluded, they keep their exact bytes), the image strips CR from the script, and the
+entrypoint runs through `sh` so the shebang is not used. Compose no longer restarts a failing
+container in a loop.
