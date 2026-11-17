@@ -1,0 +1,14 @@
+# One command: docker compose up --build   then open http://localhost:5173
+services:
+  battle-drill:
+    build: .
+    image: battle-drill
+    ports:
+      - '5173:5173'
+    volumes:
+      # Rules data stays in a named volume on your machine (GW content, never in the image or repo).
+      - rules-cache:/app/data-cache
+    restart: unless-stopped
+
+volumes:
+  rules-cache:
