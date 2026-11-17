@@ -401,3 +401,37 @@ describe('command phase', () => {
     ).toBe(false);
   });
 });
+
+describe('stratagems', () => {
+  it('spend CP once per phase per stratagem and per target unit', () => {
+    let s = started([squad('a', 'p1', { x: 10, y: 3 }), squad('b', 'p2', { x: 30, y: 27 })]);
+    expect(s.players.p1.cp).toBe(1);
+    expectError(
+      s,
+      { type: 'useStratagem', player: 'p1', stratagemId: 'x', cost: 2 },
+      'NOT_ENOUGH_CP',
+    );
+    s = run(s, {
+      type: 'useStratagem',
+      player: 'p1',
+      stratagemId: 'x',
+      cost: 1,
+      targetUnitId: 'a',
+    });
+    expect(s.players.p1.cp).toBe(0);
+    expectError(
+      s,
+      { type: 'useStratagem', player: 'p1', stratagemId: 'x', cost: 0 },
+      'STRATAGEM_USED',
+    );
+    expectError(
+      s,
+      { type: 'useStratagem', player: 'p1', stratagemId: 'y', cost: 0, targetUnitId: 'a' },
+      'STRATAGEM_USED',
+    );
+    s = run(s, { type: 'endPhase' });
+    expect(s.stratagemsThisPhase).toEqual([]);
+    s = run(s, { type: 'useStratagem', player: 'p1', stratagemId: 'x', cost: 0 });
+    expect(s.log.at(-1)).toMatchObject({ type: 'StratagemUsed', stratagemId: 'x', cpLeft: 0 });
+  });
+});

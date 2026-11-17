@@ -28,7 +28,13 @@ type Step = { state: GameState; events: GameEvent[] };
 const ORDER: Phase[] = ['command', 'movement', 'shooting', 'charge', 'fight'];
 
 function enterPhase(state: GameState, phase: Phase, roller: Roller): Step {
-  let next: GameState = { ...state, phase, fightStep: null, fightSelector: null };
+  let next: GameState = {
+    ...state,
+    phase,
+    fightStep: null,
+    fightSelector: null,
+    stratagemsThisPhase: [],
+  };
   const events: GameEvent[] = [{ type: 'PhaseStarted', phase, player: state.activePlayer }];
   if (phase === 'command') {
     const cp = gainCoreCp(next);

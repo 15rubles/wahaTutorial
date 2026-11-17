@@ -25,6 +25,7 @@ import * as fight from './phases/fight.js';
 import * as movement from './phases/movement.js';
 import * as objectives from './phases/objectives.js';
 import * as shooting from './phases/shooting.js';
+import * as stratagems from './phases/stratagems.js';
 import * as validateMove from './phases/validateMove.js';
 
 const modules: Record<string, { ruleRefs: readonly string[] }> = {
@@ -53,6 +54,7 @@ const modules: Record<string, { ruleRefs: readonly string[] }> = {
   movement,
   objectives,
   shooting,
+  stratagems,
   validateMove,
 };
 

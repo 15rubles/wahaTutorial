@@ -118,6 +118,14 @@ export type GameEvent =
       readonly total: number;
     }
   | { readonly type: 'UnitDestroyed'; readonly unitId: string }
+  | {
+      readonly type: 'StratagemUsed';
+      readonly player: PlayerId;
+      readonly stratagemId: string;
+      readonly unitId: string | null;
+      readonly cost: number;
+      readonly cpLeft: number;
+    }
   | { readonly type: 'GameEnded'; readonly winner: PlayerId | null };
 
 export interface GameState {
@@ -136,6 +144,12 @@ export interface GameState {
   /** Fight step: whose turn it is to select a unit (12.04). */
   readonly fightSelector: PlayerId | null;
   readonly objectiveControl: Readonly<Record<string, PlayerId | null>>;
+  /** Stratagems used in the current phase (15.01 restrictions). */
+  readonly stratagemsThisPhase: readonly {
+    readonly player: PlayerId;
+    readonly stratagemId: string;
+    readonly unitId: string | null;
+  }[];
   /** Everything that happened, in order. */
   readonly log: readonly GameEvent[];
 }
@@ -174,6 +188,7 @@ export function createGame(options: NewGameOptions): GameState {
     fightStep: null,
     fightSelector: null,
     objectiveControl: Object.fromEntries(options.battlefield.objectives.map((o) => [o.id, null])),
+    stratagemsThisPhase: [],
     log: [],
   };
 }

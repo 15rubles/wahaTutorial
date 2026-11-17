@@ -5,6 +5,7 @@ import { deploy } from '../phases/deployment.js';
 import { consolidate, fight, pileIn } from '../phases/fight.js';
 import { advanceRoll, move } from '../phases/movement.js';
 import { shoot } from '../phases/shooting.js';
+import { useStratagem } from '../phases/stratagems.js';
 import { aliveModels } from '../types.js';
 import type { GameAction } from './actions.js';
 import { type RuleError, err } from './errors.js';
@@ -32,6 +33,8 @@ function check(state: GameState, action: GameAction): RuleError | null {
   if (state.phase === 'game-over') return err('GAME_OVER');
   const phase = PHASE_OF[action.type];
   if (phase && phase !== state.phase) return err('WRONG_PHASE', `${action.type} in ${state.phase}`);
+  if (action.type === 'useStratagem')
+    return state.phase === 'deployment' ? err('WRONG_PHASE', 'stratagems during deployment') : null;
   if (!('unitId' in action)) return null;
   const unit = state.units[action.unitId];
   if (!unit) return err('UNKNOWN_UNIT', action.unitId);
@@ -83,6 +86,14 @@ function dispatch(
       );
     case 'consolidate':
       return consolidate(state, action.unitId, action.positions);
+    case 'useStratagem':
+      return useStratagem(
+        state,
+        action.player,
+        action.stratagemId,
+        action.cost,
+        action.targetUnitId,
+      );
   }
 }
 

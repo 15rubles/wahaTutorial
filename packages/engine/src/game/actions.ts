@@ -37,6 +37,14 @@ export type GameAction =
       /** Overrun fight only: the additional pile-in move made before fighting. */
       readonly pileInPositions?: readonly Point[];
     }
-  | { readonly type: 'consolidate'; readonly unitId: string; readonly positions: readonly Point[] };
+  | { readonly type: 'consolidate'; readonly unitId: string; readonly positions: readonly Point[] }
+  | {
+      readonly type: 'useStratagem';
+      readonly player: 'p1' | 'p2';
+      readonly stratagemId: string;
+      /** CP cost from the stratagem's data. */
+      readonly cost: number;
+      readonly targetUnitId?: string;
+    };
 
 export type ActionType = GameAction['type'];
