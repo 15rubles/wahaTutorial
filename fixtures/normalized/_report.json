@@ -18,8 +18,16 @@
     "unresolvedKeywords": 6
   },
   "errors": [],
-  "warnings": [],
+  "warnings": [
+    {
+      "file": "rules-appendix.html",
+      "line": 0,
+      "category": "missing-file",
+      "message": "rules appendix not in raw cache; sub-rules come from tooltips only"
+    }
+  ],
   "explanations": {
+    "missing-file": "An expected file is not in the raw cache. Run npm run data:sync.",
     "unresolved-keyword": "unresolvedKeywords lists every keyword that is not a faction or unit name keyword and has no matching core rules section (faction specific weapon rules, unit types such as Infantry that the core rules use without a dedicated section)."
   },
   "unresolvedKeywords": [
