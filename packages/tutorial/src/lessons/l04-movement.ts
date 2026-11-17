@@ -21,7 +21,7 @@ export const movementLesson: Lesson = {
     {
       id: 'normal',
       ruleRefs: ['core.movement-phase.normal-move', 'core.moving.moving-units'],
-      say: 'Pick Normal move and drag your {fast} forward. It can go up to its M characteristic and cannot end within 2" of an enemy. Then confirm.',
+      say: 'Pick Normal move and drag your {fast} forward. It can go up to its M characteristic ({fast.move}) and cannot end within 2" of an enemy. Then confirm.',
       focus: [
         { kind: 'unit', role: 'fast' },
         { kind: 'element', id: 'action-panel' },

@@ -34,7 +34,7 @@ export const attachedLesson: Lesson = {
     {
       id: 'fire',
       ruleRefs: ['core.shooting-phase.normal-shooting'],
-      say: 'Every model fires its own weapons, the leader included (for example {leader.rangedWeapon}). Press Fire.',
+      say: 'Every model fires its own weapons, so the leader adds its {leader.leaderWeapon}. Press Fire.',
       focus: [{ kind: 'element', id: 'action-panel' }],
       allow: ['shoot'],
       expect: {

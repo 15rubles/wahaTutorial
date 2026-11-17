@@ -23,6 +23,11 @@ export function unitFacts(role: string, unit: UnitState): Record<string, string>
   const parts = unit.components ?? [];
   const leaders = parts.filter((c) => c.role === 'leader').map((c) => c.name);
   const bodyguard = parts.find((c) => c.role === 'bodyguard')?.name;
+  const leaderModels = unit.models.filter((m) => m.attachedRole === 'leader');
+  const leaderWeapon =
+    unit.weapons.find(
+      (w) => w.type === 'ranged' && leaderModels.some((m) => m.weapons.includes(w.name)),
+    ) ?? unit.weapons.find((w) => leaderModels.some((m) => m.weapons.includes(w.name)));
   const leaderToughness = unit.models.find((m) => m.attachedRole === 'leader')?.toughness;
   const bodyguardToughness = unit.models.find((m) => m.attachedRole === 'bodyguard')?.toughness;
   const f: Record<string, string> = {
@@ -35,6 +40,7 @@ export function unitFacts(role: string, unit: UnitState): Record<string, string>
     models: String(aliveModels(unit).length),
     leaderName: leaders.join(' and ') || unit.name,
     bodyguard: bodyguard ?? unit.name,
+    leaderWeapon: leaderWeapon?.name ?? ranged?.name ?? melee?.name ?? 'its weapons',
     leaderToughness: String(leaderToughness ?? first?.toughness ?? '?'),
     bodyguardToughness: String(bodyguardToughness ?? first?.toughness ?? '?'),
     arrival: hasDeepStrike(unit)

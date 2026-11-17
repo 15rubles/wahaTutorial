@@ -34,7 +34,7 @@ export const meleeLesson: Lesson = {
     {
       id: 'fight',
       ruleRefs: ['core.fight-phase.fight-step', 'core.making-attacks.select-weapons'],
-      say: 'It is your turn, so you pick the first unit to fight. Select your {character} and press Fight.',
+      say: 'It is your turn, so you pick the first unit to fight. Select your {character} and press Fight. It attacks with its {character.meleeWeapon}.',
       focus: [
         { kind: 'unit', role: 'character' },
         { kind: 'element', id: 'action-panel' },

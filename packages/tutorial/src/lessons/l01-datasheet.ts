@@ -25,19 +25,19 @@ export const datasheetLesson: Lesson = {
     {
       id: 'profile',
       ruleRefs: ['core.datasheets.profiles'],
-      say: 'The profile row: M is how far it moves, T how hard it is to wound, Sv its armour save, W how much damage each model takes, Ld its nerve, OC how well it holds objectives. A number with ++ is an invulnerable save.',
+      say: 'The profile row: M is how far it moves, T how hard it is to wound, Sv its armour save, W how much damage each model takes, Ld its nerve, OC how well it holds objectives. A number with ++ is an invulnerable save. Your {shooter} has T{shooter.toughness} and a {shooter.save} save.',
       focus: [{ kind: 'element', id: 'profile-table' }],
     },
     {
       id: 'weapons',
       ruleRefs: ['core.datasheets.weapons'],
-      say: 'Each weapon has a range (or Melee), A for how many attacks, BS or WS for the roll needed to hit, S for strength, AP for how much it cuts armour, and D for damage.',
+      say: 'Each weapon has a range (or Melee), A for how many attacks, BS or WS for the roll needed to hit, S for strength, AP for how much it cuts armour, and D for damage. Find the {shooter.rangedWeapon} in the table.',
       focus: [{ kind: 'element', id: 'weapon-table' }],
     },
     {
       id: 'weapon-keywords',
       ruleRefs: ['core.core-abilities'],
-      say: 'The small chips under a weapon are its abilities. Tap one to read its rule (if your {shooter} has any), then press Next.',
+      say: 'The small chips under a weapon are its abilities. Tap one to read its rule, then press Next. Abilities on your {shooter}: {shooter.weaponAbilities}.',
       focus: [
         { kind: 'element', id: 'weapon-table' },
         { kind: 'element', id: 'rule-popup' },

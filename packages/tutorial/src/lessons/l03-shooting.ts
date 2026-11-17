@@ -50,7 +50,7 @@ export const shootingLesson: Lesson = {
     {
       id: 'keywords',
       ruleRefs: ['core.core-abilities'],
-      say: 'Weapon abilities change the attack: extra dice up close, automatic hits, extra damage and more. Tap them on the datasheet any time.',
+      say: 'Weapon abilities change the attack: extra dice up close, automatic hits, extra damage and more. Your {shooter} has: {shooter.weaponAbilities}. Tap them on the datasheet any time.',
       focus: [{ kind: 'element', id: 'unit-card' }],
     },
   ],
