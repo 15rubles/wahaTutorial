@@ -19,7 +19,7 @@ export const graduationLesson: Lesson = {
     {
       id: 'play',
       ruleRefs: [],
-      say: 'Free play. Select a unit to see what it can do. Finish both battle rounds.',
+      say: 'Free play. Select a unit and press "What can I do now?" for a hint. Finish both battle rounds.',
       free: true,
       expect: { kind: 'event', event: 'GameEnded' },
     },

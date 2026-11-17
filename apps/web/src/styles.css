@@ -9,6 +9,8 @@
   --accent-2: #e69f00;
   --good: #009e73;
   --bad: #d55e00;
+  /* Darker vermillion for text, for contrast on light panels. */
+  --bad-text: #9e3f00;
   font-family: system-ui, sans-serif;
 }
 
@@ -20,6 +22,7 @@
     --muted: #9a9387;
     --line: #3a362d;
     --accent: #56b4e9;
+    --bad-text: #ff9a5c;
   }
 }
 
@@ -257,11 +260,11 @@ textarea {
 }
 
 .error {
-  color: var(--bad);
+  color: var(--bad-text);
 }
 
 .warn {
-  color: var(--bad);
+  color: var(--bad-text);
 }
 
 .army-head {
@@ -400,6 +403,13 @@ button[aria-pressed='true'] {
   fill: var(--board);
   stroke: var(--line);
   stroke-width: 0.1;
+}
+
+.battlefield .zone,
+.battlefield .terrain,
+.battlefield .terrain-label,
+.battlefield .objective-range {
+  pointer-events: none;
 }
 
 .battlefield .zone {
@@ -799,4 +809,49 @@ a.button.primary {
 
 .army-rules h4 {
   margin: 0.75rem 0 0.25rem;
+}
+
+.banner {
+  background: var(--accent-2);
+  color: #000;
+  padding: 0.5rem 0.75rem;
+  border-radius: 6px;
+}
+
+.quick-ref {
+  margin: 0 0 0 auto;
+  height: 100vh;
+  max-height: 100vh;
+  width: min(36rem, 100vw);
+  border: none;
+  border-left: 1px solid var(--line);
+  background: var(--panel);
+  color: var(--fg);
+}
+
+.quick-ref header {
+  display: flex;
+  gap: 0.5rem;
+  position: sticky;
+  top: 0;
+  background: var(--panel);
+  padding-bottom: 0.5rem;
+}
+
+.quick-ref header input {
+  flex: 1;
+}
+
+.quick-ref::backdrop {
+  background: rgb(0 0 0 / 0.3);
+}
+
+.quick-ref .search-results {
+  list-style: none;
+  padding: 0;
+}
+
+.what-now ul {
+  margin: 0.25rem 0 0.5rem;
+  padding-left: 1.2rem;
 }

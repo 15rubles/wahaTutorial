@@ -1,4 +1,6 @@
 import { DataGate } from './components/DataGate.js';
+import { QuickReference } from './components/QuickReference.js';
+import { cacheAgeDays, isStale } from './data/freshness.js';
 import { RulePopup } from './components/RulePopup.js';
 import { useData } from './data/store.js';
 import { ArmyPage } from './pages/ArmyPage.js';
@@ -50,6 +52,18 @@ function DataSourceBadge() {
   );
 }
 
+function FreshnessBanner() {
+  const meta = useData((s) => s.meta);
+  const age = cacheAgeDays(meta, Date.now());
+  if (!isStale(age)) return null;
+  return (
+    <p className="banner" role="status" data-testid="freshness-banner">
+      Your rules cache is {age} days old. Run <code>npm run data:sync</code> and{' '}
+      <code>npm run data:build</code> to update it.
+    </p>
+  );
+}
+
 export function App() {
   const [page, ...rest] = useRoute();
   return (
@@ -64,8 +78,10 @@ export function App() {
           <a href={href('sandbox')}>Sandbox</a>
           <a href={href('rules')}>Rules</a>
         </nav>
+        <QuickReference />
         <DataSourceBadge />
       </header>
+      <FreshnessBanner />
       <main>
         {page === 'rules' ? (
           <DataGate>

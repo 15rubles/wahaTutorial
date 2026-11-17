@@ -24,6 +24,7 @@ import {
 import { useState } from 'react';
 import { ERROR_TEXT } from '../game/messages.js';
 import { useGame } from '../game/store.js';
+import { WhatNow } from './WhatNow.js';
 
 const enemies = (state: GameState, unit: UnitState) =>
   Object.values(state.units).filter(
@@ -411,6 +412,7 @@ export function ActionPanel({ state }: { state: GameState }) {
       {unit && yours && aliveModels(unit).length > 0 && (
         <>
           <h4>{unit.name}</h4>
+          <WhatNow state={state} unitId={unit.id} />
           {state.phase === 'command' && (
             <p className="small">
               Command phase: both players gained 1 CP. Battle-shock tests happen here.

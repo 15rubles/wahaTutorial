@@ -27,6 +27,8 @@ interface Props {
   rings: readonly { radius: number; label: string }[];
   onUnitClick: (unitId: string) => void;
   onBackgroundClick?: () => void;
+  /** Enter on the selected unit with a pending move. */
+  onConfirm?: () => void;
   highlightUnitIds?: readonly string[];
 }
 
@@ -43,6 +45,7 @@ export function Battlefield({
   rings,
   onUnitClick,
   onBackgroundClick,
+  onConfirm,
   highlightUnitIds = [],
 }: Props) {
   const svgRef = useRef<SVGSVGElement>(null);
@@ -106,7 +109,7 @@ export function Battlefield({
       ref={svgRef}
       className="battlefield"
       viewBox={`-0.5 -0.5 ${width + 1} ${height + 1}`}
-      role="img"
+      role="group"
       aria-label={`Battlefield ${width} by ${height} inches`}
       data-tutorial-id="battlefield"
       data-testid="battlefield"
@@ -210,6 +213,48 @@ export function Battlefield({
               onUnitClick(u.id);
             }}
             onKeyDown={(e) => {
+              // Keyboard moves: arrows nudge the selected unit 1" (within the move's limit),
+              // Enter confirms, Escape cancels.
+              const arrows: Record<string, Point> = {
+                ArrowUp: { x: 0, y: -1 },
+                ArrowDown: { x: 0, y: 1 },
+                ArrowLeft: { x: -1, y: 0 },
+                ArrowRight: { x: 1, y: 0 },
+              };
+              const step = arrows[e.key];
+              if (step && isSel && dragLimit !== null) {
+                e.preventDefault();
+                const base = aliveModels(u);
+                const current =
+                  pending && pending.unitId === u.id
+                    ? pending.positions
+                    : base.map((m) => m.position!);
+                const offset = {
+                  x: current[0]!.x - base[0]!.position!.x + step.x,
+                  y: current[0]!.y - base[0]!.position!.y + step.y,
+                };
+                const len = Math.hypot(offset.x, offset.y);
+                const k = len > dragLimit ? dragLimit / len : 1;
+                setPending({
+                  unitId: u.id,
+                  positions: base.map((m) => ({
+                    x: m.position!.x + offset.x * k,
+                    y: m.position!.y + offset.y * k,
+                  })),
+                });
+                return;
+              }
+              if (e.key === 'Escape') {
+                e.preventDefault();
+                if (pending) setPending(null);
+                else onBackgroundClick?.();
+                return;
+              }
+              if (e.key === 'Enter' && isSel && pending && pending.unitId === u.id && onConfirm) {
+                e.preventDefault();
+                onConfirm();
+                return;
+              }
               if (e.key === 'Enter' || e.key === ' ') {
                 e.preventDefault();
                 onUnitClick(u.id);

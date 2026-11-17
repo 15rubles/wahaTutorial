@@ -52,7 +52,7 @@ export function describeEvent(e: GameEvent, state: GameState): string | null {
 /** Phase bar, battlefield, controls, dice and unit card: shared by the sandbox and lessons. */
 export function GameView({ state, extra }: { state: GameState; extra?: ReactNode }) {
   const { datasheets } = useData();
-  const { selectedUnitId, select, lastEvents, dragMode } = useGame();
+  const { selectedUnitId, select, lastEvents, dragMode, pending, act } = useGame();
   const selected = selectedUnitId ? state.units[selectedUnitId] : undefined;
   const dragLimit = useMemo(() => {
     if (
@@ -92,6 +92,15 @@ export function GameView({ state, extra }: { state: GameState; extra?: ReactNode
             rings={rings}
             onUnitClick={(id) => select(id)}
             onBackgroundClick={() => select(null)}
+            onConfirm={() =>
+              pending &&
+              act({
+                type: 'move',
+                unitId: pending.unitId,
+                moveType: dragMode,
+                positions: pending.positions,
+              })
+            }
           />
           <p className="small muted legend">
             <span className="swatch p1" /> your units <span className="swatch p2" /> opponent.
