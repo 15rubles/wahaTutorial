@@ -180,3 +180,35 @@ overridden later through the attack context:
 `packages/engine` imports types (no runtime code) from `@battle-drill/data` to map datasheets to
 units. Keyword behaviour is a registry of modules, one per keyword, each exporting `ruleRefs`.
 Keywords the engine does not simulate are reported by `unimplementedKeywords()` so the UI can say so.
+
+## D-028 (M6) Engine API
+
+One entry point: `apply(state, action) -> { ok, state, events } | { ok: false, error }`. Errors are
+codes (`TOO_FAR`, `NOT_VISIBLE`...) that the tutorial turns into hints. Dice come from `state.rng`, or
+from a scripted roller passed in (tutorials). History is `{ initial, actions }`; undo replays all but
+the last action. The game log lives in the state.
+
+## D-029 (M6) Battlefield simplifications
+
+- Flat 2D board in inches; models are circles; vertical distances are ignored.
+- Moves are straight lines from start to end per model (rotation is free); the path is checked for
+  enemy bases and for dense terrain.
+- Dense terrain: INFANTRY / BEASTS / SWARM / MOBILE models may cross it; other models may not (there
+  are no heights, so every dense feature is treated as taller than 2").
+- Line of sight: 25 lines between the centre and four edge points of each base. Obscuring areas
+  (light or dense) block unless one of the two models is inside. Models never block line of sight
+  (`MODELS_BLOCK_LOS = false`). Solid, Hidden, Plunging Fire and FRAME are not simulated.
+- Not simulated yet: strategic reserves, transports, attached units, aircraft, indirect shooting,
+  stratagems (M9 adds the stratagem layer for lessons), actions, secured objectives.
+
+## D-030 (M6) Training mission
+
+Missions are GW content, so games use an invented "Training Drill": 5 battle rounds, the first player
+fixed, VP equal to 5 per objective you control at the end of your turn. The training ground board
+(44" x 30", three objectives, a ruin, low walls, craters) is invented too.
+
+## D-031 (M6) Scripted opponent lives in the engine
+
+`nextAiAction(state, player)` is pure and deterministic. It proposes candidate actions in a fixed order
+and returns the first one `apply` accepts, so it can never break the rules. It drives the M6 acceptance
+test (both sides) and will be the M9 opponent.

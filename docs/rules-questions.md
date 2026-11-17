@@ -44,6 +44,23 @@ rules, then record the resolution here.
 - Current interpretation: 3 mortal wounds per failed roll if the unit has MONSTER or VEHICLE.
 - Status: open
 
+### RQ-4: Charge move "must end within 1" / engaged if it can"
+
+- Rule ref: `core.charge-phase.charge-move`
+- Question: enforcing "each model that can end within 1" of a charge target must do so" needs a search
+  over all legal placements.
+- Current interpretation: not enforced. The engine enforces closer-to-target, engaged with every
+  target and not engaged with other units. The UI's charge helper always ends models as close as it can.
+- Status: open (simplification)
+
+### RQ-5: Selecting the next fighter after the Fights First units are used up
+
+- Rule ref: `core.fight-phase.fight-step`
+- Question: "starting with the player who just moved this sequence onto this step" is modelled as
+  "the player after the one who fought last".
+- Current interpretation: `nextFightSelector()` alternates; a player with no eligible unit passes.
+- Status: open
+
 ## Resolved
 
 None yet.

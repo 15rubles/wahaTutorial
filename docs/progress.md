@@ -85,9 +85,18 @@ enhancement tags, and a detachment picker. Unknown units show up in "Fix me".
 allocation groups, and devastating wounds hitting one model at most. The rules appendix is now
 synced and merged into the rules browser (390 sections).
 
-## M6 - Engine: battlefield and phases
+## M6 - Engine: battlefield and phases - DONE
 
-- [ ] Accept: scripted game between two invented armies runs to end of battle round 1 deterministically
+- [x] Battlefield: inches, circular bases, terrain polygons with categories, objectives, deployment zones
+- [x] Measuring (edge to edge), 2" engagement, coherency, 2D line of sight with obscuring terrain, benefit of cover
+- [x] Battle round, turn and phase state machine following the cached structure (07 to 12), including the 11th edition fight phase steps (pile in, fight, consolidate)
+- [x] Actions: deploy, remain stationary, normal / advance / fall-back moves (desperate escape), four shooting checks, charge declare / move, pile in, normal and overrun fights, consolidation; Core CP, battle-shock, objective control, training scoring
+- [x] Undo and replay from the action log
+- [x] Every engine `ruleRefs` id (106) exists in the real cache
+- [x] Accept: two invented armies, both played by the scripted AI, go from deployment to the end of battle round 1 in a test; same seed gives an identical game (state and action log), replay and undo reproduce it
+
+**Demo:** engine only (`npx vitest run --project engine`). The acceptance test plays a full first
+battle round between the Rust Pilgrims and the Glass Choir on the invented training ground.
 
 ## M7 - Web UI: playable sandbox
 
