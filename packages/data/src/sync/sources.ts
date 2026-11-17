@@ -45,10 +45,18 @@ export function coreRulesSource(origin = WAHAPEDIA_ORIGIN): SourceFile {
   return { key: 'core-rules.html', url: `${origin}${EDITION_PATH}/the-rules/core-rules/` };
 }
 
+export function rulesAppendixSource(origin = WAHAPEDIA_ORIGIN): SourceFile {
+  return { key: 'rules-appendix.html', url: `${origin}${EDITION_PATH}/the-rules/rules-appendix/` };
+}
+
 export function robotsSource(origin = WAHAPEDIA_ORIGIN): SourceFile {
   return { key: 'robots.txt', url: `${origin}/robots.txt` };
 }
 
 export function allContentSources(origin = WAHAPEDIA_ORIGIN): SourceFile[] {
-  return [...CSV_FILES.map((f) => csvSource(f, origin)), coreRulesSource(origin)];
+  return [
+    ...CSV_FILES.map((f) => csvSource(f, origin)),
+    coreRulesSource(origin),
+    rulesAppendixSource(origin),
+  ];
 }

@@ -123,8 +123,8 @@ function findMarkers(html: string): Marker[] {
 
 function cleanBody(
   html: string,
-  opts: { pageUrl: string; origin: string },
-  anchorHref: (a: string) => string,
+  origin: string,
+  linkTarget: (path: string, anchor: string) => string | undefined,
 ): string {
   // No wrapper element: fragments start with stray closing tags that would close a wrapper early.
   const top: HTMLElement = parse(html, { comment: false });
@@ -162,7 +162,7 @@ function cleanBody(
     }
     let url: URL;
     try {
-      url = new URL(href, opts.origin);
+      url = new URL(href, origin);
     } catch {
       el.replaceWith(el.innerHTML);
       return;
@@ -172,9 +172,10 @@ function cleanBody(
       el.replaceWith(el.innerHTML);
       return;
     }
-    const page = new URL(opts.pageUrl);
-    if (url.pathname === page.pathname && url.hash)
-      el.setAttribute('href', anchorHref(decodeURIComponent(url.hash.slice(1))));
+    const target = url.hash
+      ? linkTarget(url.pathname, decodeURIComponent(url.hash.slice(1)))
+      : undefined;
+    if (target) el.setAttribute('href', `#rule:${target}`);
     else {
       el.setAttribute('href', url.toString());
       el.setAttribute('target', '_blank');
@@ -189,23 +190,67 @@ function cleanBody(
   return top.innerHTML.replace(/(<br\s*\/?>\s*){3,}/g, '<br><br>').trim();
 }
 
-export function parseCoreRules(html: string, options: ParseCoreRulesOptions): CoreRules {
-  const origin = options.origin ?? new URL(options.pageUrl).origin;
+export interface RulesPage {
+  readonly html: string;
+  readonly pageUrl: string;
+}
+
+interface PageParts {
+  region: string;
+  markers: Marker[];
+  glossary: { code: string; title: string; html: string; href: string }[];
+}
+
+function pageParts(html: string): PageParts {
   const startIdx = html.search(/class="page_header"/);
   const fromStart = startIdx >= 0 ? html.slice(html.lastIndexOf('<', startIdx)) : html;
   // Main content ends where the site footer / login template begins.
   const endIdx = fromStart.indexOf('<!--noindex-->');
-  let region = endIdx >= 0 ? fromStart.slice(0, endIdx) : fromStart;
-  // Drop tooltip templates up front: they repeat ability boxes and would create false markers.
-  const pre = parse(region, { comment: false });
+  const content = endIdx >= 0 ? fromStart.slice(0, endIdx) : fromStart;
+  // Tooltip templates hold a glossary of numbered sub-rules ("01.05.03 Modifying Dice Rolls"). They
+  // sit at the end of the page, outside the content region.
+  const glossary: PageParts['glossary'] = [];
+  for (const tip of parse(fromStart, { comment: false }).querySelectorAll(
+    '.tooltip_templates > span',
+  )) {
+    const header = tip.querySelector('.tooltip_header');
+    const m = /^(\d\d(?:\.\d\d)+)\s+(.+)$/.exec(header?.textContent.trim() ?? '');
+    if (!header || !m) continue;
+    const href = tip.querySelector('a')?.getAttribute('href') ?? '';
+    header.remove();
+    tip
+      .querySelectorAll('.tooltip_link')
+      .forEach((el) => (el.parentNode?.tagName === 'A' ? el.parentNode.remove() : el.remove()));
+    glossary.push({ code: m[1]!, title: cleanTitle(m[2]!), html: tip.innerHTML, href });
+  }
+  // Drop templates inside the content too: they repeat ability boxes and would create false markers.
+  const pre = parse(content, { comment: false });
   pre.querySelectorAll('.tooltip_templates, script, style').forEach((el) => el.remove());
-  region = pre.toString();
+  const region = pre.toString();
+  return { region, markers: findMarkers(region), glossary };
+}
 
-  const markers = findMarkers(region);
+/**
+ * Parses the core rules page plus optional extra pages (the rules appendix). The first page gives the
+ * structure. Extra pages contribute coded sections that the first page lacks, attached by code, with
+ * their uncoded sub-headings. Glossary tooltips fill any code still missing.
+ */
+export function parseCoreRules(
+  html: string,
+  options: ParseCoreRulesOptions,
+  extraPages: readonly RulesPage[] = [],
+): CoreRules {
+  const origin = options.origin ?? new URL(options.pageUrl).origin;
+  const pages = [{ html, pageUrl: options.pageUrl }, ...extraPages].map((pg) => ({
+    ...pg,
+    path: new URL(pg.pageUrl).pathname,
+    ...pageParts(pg.html),
+  }));
+
   const anchors: Record<string, string> = {};
+  const pageAnchors = new Map<string, Record<string, string>>(pages.map((pg) => [pg.path, {}]));
   const codes: Record<string, string> = {};
   const usedIds = new Set<string>();
-
   const makeId = (path: string[], code: string): string => {
     let id = ['core', ...path].join('.');
     if (usedIds.has(id) && code) id = `${id}-${code.replace(/\./g, '-')}`;
@@ -216,54 +261,118 @@ export function parseCoreRules(html: string, options: ParseCoreRulesOptions): Co
     return id;
   };
 
-  // Pass 1: one node per marker, remembering its group and the previous coded node.
   interface Pending {
     node: RuleSection;
     raw: string;
     slug: string;
+    page: string;
     group: Pending | undefined;
     prevCoded: Pending | undefined;
   }
   const pending: Pending[] = [];
   const byCode = new Map<string, Pending>();
-  let group: Pending | undefined;
-  let prevCoded: Pending | undefined;
-  markers.forEach((mk, i) => {
-    const raw = region.slice(mk.end, markers[i + 1]?.start ?? region.length);
-    const code = mk.codes[0] ?? '';
-    const slug = slugify(mk.title) || slugify(mk.anchor) || 'section';
-    const node: RuleSection = {
-      id: '',
-      number: code,
-      title: mk.title,
-      kind: mk.kind,
-      html: '',
-      text: '',
-      anchor: mk.anchor || slug,
-      sourceUrl: `${options.pageUrl}${mk.anchor ? `#${mk.anchor}` : ''}`,
-      keywords: mk.kind === 'ability' ? [slug] : [],
-      children: [],
-    };
-    const p: Pending = {
-      node,
-      raw,
-      slug,
-      group: mk.kind === 'group' ? undefined : group,
-      prevCoded,
-    };
-    pending.push(p);
-    if (mk.kind === 'group') {
-      group = p;
-      prevCoded = undefined;
-    } else if (code) {
-      byCode.set(code, p);
-      prevCoded = p;
-    }
+  const newNode = (
+    fields: Pick<RuleSection, 'number' | 'title' | 'kind' | 'anchor' | 'sourceUrl'>,
+    slug: string,
+  ): RuleSection => ({
+    id: '',
+    html: '',
+    text: '',
+    keywords: fields.kind === 'ability' ? [slug] : [],
+    children: [],
+    ...fields,
   });
 
-  // Pass 2: parents. Coded nodes hang under the longest existing code prefix, wherever it is in the
-  // page (some boxes appear before their parent section). Uncoded headings hang under the previous
-  // coded node. Everything else goes under its group.
+  // Pass 1: one node per marker, remembering its group and the previous coded node.
+  pages.forEach((pg, pageIndex) => {
+    let group: Pending | undefined;
+    let prevCoded: Pending | undefined;
+    let skipping = false;
+    pg.markers.forEach((mk, i) => {
+      const raw = pg.region.slice(mk.end, pg.markers[i + 1]?.start ?? pg.region.length);
+      const code = mk.codes[0] ?? '';
+      const slug = slugify(mk.title) || slugify(mk.anchor) || 'section';
+      if (pageIndex > 0) {
+        // Extra pages: only new codes and the uncoded headings under them.
+        if (mk.kind === 'group') return;
+        if (code) {
+          skipping = byCode.has(code);
+          if (skipping) return;
+        } else if (skipping || !prevCoded) return;
+      }
+      const node = newNode(
+        {
+          number: code,
+          title: mk.title,
+          kind: mk.kind,
+          anchor: mk.anchor || slug,
+          sourceUrl: `${pg.pageUrl}${mk.anchor ? `#${mk.anchor}` : ''}`,
+        },
+        slug,
+      );
+      const p: Pending = {
+        node,
+        raw,
+        slug,
+        page: pg.path,
+        group: mk.kind === 'group' ? undefined : group,
+        prevCoded,
+      };
+      pending.push(p);
+      if (mk.kind === 'group') {
+        group = p;
+        prevCoded = undefined;
+      } else if (code) {
+        byCode.set(code, p);
+        prevCoded = p;
+      }
+    });
+  });
+
+  // Glossary entries for codes that still have no section.
+  for (const g of pages.flatMap((pg) => pg.glossary)) {
+    if (byCode.has(g.code)) continue;
+    const slug = slugify(g.title) || 'section';
+    // An uncoded heading with the same title under the same parent is this entry: give it the code.
+    const parentCode = g.code.split('.').slice(0, -1).join('.');
+    const twin = pending.find(
+      (p) =>
+        !p.node.number &&
+        p.node.kind !== 'group' &&
+        p.slug === slug &&
+        p.prevCoded?.node.number === parentCode,
+    );
+    if (twin) {
+      twin.node.number = g.code;
+      byCode.set(g.code, twin);
+      continue;
+    }
+    let sourceUrl = options.pageUrl;
+    let anchor = slug;
+    let page = pages[0]!.path;
+    try {
+      const u = new URL(g.href, origin);
+      sourceUrl = u.toString();
+      anchor = decodeURIComponent(u.hash.slice(1)) || slug;
+      page = u.pathname;
+    } catch {
+      // keep defaults
+    }
+    const p: Pending = {
+      node: newNode({ number: g.code, title: g.title, kind: 'section', anchor, sourceUrl }, slug),
+      raw: g.html,
+      slug,
+      page,
+      group: undefined,
+      prevCoded: undefined,
+    };
+    pending.push(p);
+    byCode.set(g.code, p);
+  }
+
+  // Pass 2: parents. Coded nodes hang under the longest existing code prefix, wherever they are in
+  // the page (some boxes appear before their parent section). Uncoded headings hang under the
+  // previous coded node. Everything else goes under its group.
   const parentOf = new Map<Pending, Pending | undefined>();
   for (const p of pending) {
     if (p.node.kind === 'group') continue;
@@ -294,20 +403,39 @@ export function parseCoreRules(html: string, options: ParseCoreRulesOptions): Co
     p.node.id = makeId(resolvePath(p), p.node.number);
     const parent = parentOf.get(p);
     (parent ? parent.node.children : roots).push(p.node);
-    if (p.node.anchor && !(p.node.anchor in anchors)) anchors[p.node.anchor] = p.node.id;
+    const own = pageAnchors.get(p.page);
+    if (own && p.node.anchor && !(p.node.anchor in own)) own[p.node.anchor] = p.node.id;
+    if (p.page === pages[0]!.path && p.node.anchor && !(p.node.anchor in anchors))
+      anchors[p.node.anchor] = p.node.id;
     if (p.node.number) codes[p.node.number] = p.node.id;
   }
-  const bodies = pending;
+  sortChildren(roots);
 
-  for (const { node, raw } of bodies) {
-    node.html = cleanBody(
-      raw,
-      { pageUrl: options.pageUrl, origin },
-      (a) => `#rule:${anchors[a] ?? a}`,
-    );
-    node.text = textOf(node.html);
+  const linkTarget = (path: string, anchor: string): string | undefined =>
+    pageAnchors.get(path)?.[anchor];
+  for (const p of pending) {
+    p.node.html = cleanBody(p.raw, origin, linkTarget);
+    p.node.text = textOf(p.node.html);
   }
   return { roots, anchors, codes };
+}
+
+/** Coded children in code order; uncoded children stay right after the coded sibling before them. */
+function sortChildren(nodes: RuleSection[]): void {
+  const key = new Map<RuleSection, string>();
+  let last = '';
+  nodes.forEach((n, i) => {
+    if (n.number) last = n.number;
+    key.set(
+      n,
+      `${last
+        .split('.')
+        .map((x) => x.padStart(3, '0'))
+        .join('.')}|${n.number ? 0 : 1}|${String(i).padStart(4, '0')}`,
+    );
+  });
+  nodes.sort((a, b) => (key.get(a)! < key.get(b)! ? -1 : 1));
+  nodes.forEach((n) => sortChildren(n.children));
 }
 
 export function flattenRules(roots: readonly RuleSection[]): RuleSection[] {

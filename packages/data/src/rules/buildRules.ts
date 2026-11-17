@@ -4,6 +4,8 @@ import { flattenRules, parseCoreRules } from './parseCoreRules.js';
 
 export const CORE_RULES_FILE = 'core-rules.html';
 export const CORE_RULES_URL = 'https://wahapedia.ru/wh40k11ed/the-rules/core-rules/';
+export const RULES_APPENDIX_FILE = 'rules-appendix.html';
+export const RULES_APPENDIX_URL = 'https://wahapedia.ru/wh40k11ed/the-rules/rules-appendix/';
 
 /** Adds the core rules tree and keyword index to a normalized build. Mutates the report. */
 export function addCoreRules(
@@ -22,7 +24,22 @@ export function addCoreRules(
       'An expected file is not in the raw cache. Run npm run data:sync.';
     return {};
   }
-  const rules = parseCoreRules(html, { pageUrl: CORE_RULES_URL });
+  const appendix = files[RULES_APPENDIX_FILE];
+  if (appendix === undefined) {
+    data.report.warnings.push({
+      file: RULES_APPENDIX_FILE,
+      line: 0,
+      category: 'missing-file',
+      message: 'rules appendix not in raw cache; sub-rules come from tooltips only',
+    });
+    data.report.explanations['missing-file'] ??=
+      'An expected file is not in the raw cache. Run npm run data:sync.';
+  }
+  const rules = parseCoreRules(
+    html,
+    { pageUrl: CORE_RULES_URL },
+    appendix ? [{ html: appendix, pageUrl: RULES_APPENDIX_URL }] : [],
+  );
   const result = buildKeywordIndex(rules.roots, data, rules);
   data.keywords = result.keywords;
   data.report.unresolvedKeywords = result.unresolved.sort((a, b) => b.uses - a.uses);

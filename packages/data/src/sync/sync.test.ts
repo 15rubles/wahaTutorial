@@ -17,6 +17,10 @@ function siteFiles(lastUpdate: string): Record<string, FakeFile> {
       etag: `"lu-${lastUpdate}"`,
     },
     '/wh40k11ed/the-rules/core-rules/': { body: '<html>invented</html>', etag: '"core1"' },
+    '/wh40k11ed/the-rules/rules-appendix/': {
+      body: '<html>invented appendix</html>',
+      etag: '"app1"',
+    },
   };
   for (const f of CSV_FILES)
     files[`/wh40k11ed/${f}.csv`] = { body: `id|name|\r\n1|${f}|\r\n`, etag: `"${f}-1"` };
@@ -38,7 +42,7 @@ describe('runSync', () => {
     const log = await runSync({ rawDir: dir, fetcher: server.fetcher, clock, origin: ORIGIN });
 
     expect(log.reason).toBe('synced');
-    expect(server.requests).toHaveLength(2 + CSV_FILES.length + 1);
+    expect(server.requests).toHaveLength(2 + CSV_FILES.length + 2);
     for (let i = 1; i < server.requests.length; i++) {
       expect(server.requests[i]!.at - server.requests[i - 1]!.at).toBeGreaterThanOrEqual(1000);
     }
@@ -136,7 +140,7 @@ describe('runSync', () => {
       force: true,
     });
     expect(log.files.filter((f) => f.outcome === 'not-modified').length).toBe(
-      2 + CSV_FILES.length + 1,
+      2 + CSV_FILES.length + 2,
     );
   });
 });
