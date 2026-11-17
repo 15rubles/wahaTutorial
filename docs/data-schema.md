@@ -6,17 +6,78 @@ before any parser is written), and our own normalized schema (filled in during M
 No schema is assumed until the recon is done. The 10th edition file names in `CLAUDE.md` are a
 starting hint only.
 
-## Part 1: Source recon (M1, not started)
+## Part 1: Source recon (M1, done 2026-11-17)
 
-Questions the recon must answer:
+### robots.txt
 
-- Does an 11th edition data export exist? URL, format, delimiter, encoding.
-- Real file names and columns, with a note on how they differ from the 10th edition export.
-- How IDs link entities (faction, datasheet, model, wargear, ability, keyword, stratagem, detachment, enhancement).
-- Is there a last-update file usable for incremental sync?
-- Which core rules pages exist, and what their HTML structure looks like (heading levels, anchors).
-- What `robots.txt` allows and disallows.
-- Does the server send `ETag` / `Last-Modified`?
+- `User-agent: *` disallows old editions and the underscore mirrors (`/wh40k11ed_/`), not `/wh40k11ed/`.
+- Everything we need (`/wh40k11ed/*.csv`, `/wh40k11ed/the-rules/core-rules/`) is allowed.
+- Sitemap: `https://wahapedia.ru/wh40k11ed/SiteMap.xml`.
+
+### Data export (yes, an 11th edition export exists)
+
+- Landing page: `https://wahapedia.ru/wh40k11ed/the-rules/data-export/`.
+- Spec: `https://wahapedia.ru/wh40k11ed/Export%20Data%20Specs.xlsx` (English and Russian sheets).
+- Files: `https://wahapedia.ru/wh40k11ed/<Name>.csv`.
+- Format: `|` delimited, UTF-8 **with BOM**, **CRLF** line endings, every line (header too) ends with a trailing `|`.
+  Description fields contain HTML using site CSS classes. Booleans are `true` / `false`. IDs are strings
+  (zero padded, for example `000000001`), unique per table.
+- The server sends `ETag` and `Last-Modified`, so conditional GETs work. Connections are sometimes reset
+  mid-request; the client must retry.
+- `Last_update.csv` has one row: `last_update` as `YYYY-MM-DD HH:MM:SS`. Drives incremental sync.
+
+| File                            | Fields                                                                                                                                                   |
+| ------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Factions                        | id, name, link                                                                                                                                           |
+| Source                          | id, name, type, edition, version, errata_date, errata_link                                                                                               |
+| Datasheets                      | id, name, faction_id, source_id, legend, role, loadout, transport, virtual, is_support, leader_head, leader_footer, damaged_w, damaged_description, link |
+| Datasheets_abilities            | datasheet_id, line, ability_id, model, name, description, type, parameter                                                                                |
+| Datasheets_keywords             | datasheet_id, keyword, model, is_faction_keyword                                                                                                         |
+| Datasheets_models               | datasheet_id, line, name, M, T, Sv, inv_sv, inv_sv_descr, W, Ld, OC, base_size, base_size_descr                                                          |
+| Datasheets_options              | datasheet_id, line, button, description                                                                                                                  |
+| Datasheets_wargear              | datasheet_id, line, line_in_wargear, dice, name, description, range, type, A, BS_WS, S, AP, D                                                            |
+| Datasheets_unit_composition     | datasheet_id, line, description                                                                                                                          |
+| Datasheets_models_cost          | datasheet_id, line, description, cost                                                                                                                    |
+| Datasheets_stratagems           | datasheet_id, stratagem_id                                                                                                                               |
+| Datasheets_enhancements         | datasheet_id, enhancement_id                                                                                                                             |
+| Datasheets_detachment_abilities | datasheet_id, detachment_ability_id                                                                                                                      |
+| Datasheets_leader               | leader_id, attached_id                                                                                                                                   |
+| Stratagems                      | id, faction_id, name, type, cp_cost, legend, turn, phase, description, detachment, detachment_id                                                         |
+| Abilities                       | id, name, legend, faction_id, description                                                                                                                |
+| Enhancements                    | id, faction_id, name, legend, description, cost, detachment, detachment_id, upgrade, support_leader                                                      |
+| Enhancements_wargear            | enhancement_id, line, line_in_wargear, dice, name, description, range, type, A, BS_WS, S, AP, D                                                          |
+| Detachment_abilities            | id, faction_id, name, legend, description, detachment, detachment_id                                                                                     |
+| Detachments                     | id, faction_id, name, legend, type, dp, force_disposition                                                                                                |
+| Detachments_chapter_dp          | detachment_id, keyword, dp                                                                                                                               |
+| Last_update                     | last_update                                                                                                                                              |
+
+### Differences from the 10th edition export
+
+- New: `Detachments.csv` (with `dp` = detachment points and `force_disposition`, a comma separated list
+  such as two named dispositions), `Detachments_chapter_dp.csv` (per chapter keyword dp overrides),
+  `Enhancements_wargear.csv` (weapon profiles granted by enhancements).
+- New columns: `Datasheets.is_support`, `Enhancements.upgrade`, `Enhancements.support_leader`.
+- Stratagems, enhancements and detachment abilities link to a detachment by `detachment_id`.
+
+### Data quirks seen in the real files
+
+- `Datasheets_wargear.type` is `Ranged` or `Melee` (a few rows empty: wargear without a profile).
+- Weapon keywords are a comma separated list in `Datasheets_wargear.description`, with inconsistent case
+  (`rapid fire 1`, `Rapid Fire 1`, `RAPID FIRE 1`), parameters (`sustained hits d3`, `anti-infantry 4+`)
+  and an 11th edition conditional form `KEYWORD: non-X/Y` (for example a hits keyword that only applies
+  against targets without some keywords).
+- `Datasheets_wargear.name` for combi weapons uses `Profile group - Profile name`.
+
+### Core rules
+
+- One page: `https://wahapedia.ru/wh40k11ed/the-rules/core-rules/` (about 790 KB of HTML).
+- Section headings are `h2` / `h3` with an `id` anchor and a `<span class="h_number">05.01</span>`
+  dotted section code. The heading level is NOT a reliable hierarchy; the dotted code is.
+- Top level sections 01 to 25. `super_header` h2s (for example "BASIC RULES") group them.
+- FAQ and Errata are h3s without a code and belong to the section above them.
+- Core abilities (weapon keywords) live in section 24 as `div.abName` blocks (`[ANTI]` plus an `h_number`
+  like `24.03`) rather than headings.
+- Body text uses `span.kwb` for keywords and tooltip spans; ads and scripts must be stripped.
 
 ## Part 2: Normalized schema (M2, not started)
 
