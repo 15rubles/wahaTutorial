@@ -14,6 +14,9 @@ export const ERROR_TEXT: Record<RuleErrorCode, string> = {
     'A charging model that can get within 1" of a charge target has to. Move it closer.',
   MUST_END_ENGAGED:
     'A charging model that can reach engagement range of a charge target has to. Move it closer.',
+  NO_CAPACITY: 'The transport does not have room for every model in this unit.',
+  NOT_NEAR_TRANSPORT:
+    'Too far from the transport: models embark from within 3" and disembark wholly within 3".',
   NOT_NEAR_EDGE:
     'Too far from the edge: arriving models go wholly within 6" of a battlefield edge.',
   TOO_CLOSE_TO_ENEMY: 'Too close: keep arriving models over 8" from every enemy.',

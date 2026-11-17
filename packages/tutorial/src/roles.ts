@@ -5,6 +5,7 @@ import {
   attachUnits,
   flat,
   hasDeepStrike,
+  isTransport,
 } from '@battle-drill/engine';
 import type { Role } from './types.js';
 
@@ -63,8 +64,28 @@ export function pickRoles(
     } else fallbacks.push(role);
   };
   // Scarce roles first, so they are not taken by a role with more candidates.
-  const order: Role[] = ['leader', 'deepStriker', 'character', 'fast', 'shooter', 'melee'];
+  const order: Role[] = [
+    'leader',
+    'deepStriker',
+    'transport',
+    'passenger',
+    'character',
+    'fast',
+    'shooter',
+    'melee',
+  ];
   for (const role of order.filter((r) => roles.includes(r))) {
+    if (role === 'passenger')
+      choose(
+        role,
+        army.filter((u) => u.keywords.includes('INFANTRY') && !isChar(u) && !isTransport(u)),
+        // Biggest unit that fits the picked transport; units that do not fit come last.
+        (u) =>
+          u.models.length +
+          (u.models.length <= (picked.transport?.transport?.capacity ?? 0) ? 1000 : 0),
+      );
+    if (role === 'transport')
+      choose(role, army.filter(isTransport), (u) => u.transport?.capacity ?? 0);
     if (role === 'leader')
       choose(
         role,
@@ -129,6 +150,28 @@ export function standIn(role: Role, id: string): UnitState {
     const brawlers = standIn('melee', `${id}-bodyguard`);
     return { ...attachUnits(brawlers, [sergeant]), id };
   }
+  if (role === 'transport') {
+    const hull = standIn('fast', id);
+    return {
+      ...hull,
+      name: 'Drill Hauler (stand-in)',
+      datasheetId: 'stand-in-transport',
+      keywords: ['VEHICLE', 'TRANSPORT'],
+      transport: { capacity: 20, text: 'Invented stand-in: carries 20 models.' },
+      models: hull.models.slice(0, 1).map((m) => ({
+        ...m,
+        name: 'Drill Hauler',
+        toughness: 9,
+        save: 3,
+        wounds: 10,
+        woundsLeft: 10,
+        movement: 10,
+        baseRadius: 2,
+      })),
+      startingStrength: 1,
+    };
+  }
+  if (role === 'passenger') return { ...standIn('shooter', id), datasheetId: 'stand-in-passenger' };
   if (role === 'deepStriker')
     return {
       ...standIn('shooter', id),
@@ -170,7 +213,7 @@ export function standIn(role: Role, id: string): UnitState {
     keywords: [],
   };
   const spec: Record<
-    Exclude<Role, 'leader' | 'deepStriker'>,
+    Exclude<Role, 'leader' | 'deepStriker' | 'transport' | 'passenger'>,
     {
       name: string;
       n: number;
@@ -249,7 +292,7 @@ export function standIn(role: Role, id: string): UnitState {
       player: 'p2',
     },
   };
-  const s = spec[role as Exclude<Role, 'leader' | 'deepStriker'>];
+  const s = spec[role as Exclude<Role, 'leader' | 'deepStriker' | 'transport' | 'passenger'>];
   return {
     id,
     name: s.name,

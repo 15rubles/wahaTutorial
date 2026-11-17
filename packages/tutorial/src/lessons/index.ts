@@ -10,8 +10,9 @@ import { objectivesLesson } from './l07-objectives.js';
 import { armyRulesLesson } from './l08-army-rules.js';
 import { attachedLesson } from './l09-attached.js';
 import { reservesLesson } from './l10-reserves.js';
-import { battleRoundLesson } from './l11-battle-round.js';
-import { graduationLesson } from './l12-graduation.js';
+import { transportsLesson } from './l11-transports.js';
+import { battleRoundLesson } from './l12-battle-round.js';
+import { graduationLesson } from './l13-graduation.js';
 
 /** The campaign, in order. */
 export const LESSONS: readonly Lesson[] = [
@@ -25,6 +26,7 @@ export const LESSONS: readonly Lesson[] = [
   armyRulesLesson,
   attachedLesson,
   reservesLesson,
+  transportsLesson,
   battleRoundLesson,
   graduationLesson,
 ];

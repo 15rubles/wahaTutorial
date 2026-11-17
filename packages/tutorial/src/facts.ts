@@ -43,6 +43,7 @@ export function unitFacts(role: string, unit: UnitState): Record<string, string>
     leaderWeapon: leaderWeapon?.name ?? ranged?.name ?? melee?.name ?? 'its weapons',
     leaderToughness: String(leaderToughness ?? first?.toughness ?? '?'),
     bodyguardToughness: String(bodyguardToughness ?? first?.toughness ?? '?'),
+    capacity: String(unit.transport?.capacity ?? 0),
     arrival: hasDeepStrike(unit)
       ? 'it has Deep Strike, so it can arrive anywhere more than 8" from every enemy'
       : 'it arrives wholly within 6" of a battlefield edge',

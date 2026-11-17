@@ -3,6 +3,7 @@ import type { Roller } from '../dice/roller.js';
 import { chargeMove, declareCharge, skipCharge } from '../phases/charge.js';
 import { deploy } from '../phases/deployment.js';
 import { placeInReserves } from '../phases/reserves.js';
+import { embark, emergencyDisembark, passengers } from '../phases/transports.js';
 import { consolidate, fight, pileIn } from '../phases/fight.js';
 import { advanceRoll, move } from '../phases/movement.js';
 import { shoot } from '../phases/shooting.js';
@@ -63,6 +64,8 @@ function dispatch(
       return deploy(state, action.unitId, action.positions);
     case 'placeInReserves':
       return placeInReserves(state, action.unitId);
+    case 'embark':
+      return embark(state, action.unitId, action.transportId);
     case 'endPhase':
       return endPhase(state, roller);
     case 'advanceRoll':
@@ -112,12 +115,25 @@ export function apply(state: GameState, action: GameAction, roller?: Roller): Ap
   const result = dispatch(state, action, dice);
   if ('code' in result) return { ok: false, error: result };
   const events = [...result.events];
-  // Report units destroyed by this action.
+  let after = result.state;
+  // Report units destroyed by this action; passengers of a destroyed TRANSPORT get out first (18.05).
   for (const [id, before] of Object.entries(state.units)) {
-    const after = result.state.units[id]!;
-    if (aliveModels(before).length > 0 && aliveModels(after).length === 0)
+    const now = after.units[id]!;
+    if (aliveModels(before).length > 0 && aliveModels(now).length === 0) {
+      if (passengers(after, id).length > 0) {
+        const out = emergencyDisembark(after, id, dice);
+        after = out.state;
+        events.push(...out.events);
+      }
       events.push({ type: 'UnitDestroyed', unitId: id });
+    }
   }
-  const next: GameState = { ...result.state, rng: dice.state(), log: [...state.log, ...events] };
+  // Passengers can also die to the emergency disembark hazard rolls.
+  for (const [id, before] of Object.entries(result.state.units)) {
+    if (aliveModels(before).length > 0 && aliveModels(after.units[id]!).length === 0)
+      if (!events.some((e) => e.type === 'UnitDestroyed' && e.unitId === id))
+        events.push({ type: 'UnitDestroyed', unitId: id });
+  }
+  const next: GameState = { ...after, rng: dice.state(), log: [...state.log, ...events] };
   return { ok: true, state: next, events };
 }

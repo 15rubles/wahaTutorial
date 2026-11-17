@@ -70,6 +70,8 @@ export interface UnitState {
   readonly startingStrength: number;
   /** Slugs of core abilities the unit has, e.g. `deep-strike` (only those the engine uses). */
   readonly abilities?: readonly string[];
+  /** TRANSPORT capacity in models, read from the datasheet text (18.01). */
+  readonly transport?: { readonly capacity: number; readonly text: string };
   /** One-shot weapons already used this battle (24.26). */
   readonly spentWeapons?: readonly string[];
   /** For attached units (19): the units it was formed from, in order (bodyguard first). */

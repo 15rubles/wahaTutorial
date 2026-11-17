@@ -24,6 +24,7 @@ export function canDeclareCharge(state: GameState, unitId: string): RuleError | 
     return err('NOT_ELIGIBLE', 'not on the battlefield');
   if (st.declaredCharge) return err('ALREADY_ACTED', 'already declared');
   if (st.moved === 'advance' || st.moved === 'fall-back') return err('NOT_ELIGIBLE', st.moved);
+  if (st.cannotCharge) return err('NOT_ELIGIBLE', 'disembarked this turn');
   if (isEngaged(state, unit)) return err('NOT_ELIGIBLE', 'engaged');
   const enemiesNear = Object.values(state.units).some(
     (o) =>

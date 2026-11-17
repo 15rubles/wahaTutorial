@@ -1459,3 +1459,9 @@ pre {
   display: grid;
   gap: 0.6rem;
 }
+.battlefield .disembark-zone {
+  fill: rgba(196, 160, 52, 0.28);
+  stroke: #8a6d12;
+  stroke-width: 0.08;
+  stroke-dasharray: 0.4 0.3;
+}

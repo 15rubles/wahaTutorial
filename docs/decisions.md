@@ -365,3 +365,18 @@ Other weapons still need visible targets. One-shot weapons are recorded on the u
 (`spentWeapons`) when fired and cannot be selected again that battle. Every weapon ability still
 unsimulated in the real cache is one the core rules do not define (the most common is on 9 weapons);
 those stay marked "not simulated" on the datasheet.
+
+## D-046 Transports
+
+Embarked units keep `embarkedIn` in their status across turns and have no model positions, like units
+in reserves. Units can start embarked during deployment, embark after a normal, advance or fall back
+move with every model within 3", and disembark in the movement phase as a `disembark` move: rapid when
+the transport made a normal or ingress move (no charge after), tactical when it has not moved or stayed
+still (the unit may then make a normal or advance move), not at all after an advance or fall back.
+When a transport is destroyed, `apply` makes an emergency disembark for its passengers before
+reporting it destroyed: hazard rolls, models set up as close as possible within 6" (unengaged if they
+can), battle-shocked, no charge. In the UI, passengers appear in the "Off the battlefield" list; a click
+next to the transport sets them up, packed around the hull (`disembarkPositions`). The invented
+fixture faction gained a Rust Crawler transport (not in the fixture roster). New lesson 11.
+Transports (roles `transport` and `passenger`; an invented hauler stands in when the army has no
+transport with room), lessons 11 and 12 became 12 and 13.

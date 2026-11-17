@@ -10,7 +10,7 @@ describe('normalize (fixture export)', () => {
   it('loads both factions with no errors', () => {
     expect(data.report.errors).toEqual([]);
     expect(data.factions.map((f) => [f.id, f.datasheetCount])).toEqual([
-      ['RP', 5],
+      ['RP', 6],
       ['GC', 4],
     ]);
   });
@@ -83,6 +83,6 @@ describe('normalize (fixture export)', () => {
       expect.arrayContaining(['missing-file', 'malformed-record', 'orphan-reference']),
     );
     for (const c of cats) expect(result.report.explanations[c]).toBeTruthy();
-    expect(result.datasheets).toHaveLength(9);
+    expect(result.datasheets).toHaveLength(10);
   });
 });

@@ -189,7 +189,32 @@ test.describe('M9 campaign', () => {
     await expectDone(page);
   });
 
-  test('11. deployment and a full battle round', async ({ page }) => {
+  test('11. transports', async ({ page }) => {
+    await openLesson(page, 'transports');
+    if (FIXTURE)
+      await expect(page.getByTestId('tutorial-box')).toContainText(
+        'Drill Hauler (stand-in) has room for 20 models',
+      );
+    await next(page);
+    await page.locator('[data-testid^="select-reserve-"]').click();
+    await expectStep(page, 3);
+    await expect(page.getByTestId('disembark-zone')).toBeVisible();
+    // Click just above the transport (set at 20", 6"): inside the 3" set-up area.
+    const hull = (await role(page, 'transport').locator('circle').first().boundingBox())!;
+    const box = (await page.getByTestId('battlefield').boundingBox())!;
+    const px = box.width / 45;
+    await page.mouse.click(hull.x + hull.width / 2, hull.y - 1.6 * px);
+    await expectStep(page, 4);
+    await expect(page.getByTestId('battle-log')).toContainText('tactical disembark', {
+      useInnerText: false,
+    });
+    await next(page);
+    await next(page);
+    await next(page);
+    await expectDone(page);
+  });
+
+  test('12. deployment and a full battle round', async ({ page }) => {
     await openLesson(page, 'battle-round');
     await expect(page.getByTestId('phase')).toHaveText('Deployment');
     await next(page);
@@ -202,7 +227,7 @@ test.describe('M9 campaign', () => {
     await expect(page.getByTestId('round')).toHaveText('Round 2');
   });
 
-  test('12. graduation', async ({ page }) => {
+  test('13. graduation', async ({ page }) => {
     await openLesson(page, 'graduation');
     await next(page);
     await endPhasesUntil(

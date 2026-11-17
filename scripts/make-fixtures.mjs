@@ -275,7 +275,7 @@ function datasheet(d) {
     legend: 'Invented fixture background.',
     role: d.role,
     loadout: `<b>This model is equipped with:</b> ${d.weapons.map((w) => w.name).join('; ')}.`,
-    transport: '',
+    transport: d.transport ?? '',
     virtual: 'false',
     is_support: 'false',
     leader_head: d.leads ? 'Invented fixture text: leads these units.' : '',
@@ -590,6 +590,33 @@ datasheet({
   keywords: ['Infantry', 'Gutter Marksman'],
   composition: ['1 Gutter Marksman model'],
   costs: [['1 model', 40]],
+  stratagems: RP_STRATS,
+});
+
+datasheet({
+  id: '900000006',
+  name: 'Rust Crawler',
+  faction: 'RP',
+  role: 'Dedicated Transport',
+  transport: 'Invented fixture text: carries up to 10 Rust Pilgrims Infantry models.',
+  models: [{ M: '10"', T: '9', Sv: '3+', W: '10', Ld: '7+', OC: '2', base: '100mm' }],
+  weapons: [
+    {
+      name: 'Rivet repeater',
+      kw: 'rapid fire 2',
+      range: '24"',
+      A: '3',
+      skill: '4',
+      S: '5',
+      AP: '0',
+      D: '1',
+    },
+    { name: 'Crawler treads', kw: '', range: 'Melee', A: '3', skill: '4', S: '6', AP: '0', D: '1' },
+  ],
+  abilities: [{ ref: '900000102', type: 'Faction' }],
+  keywords: ['Vehicle', 'Transport', 'Dedicated Transport', 'Rust Crawler'],
+  composition: ['1 Rust Crawler model'],
+  costs: [['1 model', 80]],
   stratagems: RP_STRATS,
 });
 

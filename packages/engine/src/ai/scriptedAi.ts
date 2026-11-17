@@ -28,7 +28,7 @@ import { chargePositions } from '../phases/chargeProximity.js';
 const onTable = (u: UnitState) => aliveModels(u).some((m) => m.position);
 const alive = (u: UnitState) => aliveModels(u).length > 0;
 const toDeploy = (state: GameState, u: UnitState) =>
-  alive(u) && !onTable(u) && !state.status[u.id]?.inReserves;
+  alive(u) && !onTable(u) && !state.status[u.id]?.inReserves && !state.status[u.id]?.embarkedIn;
 
 /** Whose decision the game is waiting for. */
 export function actingPlayer(state: GameState): PlayerId | null {

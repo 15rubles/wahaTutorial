@@ -11,6 +11,7 @@ export const ruleRefs = ['core.the-battle-round.player-turns'];
 export type LegalOption =
   | { readonly kind: 'move'; readonly moveTypes: readonly string[] }
   | { readonly kind: 'in-reserves'; readonly canArrive: boolean }
+  | { readonly kind: 'embarked'; readonly transportId: string; readonly canDisembark: boolean }
   | { readonly kind: 'shoot'; readonly shootingTypes: readonly string[] }
   | { readonly kind: 'declare-charge' }
   | { readonly kind: 'charge-move'; readonly targets: readonly string[] }
@@ -29,6 +30,14 @@ export function legalActions(state: GameState, unitId: string): LegalOption[] {
     return [{ kind: 'none', reason: 'destroyed' }];
   const out: LegalOption[] = [];
   const active = unit.player === state.activePlayer;
+  if (st.embarkedIn)
+    return [
+      {
+        kind: 'embarked',
+        transportId: st.embarkedIn,
+        canDisembark: active && eligibleMoveTypes(state, unitId).includes('disembark'),
+      },
+    ];
   if (st.inReserves)
     return [
       {

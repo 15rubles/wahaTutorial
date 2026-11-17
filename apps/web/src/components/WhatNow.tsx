@@ -7,6 +7,7 @@ const MOVE: Record<string, string> = {
   advance: 'advance (roll a D6 for extra distance)',
   'fall-back': 'fall back out of combat',
   ingress: 'arrive from reserves',
+  disembark: 'disembark from its transport',
 };
 const SHOOT: Record<string, string> = {
   normal: 'shoot normally',
@@ -21,6 +22,10 @@ export function describeOption(o: LegalOption, state: GameState): string {
       return `It can ${o.moveTypes.map((t) => MOVE[t] ?? t).join(', or ')}.`;
     case 'shoot':
       return `It can ${o.shootingTypes.map((t) => SHOOT[t] ?? t).join(', or ')}.`;
+    case 'embarked':
+      return o.canDisembark
+        ? `It is embarked in ${state.units[o.transportId]?.name ?? 'a transport'}: it can disembark now. Click the board next to the transport.`
+        : `It is embarked in ${state.units[o.transportId]?.name ?? 'a transport'} and cannot disembark right now.`;
     case 'in-reserves':
       return o.canArrive
         ? 'It is in reserves: it can arrive now with an ingress move. Click the board to set it up.'

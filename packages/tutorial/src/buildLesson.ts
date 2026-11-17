@@ -33,6 +33,7 @@ export function buildLessonGame(
   const names: Partial<Record<Role, string>> = {};
   const missing: Role[] = [];
   const reserves: string[] = [];
+  const embarks: { unitId: string; transportId: string }[] = [];
 
   for (const spec of lesson.units) {
     const base = ENEMY_ROLES.includes(spec.role)
@@ -49,6 +50,28 @@ export function buildLessonGame(
     if (spec.reserves) {
       units.push(fresh);
       reserves.push(id);
+      ids[spec.role] = id;
+      names[spec.role] = fresh.name;
+      continue;
+    }
+    if (spec.embarkIn) {
+      // The army's transport must have room; otherwise an invented one carries the unit.
+      const tIndex = units.findIndex((u) => u.id === ids[spec.embarkIn!]);
+      const t = units[tIndex];
+      if (t && (t.transport?.capacity ?? 0) < fresh.models.length) {
+        const swap = standIn('transport', t.id);
+        units[tIndex] = {
+          ...swap,
+          models: swap.models.map((m, i) => ({
+            ...m,
+            position: t.models[i]?.position ?? t.models[0]!.position,
+          })),
+        };
+        names[spec.embarkIn] = swap.name;
+        missing.push(spec.embarkIn);
+      }
+      units.push(fresh);
+      embarks.push({ unitId: id, transportId: ids[spec.embarkIn]! });
       ids[spec.role] = id;
       names[spec.role] = fresh.name;
       continue;
@@ -72,6 +95,10 @@ export function buildLessonGame(
   });
   for (const id of reserves) {
     const r = apply(state, { type: 'placeInReserves', unitId: id });
+    if (r.ok) state = r.state;
+  }
+  for (const e of embarks) {
+    const r = apply(state, { type: 'embark', ...e });
     if (r.ok) state = r.state;
   }
   // Leave deployment (units are already placed) and walk to the lesson's starting phase.

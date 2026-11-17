@@ -127,11 +127,11 @@ describe('campaign lessons', () => {
   });
 
   it('start full army lessons in deployment, or deployed', async () => {
-    const { battleRoundLesson } = await import('./lessons/l11-battle-round.js');
-    const { graduationLesson } = await import('./lessons/l12-graduation.js');
+    const { battleRoundLesson } = await import('./lessons/l12-battle-round.js');
+    const { graduationLesson } = await import('./lessons/l13-graduation.js');
     const a = buildLessonGame(battleRoundLesson, fixtureArmy());
     expect(a.state.phase).toBe('deployment');
-    expect(Object.values(a.state.units).filter((u) => u.player === 'p1')).toHaveLength(5);
+    expect(Object.values(a.state.units).filter((u) => u.player === 'p1')).toHaveLength(6);
     const b = buildLessonGame(graduationLesson, fixtureArmy());
     expect([b.state.phase, b.state.battleRound, b.state.mission.battleRounds]).toEqual([
       'command',
@@ -185,5 +185,28 @@ describe('campaign lessons', () => {
     const { ctx } = buildLessonGame(demoLesson, fixtureArmy());
     expect(fillText('{shooter.weaponAbilities}', ctx)).not.toContain('{');
     expect(fillText('{shooter.nonsense}', ctx)).toBe('{shooter.nonsense}');
+  });
+
+  it('start the transports lesson with the passenger embarked', async () => {
+    const { transportsLesson } = await import('./lessons/l11-transports.js');
+    const { state, ctx } = buildLessonGame(transportsLesson, fixtureArmy());
+    expect(ctx.names.transport).toBe('Rust Crawler');
+    const passenger = ctx.units.passenger!;
+    expect(ctx.names.passenger).toBe('Rustbound Devotees');
+    expect(state.status[passenger]!.embarkedIn).toBe(ctx.units.transport);
+    expect(fillText('{transport.capacity}', ctx)).toBe('10');
+    // A passenger too big for the army's transport rides in an invented one instead.
+    const small = fixtureArmy().map((u) =>
+      u.name === 'Rust Crawler' ? { ...u, transport: { capacity: 4, text: 'tiny' } } : u,
+    );
+    // A unit that fits is preferred...
+    expect(buildLessonGame(transportsLesson, small).ctx.names.passenger).toBe('Gutter Marksman');
+    // ...and with none that fits, an invented transport carries the unit.
+    const big = small.filter((u) => ['Rust Crawler', 'Rustbound Devotees'].includes(u.name));
+    const swapped = buildLessonGame(transportsLesson, big);
+    expect(swapped.ctx.fallbacks).toContain('transport');
+    expect(swapped.state.status[swapped.ctx.units.passenger!]!.embarkedIn).toBe(
+      swapped.ctx.units.transport,
+    );
   });
 });

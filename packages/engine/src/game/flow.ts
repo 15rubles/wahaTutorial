@@ -62,7 +62,10 @@ function enterPhase(state: GameState, phase: Phase, roller: Roller): Step {
 
 function startTurn(state: GameState, player: typeof state.activePlayer, roller: Roller): Step {
   const status = Object.fromEntries(
-    Object.entries(state.status).map(([id, s]) => [id, freshStatus(s.battleShocked, s.inReserves)]),
+    Object.entries(state.status).map(([id, s]) => [
+      id,
+      freshStatus(s.battleShocked, s.inReserves, s.embarkedIn),
+    ]),
   );
   const base: GameState = { ...state, activePlayer: player, status };
   const entered = enterPhase(base, 'command', roller);

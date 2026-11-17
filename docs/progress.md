@@ -157,6 +157,9 @@ Tab to a unit, Enter, then arrow keys and Enter to move it.
 - [x] Reserves destroyed at the end of battle round 3 and at the end of the battle
 - [x] Lesson text tokens with the player's unit details (`{role.fact}`)
 - [x] New lessons: 9. Leaders and bodyguards, 10. Reserves and Deep Strike (unit tests and E2E)
+- [x] Charge moves: models must end within 1" / engaged when they can (RQ-4, conservative check)
+- [x] Indirect shooting and one-shot weapons
+- [x] Transports: embark, rapid / tactical / emergency disembark, lesson 11. Transports
 
 **Demo:** import a roster with a character: the Army page shows "Leads ..." for it and the sandbox
 shows the joined unit. In the sandbox deployment press "Reserves" next to a unit, then bring it in
@@ -165,4 +168,4 @@ from round 2 by selecting it in the reserves list and clicking the board.
 ## Still open for the owner
 
 - Manual run of the campaign with your real roster (see M9).
-- Open rules questions in `docs/rules-questions.md` (RQ-1 to RQ-7).
+- Open rules questions in `docs/rules-questions.md` (RQ-1 to RQ-10).

@@ -27,6 +27,8 @@ interface Props {
   onUnitClick: (unitId: string) => void;
   /** Click on empty battlefield, with the point in inches (null: Escape key). */
   onBackgroundClick?: (at: Point | null) => void;
+  /** Areas next to a TRANSPORT where the selected passengers may disembark. */
+  disembarkZone?: readonly { readonly x: number; readonly y: number; readonly r: number }[];
   /** Shows where the selected reserve unit may arrive. */
   arrival?: {
     readonly deepStrike: boolean;
@@ -75,6 +77,7 @@ export function Battlefield({
   onConfirm,
   highlightUnitIds = [],
   arrival = null,
+  disembarkZone = [],
 }: Props) {
   const svgRef = useRef<SVGSVGElement>(null);
   const { selectedUnitId, pending, setPending } = useGame();
@@ -254,6 +257,13 @@ export function Battlefield({
         );
       })}
 
+      {disembarkZone.length > 0 && (
+        <g className="arrival" data-testid="disembark-zone" aria-hidden="true">
+          {disembarkZone.map((z, i) => (
+            <circle key={i} className="disembark-zone" cx={z.x} cy={z.y} r={z.r} />
+          ))}
+        </g>
+      )}
       {arrival && (
         <g className="arrival" data-testid="arrival-zone" aria-hidden="true">
           {!arrival.deepStrike && (

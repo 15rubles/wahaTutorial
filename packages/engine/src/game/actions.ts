@@ -5,6 +5,7 @@ import type { MoveType, ShootingType } from './state.js';
 export type GameAction =
   | { readonly type: 'deploy'; readonly unitId: string; readonly positions: readonly Point[] }
   | { readonly type: 'placeInReserves'; readonly unitId: string }
+  | { readonly type: 'embark'; readonly unitId: string; readonly transportId: string }
   | { readonly type: 'endPhase' }
   | { readonly type: 'advanceRoll'; readonly unitId: string }
   | {

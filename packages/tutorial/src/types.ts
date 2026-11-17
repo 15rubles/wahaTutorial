@@ -10,6 +10,10 @@ export type Role =
   | 'leader'
   /** A unit with the Deep Strike ability, starting in reserves. */
   | 'deepStriker'
+  /** A TRANSPORT that can carry another lesson unit. */
+  | 'transport'
+  /** An INFANTRY unit to ride in the transport. */
+  | 'passenger'
   | 'target'
   | 'enemyMelee';
 
@@ -77,6 +81,8 @@ export interface LessonUnitSpec {
   readonly near?: { readonly role: Role; readonly gap: number };
   /** Start off the board in strategic reserves (`at` is ignored). */
   readonly reserves?: boolean;
+  /** Start embarked within this role's TRANSPORT (`at` is ignored). List the transport first. */
+  readonly embarkIn?: Role;
 }
 
 export type LessonPanel = 'stratagems' | 'army-rules';

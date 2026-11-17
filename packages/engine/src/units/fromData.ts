@@ -89,6 +89,17 @@ function coreAbilities(ds: Datasheet, abilityName?: (id: string) => string | und
   return [...out];
 }
 
+/** Transport capacity from the datasheet text: the first number of models it mentions. */
+function transportOf(ds: Datasheet, keywords: readonly string[]): Pick<UnitState, 'transport'> {
+  if (!keywords.includes('TRANSPORT') || !ds.transportHtml) return {};
+  const text = ds.transportHtml
+    .replace(/<[^>]+>/g, ' ')
+    .replace(/\s+/g, ' ')
+    .trim();
+  const m = /capacity of (\d+)/i.exec(text) ?? /(\d+)\s+[^.]*?models?/i.exec(text);
+  return m ? { transport: { capacity: Number(m[1]), text } } : {};
+}
+
 function pickProfile(profiles: readonly ModelProfile[], name: string): ModelProfile {
   const n = norm(name);
   return (
@@ -155,5 +166,6 @@ export function unitFromDatasheet(ds: Datasheet, choices: UnitChoices): UnitStat
     models: models.map((m, i) => ({ ...m, weapons: carried[i]! })),
     startingStrength: models.length,
     abilities: coreAbilities(ds, choices.abilityName),
+    ...transportOf(ds, keywords),
   };
 }

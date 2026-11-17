@@ -18,6 +18,11 @@
 900000005|Infantry||false|
 900000005|Gutter Marksman||false|
 900000005|Rust Pilgrims||true|
+900000006|Vehicle||false|
+900000006|Transport||false|
+900000006|Dedicated Transport||false|
+900000006|Rust Crawler||false|
+900000006|Rust Pilgrims||true|
 900000011|Infantry||false|
 900000011|Character||false|
 900000011|Choir Precentor||false|

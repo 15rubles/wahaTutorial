@@ -8,7 +8,7 @@ export const ruleRefs = ['core.the-battle-round', 'core.the-battle-round.player-
 export type Phase =
   'deployment' | 'command' | 'movement' | 'shooting' | 'charge' | 'fight' | 'game-over';
 export type FightStep = 'pile-in' | 'fight' | 'consolidate';
-export type MoveType = 'stationary' | 'normal' | 'advance' | 'fall-back' | 'ingress';
+export type MoveType = 'stationary' | 'normal' | 'advance' | 'fall-back' | 'ingress' | 'disembark';
 export type ShootingType = 'normal' | 'assault' | 'close-quarters' | 'indirect';
 
 /** Per unit flags that reset every turn (or phase, where noted). */
@@ -31,9 +31,21 @@ export interface UnitStatus {
   readonly battleShocked: boolean;
   /** In strategic reserves (20): off the battlefield until an ingress move. Persists across turns. */
   readonly inReserves: boolean;
+  /** Id of the TRANSPORT this unit is embarked within (18). Persists across turns. */
+  readonly embarkedIn: string | null;
+  /** Embarked this turn (so it cannot disembark again this phase). */
+  readonly embarkedThisTurn: boolean;
+  /** Disembarked this turn, and how (18.04). Tactical: may still make a normal or advance move. */
+  readonly disembarked: 'rapid' | 'tactical' | 'emergency' | null;
+  /** Rapid or emergency disembark this turn: no charge declarations until the turn ends. */
+  readonly cannotCharge: boolean;
 }
 
-export const freshStatus = (battleShocked = false, inReserves = false): UnitStatus => ({
+export const freshStatus = (
+  battleShocked = false,
+  inReserves = false,
+  embarkedIn: string | null = null,
+): UnitStatus => ({
   moved: null,
   advanceRoll: null,
   maxMoved: 0,
@@ -48,6 +60,10 @@ export const freshStatus = (battleShocked = false, inReserves = false): UnitStat
   eligibleToFight: false,
   battleShocked,
   inReserves,
+  embarkedIn,
+  embarkedThisTurn: false,
+  disembarked: null,
+  cannotCharge: false,
 });
 
 export interface PlayerState {
@@ -67,6 +83,14 @@ export type GameEvent =
   | AttackEvent
   | { readonly type: 'UnitDeployed'; readonly unitId: string }
   | { readonly type: 'UnitPlacedInReserves'; readonly unitId: string }
+  | { readonly type: 'UnitEmbarked'; readonly unitId: string; readonly transportId: string }
+  | {
+      readonly type: 'UnitDisembarked';
+      readonly unitId: string;
+      readonly transportId: string;
+      readonly mode: 'rapid' | 'tactical' | 'emergency';
+      readonly lost: number;
+    }
   | { readonly type: 'UnitArrived'; readonly unitId: string; readonly deepStrike: boolean }
   | { readonly type: 'BattleRoundStarted'; readonly round: number }
   | { readonly type: 'TurnStarted'; readonly player: PlayerId; readonly round: number }

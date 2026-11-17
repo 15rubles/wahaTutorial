@@ -89,6 +89,24 @@ rules, then record the resolution here.
   "not eligible to start an action" part are not modelled (the engine has no hit re-rolls or actions).
 - Status: open
 
+### RQ-9: Which models a TRANSPORT can carry
+
+- Rule ref: `core.transports.transport-capacity`
+- Question: capacity and allowed passengers are free text on each datasheet (keywords, models that
+  take more space, units that cannot embark).
+- Current interpretation: only the model count is checked, using the first number of models in the
+  text (127 of 131 transports in the cache have one). The text is kept on the unit for display.
+- Status: open (simplification)
+
+### RQ-10: Combat disembark
+
+- Rule ref: `core.transports.disembark-move`
+- Question: combat disembark (6", hazard rolls, may end engaged) applies when a tactical set-up is not
+  possible; deciding "not possible" needs a placement search.
+- Current interpretation: not offered. Rapid and tactical disembarks are modelled, plus emergency
+  disembark when a transport is destroyed. Firing from inside a transport is not modelled.
+- Status: open (simplification)
+
 ## Resolved
 
 None yet.

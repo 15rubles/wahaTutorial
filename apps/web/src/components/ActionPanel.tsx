@@ -21,6 +21,9 @@ import {
   weaponAllowed,
   apply,
   hasDeepStrike,
+  canEmbark,
+  disembarkMode,
+  isTransport,
 } from '@battle-drill/engine';
 import { useState } from 'react';
 import { ERROR_TEXT } from '../game/messages.js';
@@ -48,7 +51,46 @@ function MovementControls({ state, unit }: { state: GameState; unit: UnitState }
         In reserves. It can arrive in the movement phase from battle round 2.
       </p>
     );
-  if (types.length === 0) return <p className="muted small">This unit has already moved.</p>;
+  if (st.embarkedIn) {
+    const transport = state.units[st.embarkedIn];
+    const mode = disembarkMode(state, unit.id);
+    return mode ? (
+      <p className="small" data-testid="disembark-hint">
+        Embarked in {transport?.name}. Click the battlefield next to it to disembark: every model
+        must be wholly within 3&quot;.{' '}
+        {mode === 'rapid'
+          ? 'The transport already moved, so this is a rapid disembark: the unit cannot charge this turn.'
+          : 'The transport has not moved, so this is a tactical disembark: the unit can still make a normal or advance move.'}
+      </p>
+    ) : (
+      <p className="muted small">
+        Embarked in {transport?.name}.{' '}
+        {st.embarkedThisTurn
+          ? 'It embarked this turn, so it stays inside.'
+          : 'It cannot disembark now (the transport advanced or fell back, or it is not your movement phase).'}
+      </p>
+    );
+  }
+  if (types.length === 0) {
+    const ride = Object.values(state.units).filter(
+      (t) => t.player === unit.player && canEmbark(state, unit.id, t.id) === null,
+    );
+    return (
+      <>
+        <p className="muted small">This unit has already moved.</p>
+        {ride.map((t) => (
+          <button
+            key={t.id}
+            type="button"
+            data-testid="embark"
+            onClick={() => act({ type: 'embark', unitId: unit.id, transportId: t.id })}
+          >
+            Embark in {t.name}
+          </button>
+        ))}
+      </>
+    );
+  }
   const mine = pending?.unitId === unit.id ? pending : null;
   return (
     <div className="controls">
@@ -349,17 +391,27 @@ function FightControls({ state, unit }: { state: GameState; unit: UnitState }) {
 function ReserveList({ state }: { state: GameState }) {
   const { select, selectedUnitId } = useGame();
   const waiting = Object.values(state.units).filter(
-    (u) => u.player === 'p1' && state.status[u.id]?.inReserves && aliveModels(u).length > 0,
+    (u) =>
+      u.player === 'p1' &&
+      (state.status[u.id]?.inReserves || state.status[u.id]?.embarkedIn) &&
+      aliveModels(u).length > 0,
   );
   if (waiting.length === 0) return null;
   return (
     <div className="controls" data-tutorial-id="reserve-list">
-      <h4>Strategic reserves</h4>
+      <h4>Off the battlefield</h4>
       <ul className="reserve-list">
         {waiting.map((u) => (
           <li key={u.id}>
             <span>
               {u.name}
+              {state.status[u.id]?.embarkedIn ? (
+                <span className="tag">
+                  in {state.units[state.status[u.id]!.embarkedIn!]?.name ?? 'transport'}
+                </span>
+              ) : (
+                <span className="tag">reserves</span>
+              )}
               {hasDeepStrike(u) && <span className="tag">Deep Strike</span>}
             </span>
             <button
@@ -384,8 +436,10 @@ function DeploymentControls({ state }: { state: GameState }) {
       u.player === 'p1' &&
       aliveModels(u).length > 0 &&
       !aliveModels(u).some((m) => m.position) &&
-      !state.status[u.id]?.inReserves,
+      !state.status[u.id]?.inReserves &&
+      !state.status[u.id]?.embarkedIn,
   );
+  const transports = Object.values(state.units).filter((u) => u.player === 'p1' && isTransport(u));
   const reserves = Object.values(state.units).filter(
     (u) => u.player === 'p1' && state.status[u.id]?.inReserves,
   );
@@ -428,6 +482,19 @@ function DeploymentControls({ state }: { state: GameState }) {
                 >
                   Reserves
                 </button>
+                {transports
+                  .filter((t) => canEmbark(state, u.id, t.id) === null)
+                  .map((t) => (
+                    <button
+                      key={t.id}
+                      type="button"
+                      className="link"
+                      data-testid={`embark-${u.id}`}
+                      onClick={() => act({ type: 'embark', unitId: u.id, transportId: t.id })}
+                    >
+                      Embark in {t.name}
+                    </button>
+                  ))}
               </li>
             ))}
           </ul>

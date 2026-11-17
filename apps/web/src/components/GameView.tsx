@@ -3,8 +3,10 @@ import {
   type GameEvent,
   type GameState,
   INGRESS_EDGE_DISTANCE,
+  DISEMBARK_DISTANCE,
   aliveModels,
   eligibleMoveTypes,
+  disembarkPositions,
   formation,
   hasDeepStrike,
 } from '@battle-drill/engine';
@@ -24,12 +26,16 @@ export function describeEvent(e: GameEvent, state: GameState): string | null {
   switch (e.type) {
     case 'TurnStarted':
       return `Round ${e.round}: ${e.player === 'p1' ? 'your' : 'opponent'} turn`;
+    case 'UnitEmbarked':
+      return `${name(e.unitId)} embarked in ${name(e.transportId)}`;
+    case 'UnitDisembarked':
+      return `${name(e.unitId)} made ${e.mode === 'emergency' ? 'an emergency' : `a ${e.mode}`} disembark from ${name(e.transportId)}${e.lost ? ` (${e.lost} models lost)` : ''}`;
     case 'UnitPlacedInReserves':
       return `${name(e.unitId)} was placed in strategic reserves`;
     case 'UnitArrived':
       return `${name(e.unitId)} arrived from reserves${e.deepStrike ? ' by Deep Strike' : ''}`;
     case 'UnitMoved':
-      if (e.moveType === 'ingress') return null;
+      if (e.moveType === 'ingress' || e.moveType === 'disembark') return null;
       return e.moveType === 'stationary'
         ? `${name(e.unitId)} remained stationary`
         : `${name(e.unitId)} made a ${e.moveType} move (${e.moved.toFixed(1)}")`;
@@ -139,6 +145,19 @@ export function GameView({ state, extra }: { state: GameState; extra?: ReactNode
           enemyGap: ARRIVAL_ENEMY_DISTANCE,
         }
       : null;
+  const disembarkFrom =
+    selected &&
+    selected.player === 'p1' &&
+    state.phase === 'movement' &&
+    state.activePlayer === 'p1' &&
+    eligibleMoveTypes(state, selected.id).includes('disembark')
+      ? state.status[selected.id]!.embarkedIn
+      : null;
+  const disembarkZone = disembarkFrom
+    ? aliveModels(state.units[disembarkFrom]!)
+        .filter((m) => m.position)
+        .map((m) => ({ x: m.position!.x, y: m.position!.y, r: m.baseRadius + DISEMBARK_DISTANCE }))
+    : [];
   const log = state.log.map((e) => describeEvent(e, state)).filter((x): x is string => !!x);
 
   return (
@@ -152,6 +171,7 @@ export function GameView({ state, extra }: { state: GameState; extra?: ReactNode
             rings={rings}
             onUnitClick={(id) => select(id)}
             arrival={arrival}
+            disembarkZone={disembarkZone}
             onBackgroundClick={(at) => {
               if (at && arrival && selected)
                 act({
@@ -159,6 +179,13 @@ export function GameView({ state, extra }: { state: GameState; extra?: ReactNode
                   unitId: selected.id,
                   moveType: 'ingress',
                   positions: formation(selected, at),
+                });
+              else if (at && disembarkFrom && selected)
+                act({
+                  type: 'move',
+                  unitId: selected.id,
+                  moveType: 'disembark',
+                  positions: disembarkPositions(state, selected.id, at) ?? formation(selected, at),
                 });
               else select(null);
             }}

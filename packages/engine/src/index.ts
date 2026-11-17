@@ -123,3 +123,13 @@ export {
   ARRIVAL_ENEMY_DISTANCE,
 } from './phases/reserves.js';
 export { chargePositions, ENFORCE_CHARGE_PROXIMITY } from './phases/chargeProximity.js';
+export {
+  canEmbark,
+  disembarkMode,
+  disembarkPositions,
+  isTransport,
+  passengers,
+  usedCapacity,
+  EMBARK_DISTANCE,
+  DISEMBARK_DISTANCE,
+} from './phases/transports.js';
