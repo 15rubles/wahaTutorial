@@ -49,7 +49,7 @@ export const transportsLesson: Lesson = {
     {
       id: 'embark',
       ruleRefs: ['core.transports.embarking'],
-      say: 'To get back in, a unit makes a normal, advance or fall back move and ends with every model within 3" of the transport. Then an Embark button appears.',
+      say: 'Getting back in works after the unit has moved this phase (any move except staying put), as long as all its models finish close to the transport, within 3". An Embark button then shows up.',
     },
     {
       id: 'emergency',

@@ -1,5 +1,14 @@
 import type { CatalogEntry } from '@battle-drill/data';
-import { type UnresolvedUnit, bodyguardOptions, normalizeName } from '@battle-drill/roster';
+import {
+  BATTLE_SIZES,
+  type BattleSize,
+  type UnresolvedUnit,
+  bodyguardOptions,
+  canAddDetachment,
+  detachmentBudget,
+  detachmentCost,
+  normalizeName,
+} from '@battle-drill/roster';
 import { useEffect, useMemo, useState } from 'react';
 import { PieceArt, pieceType } from '../art/pieces.js';
 import { useArmy } from '../army/store.js';
@@ -82,6 +91,81 @@ function FixMe({ entry }: { entry: UnresolvedUnit }) {
   );
 }
 
+/** Battle size and detachments, paid for with detachment points (DP). */
+function DetachmentPicker() {
+  const { army, toggleDetachment, setBattleSize } = useArmy();
+  const { game, datasheets } = useData();
+  if (!army || !game) return null;
+  const pool = game.detachments.filter((d) => d.factionId === army.factionId);
+  const keywords = [
+    ...new Set(
+      army.units.flatMap(
+        (u) => datasheets.get(u.datasheetId)?.keywords.map((k) => k.keyword) ?? [],
+      ),
+    ),
+  ];
+  const budget = detachmentBudget(army, game.detachments, keywords);
+  const size = army.battleSize ? BATTLE_SIZES[army.battleSize] : null;
+  const enhancementsTaken = army.units.reduce((n, u) => n + u.enhancementIds.length, 0);
+  return (
+    <section className="panel detachments" data-testid="detachments">
+      <div className="button-row">
+        <label>
+          Battle size{' '}
+          <select
+            value={army.battleSize ?? ''}
+            onChange={(e) => setBattleSize((e.target.value || null) as BattleSize | null)}
+            data-testid="battle-size"
+          >
+            <option value="">(not set)</option>
+            {Object.entries(BATTLE_SIZES).map(([id, b]) => (
+              <option key={id} value={id}>
+                {b.name} ({b.points} pts, {b.detachmentPoints} DP)
+              </option>
+            ))}
+          </select>
+        </label>
+        <span className="small" data-testid="dp-used">
+          Detachment points: {budget.used}
+          {budget.total !== null && ` of ${budget.total}`} used
+        </span>
+        {size && (
+          <span className={`small ${enhancementsTaken > size.enhancements ? 'warn' : 'muted'}`}>
+            Enhancements: {enhancementsTaken} of {size.enhancements}
+          </span>
+        )}
+      </div>
+      {budget.left !== null && budget.left < 0 && (
+        <p className="small warn">Over the detachment points for this battle size.</p>
+      )}
+      <ul className="detachment-list">
+        {pool.map((d) => {
+          const on = army.detachmentIds.includes(d.id);
+          const can = on || canAddDetachment(army, d, game.detachments, keywords);
+          return (
+            <li key={d.id}>
+              <label className={can ? '' : 'muted'}>
+                <input
+                  type="checkbox"
+                  checked={on}
+                  disabled={!can}
+                  onChange={() => toggleDetachment(d.id)}
+                  data-testid={`detachment-${d.id}`}
+                />{' '}
+                <b>{d.name}</b> <span className="tag">{detachmentCost(d, keywords)} DP</span>
+                {d.forceDispositions.length > 0 && (
+                  <span className="small muted"> {d.forceDispositions.join(', ')}</span>
+                )}
+              </label>
+            </li>
+          );
+        })}
+        {pool.length === 0 && <li className="small muted">No detachments in the data.</li>}
+      </ul>
+    </section>
+  );
+}
+
 /** Leaders pick a bodyguard unit to join; bodyguards show who leads them. */
 function LeaderCell({
   options,
@@ -117,7 +201,7 @@ function LeaderCell({
 }
 
 export function ArmyPage() {
-  const { army, setDetachment, setAttachment, clear, hydrate } = useArmy();
+  const { army, setAttachment, clear, hydrate } = useArmy();
   const { game, datasheets } = useData();
   useEffect(() => {
     void hydrate();
@@ -132,7 +216,6 @@ export function ArmyPage() {
     );
 
   const faction = game?.factions.find((f) => f.id === army.factionId);
-  const detachments = game?.detachments.filter((d) => d.factionId === army.factionId) ?? [];
   const enhancementName = (id: string) => game?.enhancements.find((e) => e.id === id)?.name ?? id;
   const attachments = army.attachments ?? {};
   const unitName = (key: string) => army.units.find((u) => u.key === key)?.datasheetName ?? key;
@@ -155,21 +238,7 @@ export function ArmyPage() {
         </div>
       </div>
 
-      <label>
-        Detachment{' '}
-        <select
-          value={army.detachmentId ?? ''}
-          onChange={(e) => setDetachment(e.target.value || null)}
-          data-testid="detachment-select"
-        >
-          <option value="">(none)</option>
-          {detachments.map((d) => (
-            <option key={d.id} value={d.id}>
-              {d.name}
-            </option>
-          ))}
-        </select>
-      </label>
+      <DetachmentPicker />
 
       {army.unresolved.length > 0 && (
         <div className="panel fixme-panel" data-testid="fixme">

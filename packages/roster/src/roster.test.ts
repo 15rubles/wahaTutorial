@@ -11,7 +11,8 @@ const load = (name: string): ResolvedArmy =>
 function expectFullRustPilgrims(army: ResolvedArmy) {
   expect(army.unresolved).toEqual([]);
   expect(army.factionId).toBe('RP');
-  expect(army.detachmentId).toBe('900000801');
+  expect(army.detachmentIds).toEqual(['900000801']);
+  expect(army.battleSize).toBe('incursion');
   expect(army.units.map((u) => u.datasheetName)).toEqual([
     'Pilgrim Scrapwarden',
     'Rustbound Devotees',
@@ -75,7 +76,7 @@ describe('roster import (fixture rosters)', () => {
     const army = load('glass-choir.ros');
     expect(army.unresolved).toEqual([]);
     expect(army.factionId).toBe('GC');
-    expect(army.detachmentId).toBe('900000802');
+    expect(army.detachmentIds).toEqual(['900000802']);
     expect(army.units.find((u) => u.datasheetName === 'Echo Skimmers')?.modelCount).toBe(3);
   });
 

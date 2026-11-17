@@ -1465,3 +1465,13 @@ pre {
   stroke-width: 0.08;
   stroke-dasharray: 0.4 0.3;
 }
+.detachment-list {
+  list-style: none;
+  padding: 0;
+  margin: 0.5rem 0 0;
+  columns: 2 18rem;
+}
+.detachment-list li {
+  margin: 0.2rem 0;
+  break-inside: avoid;
+}

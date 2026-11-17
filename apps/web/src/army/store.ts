@@ -1,10 +1,12 @@
 import {
+  type BattleSize,
   type ResolvedArmy,
   assignDatasheet,
   canAttach,
   cleanAttachments,
   dropUnresolved,
   factionsToLoad,
+  migrateArmy,
   readRoster,
   resolveRoster,
   suggestAttachments,
@@ -26,7 +28,7 @@ function save(army: ResolvedArmy | null) {
 function restore(): ResolvedArmy | null {
   try {
     const raw = window.localStorage.getItem(KEY);
-    return raw ? (JSON.parse(raw) as ResolvedArmy) : null;
+    return raw ? migrateArmy(JSON.parse(raw) as ResolvedArmy) : null;
   } catch {
     return null;
   }
@@ -39,7 +41,9 @@ interface ArmyState {
   importFile(name: string, content: Uint8Array | string): Promise<ResolvedArmy | null>;
   assign(key: string, datasheetId: string): Promise<void>;
   drop(key: string): void;
-  setDetachment(id: string | null): void;
+  /** Add or remove a detachment (the DP budget is checked by the caller). */
+  toggleDetachment(id: string): void;
+  setBattleSize(size: BattleSize | null): void;
   /** Attach a leader unit to a bodyguard unit, or detach it with null. */
   setAttachment(leaderKey: string, bodyguardKey: string | null): void;
   clear(): void;
@@ -87,10 +91,20 @@ export const useArmy = create<ArmyState>((set, get) => ({
     save(next);
     set({ army: next });
   },
-  setDetachment(id) {
+  toggleDetachment(id) {
     const { army } = get();
     if (!army) return;
-    const next = { ...army, detachmentId: id };
+    const ids = army.detachmentIds.includes(id)
+      ? army.detachmentIds.filter((x) => x !== id)
+      : [...army.detachmentIds, id];
+    const next = { ...army, detachmentIds: ids };
+    save(next);
+    set({ army: next });
+  },
+  setBattleSize(size) {
+    const { army } = get();
+    if (!army) return;
+    const next = { ...army, battleSize: size };
     save(next);
     set({ army: next });
   },

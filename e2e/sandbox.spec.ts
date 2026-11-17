@@ -83,3 +83,16 @@ test('leaders are attached on import and can be detached on the army page', asyn
   await select.selectOption('');
   await expect(page.getByTestId('army-units')).not.toContainText('Led by');
 });
+
+test('several detachments within the battle size detachment points', async ({ page }) => {
+  await importFixtureArmy(page);
+  test.skip(!FIXTURE, 'fixture roster only');
+  await expect(page.getByTestId('battle-size')).toHaveValue('incursion');
+  // The fixture detachment costs 2 DP for an army with Cinder Lancers (keyword cost).
+  await expect(page.getByTestId('dp-used')).toContainText('2 of 2');
+  await expect(page.getByTestId('detachment-900000801')).toBeChecked();
+  await page.getByTestId('battle-size').selectOption('strike-force');
+  await expect(page.getByTestId('dp-used')).toContainText('2 of 3');
+  await page.getByTestId('detachment-900000801').uncheck();
+  await expect(page.getByTestId('dp-used')).toContainText('0 of 3');
+});

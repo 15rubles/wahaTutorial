@@ -72,11 +72,15 @@ export interface UnresolvedUnit {
   readonly suggestions: readonly Suggestion[];
 }
 
+export type BattleSize = 'incursion' | 'strike-force';
+
 export interface ResolvedArmy {
   readonly name: string;
   readonly format: RosterDraft['format'];
   readonly factionId: string | null;
-  readonly detachmentId: string | null;
+  /** Detachments chosen with detachment points (25.04). */
+  readonly detachmentIds: readonly string[];
+  readonly battleSize: BattleSize | null;
   readonly points: number | null;
   readonly units: readonly ResolvedUnit[];
   readonly unresolved: readonly UnresolvedUnit[];

@@ -17,3 +17,12 @@ export {
   suggestAttachments,
   cleanAttachments,
 } from './attachments.js';
+export {
+  BATTLE_SIZES,
+  guessBattleSize,
+  detachmentCost,
+  detachmentBudget,
+  canAddDetachment,
+  migrateArmy,
+  type DetachmentBudget,
+} from './detachments.js';

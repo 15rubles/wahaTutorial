@@ -107,6 +107,17 @@ rules, then record the resolution here.
   disembark when a transport is destroyed. Firing from inside a transport is not modelled.
 - Status: open (simplification)
 
+### RQ-11: Detachment point costs
+
+- Rule ref: `core.muster-armies.fill-your-army-roster.select-detachments`
+- Question: 59 of 315 detachments in the cache have no DP value, and some have a different cost per
+  keyword (for example per chapter). It is not clear whether that cost applies when one unit has the
+  keyword or only when the whole army does.
+- Current interpretation: no value counts as 0 DP; a keyword cost applies when any unit in the army
+  has that keyword (`detachmentCost` in packages/roster/src/detachments.ts). Force dispositions are
+  shown but not used yet.
+- Status: open
+
 ## Resolved
 
 None yet.

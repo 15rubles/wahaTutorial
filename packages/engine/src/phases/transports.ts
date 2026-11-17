@@ -92,7 +92,7 @@ export function embark(
 }
 
 /**
- * Disembark mode (18.04): rapid if the TRANSPORT made a normal or ingress move this phase, tactical
+ * Disembark mode (18.04): rapid once the TRANSPORT has moved (normal or ingress), tactical
  * if it stayed still or has not moved yet; null if it advanced or fell back (not eligible).
  * RULES-QUESTION: RQ-10 combat disembark (when a tactical set-up is impossible) is not offered.
  */

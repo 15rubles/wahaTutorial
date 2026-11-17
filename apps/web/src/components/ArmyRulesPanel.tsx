@@ -23,9 +23,11 @@ export function ArmyRulesPanel() {
   const armyRules = game.abilities.filter(
     (a) => army.factionId && a.factionIds.includes(army.factionId),
   );
-  const detachment = game.detachments.find((d) => d.id === army.detachmentId);
-  const detRules = game.detachmentAbilities.filter((a) => a.detachmentId === army.detachmentId);
-  const enhancements = game.enhancements.filter((e) => e.detachmentId === army.detachmentId);
+  const chosen = game.detachments.filter((d) => army.detachmentIds.includes(d.id));
+  const detRules = game.detachmentAbilities.filter((a) =>
+    army.detachmentIds.includes(a.detachmentId),
+  );
+  const enhancements = game.enhancements.filter((e) => army.detachmentIds.includes(e.detachmentId));
   const taken = new Set(army.units.flatMap((u) => u.enhancementIds));
   return (
     <section className="panel army-rules">
@@ -40,9 +42,14 @@ export function ArmyRulesPanel() {
         ))}
       </div>
       <div data-tutorial-id="detachment-rule">
-        <h4>Detachment {detachment && <span className="small muted">({detachment.name})</span>}</h4>
-        {!detachment && (
-          <p className="small muted">No detachment selected (pick one on the army page).</p>
+        <h4>
+          {chosen.length > 1 ? 'Detachments' : 'Detachment'}{' '}
+          {chosen.length > 0 && (
+            <span className="small muted">({chosen.map((d) => d.name).join(', ')})</span>
+          )}
+        </h4>
+        {chosen.length === 0 && (
+          <p className="small muted">No detachment selected (pick them on the army page).</p>
         )}
         {detRules.map((a) => (
           <details key={a.id}>

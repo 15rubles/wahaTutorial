@@ -380,3 +380,13 @@ next to the transport sets them up, packed around the hull (`disembarkPositions`
 fixture faction gained a Rust Crawler transport (not in the fixture roster). New lesson 11.
 Transports (roles `transport` and `passenger`; an invented hauler stands in when the army has no
 transport with room), lessons 11 and 12 became 12 and 13.
+
+## D-047 Several detachments and battle size
+
+11th edition armies pick detachments with detachment points (DP) from the battle size (Incursion and
+Strike Force, read from the cached battle size table). `ResolvedArmy.detachmentId` became
+`detachmentIds` plus `battleSize`; saved armies are migrated on load. Import keeps every detachment the
+roster names and guesses the battle size from the roster text or its points. The Army page shows the
+battle size, a checklist of the faction's detachments with their DP cost, the DP used and the
+enhancement count against the limit; a detachment that would go over budget cannot be ticked. The
+stratagem and army rules panels show rules from every chosen detachment.

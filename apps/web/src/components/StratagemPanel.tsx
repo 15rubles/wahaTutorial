@@ -14,9 +14,9 @@ export function StratagemPanel({ state }: { state: GameState }) {
   const openRule = useRulePopup((s) => s.open);
   if (!game) return null;
   const core = game.stratagems.filter((s) => !s.factionId && /^core\b/i.test(s.type));
-  const detachment = army?.detachmentId
-    ? game.stratagems.filter((s) => s.detachmentId === army.detachmentId)
-    : [];
+  const detachment = game.stratagems.filter(
+    (s) => !!army && army.detachmentIds.includes(s.detachmentId),
+  );
   const used = new Set(
     state.stratagemsThisPhase.filter((s) => s.player === 'p1').map((s) => s.stratagemId),
   );

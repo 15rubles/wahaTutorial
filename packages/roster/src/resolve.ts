@@ -4,6 +4,7 @@
  * that does not match ends up in `unresolved` (with suggestions) or `warnings`.
  */
 import type { CatalogEntry, Datasheet, Detachment, Enhancement, Faction } from '@battle-drill/data';
+import { guessBattleSize } from './detachments.js';
 import { normalizeName, similarity } from './names.js';
 import type {
   DraftItem,
@@ -110,7 +111,7 @@ function resolveUnit(
   ds: Datasheet,
   match: ResolvedUnit['match'],
   lookup: RosterLookup,
-  detachmentId: string | null,
+  detachmentIds: readonly string[],
   warnings: string[],
 ): ResolvedUnit {
   // Counted lines that are really weapons (text rosters of single model units) move to items.
@@ -135,7 +136,7 @@ function resolveUnit(
       (e) => normalizeName(e.name) === normalizeName(name),
     );
     const pick =
-      candidates.find((e) => e.detachmentId === detachmentId) ??
+      candidates.find((e) => detachmentIds.includes(e.detachmentId)) ??
       candidates.find((e) => e.factionId === ds.factionId) ??
       candidates[0];
     if (pick && !enhancementIds.includes(pick.id)) enhancementIds.push(pick.id);
@@ -202,14 +203,15 @@ export function resolveRoster(draft: RosterDraft, lookup: RosterLookup): Resolve
     if (!factionId) warnings.push('Could not tell which faction this roster is for.');
   }
 
-  let detachmentId: string | null = null;
+  // Every detachment the roster names (11th edition armies can take several, paid with DP).
   const pool = lookup.detachments.filter((d) => !factionId || d.factionId === factionId);
   const hintSources = [
     ...draft.detachmentHints,
     ...draft.units.flatMap((u) => u.items.map((i) => i.name)),
   ];
-  let bestDet = 0;
+  const detachmentIds: string[] = [];
   for (const hint of hintSources) {
+    let best: { id: string; s: number } | null = null;
     for (const d of pool) {
       const s =
         normalizeName(hint) === normalizeName(d.name)
@@ -217,13 +219,12 @@ export function resolveRoster(draft: RosterDraft, lookup: RosterLookup): Resolve
           : normalizeName(hint).includes(normalizeName(d.name))
             ? 0.95
             : similarity(hint, d.name);
-      if (s >= 0.9 && s > bestDet) {
-        bestDet = s;
-        detachmentId = d.id;
-      }
+      if (s >= 0.9 && (!best || s > best.s)) best = { id: d.id, s };
     }
+    if (best && !detachmentIds.includes(best.id)) detachmentIds.push(best.id);
   }
-  if (!detachmentId) warnings.push('No detachment recognised. Pick one on the army screen.');
+  if (detachmentIds.length === 0)
+    warnings.push('No detachment recognised. Pick them on the army screen.');
 
   const units: ResolvedUnit[] = [];
   const unresolved: UnresolvedUnit[] = [];
@@ -250,18 +251,21 @@ export function resolveRoster(draft: RosterDraft, lookup: RosterLookup): Resolve
         ds,
         { method, score: Math.min(1, top.score) },
         lookup,
-        detachmentId,
+        detachmentIds,
         warnings,
       ),
     );
   });
 
+  const points =
+    draft.points ?? (units.length ? units.reduce((n, u) => n + (u.points ?? 0), 0) : null);
   return {
     name: draft.name ?? 'Imported roster',
     format: draft.format,
     factionId,
-    detachmentId,
-    points: draft.points ?? (units.length ? units.reduce((n, u) => n + (u.points ?? 0), 0) : null),
+    detachmentIds,
+    battleSize: guessBattleSize(draft.detachmentHints, points),
+    points,
     units,
     unresolved,
     warnings,
@@ -285,7 +289,7 @@ export function assignDatasheet(
     ds,
     { method: 'manual', score: 1 },
     lookup,
-    army.detachmentId,
+    army.detachmentIds,
     warnings,
   );
   const order = (k: string) => Number(k.slice(1));
