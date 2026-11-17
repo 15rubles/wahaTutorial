@@ -2,6 +2,7 @@
 import { resolve } from 'node:path';
 import { EnvHttpProxyAgent, setGlobalDispatcher } from 'undici';
 import { buildNormalized } from './build.js';
+import { addCoreRules } from './rules/buildRules.js';
 import { nodeFetcher, systemClock } from './sync/http.js';
 import { runSync, summarize } from './sync/sync.js';
 
@@ -40,7 +41,7 @@ async function main(argv: string[]): Promise<number> {
     const fixture = args.includes('--fixture');
     const rawDir = resolve(REPO_ROOT, flag(args, '--raw-dir') ?? resolve(cacheDir, 'raw'));
     const outDir = resolve(REPO_ROOT, flag(args, '--out-dir') ?? resolve(cacheDir, 'normalized'));
-    const data = await buildNormalized({ rawDir, outDir, fixture });
+    const data = await buildNormalized({ rawDir, outDir, fixture, extend: addCoreRules });
     const { counts, errors, warnings } = data.report;
     console.log(
       Object.entries(counts)
@@ -54,6 +55,9 @@ async function main(argv: string[]): Promise<number> {
     };
     console.log(`Errors: ${errors.length} (${byCategory(errors)})`);
     console.log(`Warnings: ${warnings.length} (${byCategory(warnings)})`);
+    console.log(
+      `Rules: ${counts['ruleSections'] ?? 0} sections, keywords resolved ${counts['resolvedKeywords'] ?? 0}, identity ${counts['identityKeywords'] ?? 0}, unresolved ${counts['unresolvedKeywords'] ?? 0}`,
+    );
     console.log(`Written to ${outDir} (report: _report.json)`);
     return errors.length > 0 ? 1 : 0;
   }

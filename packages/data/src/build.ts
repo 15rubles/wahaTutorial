@@ -61,7 +61,6 @@ export async function buildNormalized(options: BuildOptions): Promise<Normalized
   await write('enhancements.json', data.enhancements);
   await write('detachment-abilities.json', data.detachmentAbilities);
   await write('detachments.json', data.detachments);
-  await write('keywords.json', data.keywords);
   await write('catalog.json', data.catalog);
   const byFaction = new Map<string, unknown[]>();
   for (const ds of data.datasheets) {
@@ -76,6 +75,7 @@ export async function buildNormalized(options: BuildOptions): Promise<Normalized
       'utf8',
     );
   }
+  if (!('keywords.json' in extra)) await write('keywords.json', data.keywords);
   for (const [name, value] of Object.entries(extra)) await write(name, value);
   await writeFile(
     join(options.outDir, '_report.json'),
