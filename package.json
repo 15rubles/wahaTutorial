@@ -19,7 +19,7 @@
     "format": "prettier --write .",
     "format:check": "prettier --check .",
     "e2e": "node scripts/not-yet.mjs e2e M8",
-    "data:sync": "node scripts/not-yet.mjs data:sync M1",
+    "data:sync": "tsx packages/data/src/cli.ts sync",
     "data:build": "node scripts/not-yet.mjs data:build M2"
   },
   "devDependencies": {
@@ -36,6 +36,7 @@
     "eslint-plugin-react-hooks": "^7.1.1",
     "jsdom": "^31.0.1",
     "prettier": "^3.10.1",
+    "tsx": "^4.23.15",
     "typescript": "^6.0.3",
     "typescript-eslint": "^8.73.0",
     "vite": "^8.3.8",
