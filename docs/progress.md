@@ -122,9 +122,21 @@ unit, pick a move and drag it, shoot, charge, fight; `npm run e2e` plays a turn 
 **Demo:** `#/learn` lists lessons; "Drill zero" walks through selecting your unit, ending the command
 phase and making your first move.
 
-## M9 - The tutorial campaign
+## M9 - The tutorial campaign - DONE
 
-- [ ] Accept: every lesson completes in Playwright with the fixture army; real-roster manual run noted here
+- [x] Ten lessons, each adding one layer, using the player's own units (roles) or the whole army:
+      datasheet, melee duel, shooting, movement, charge and fight phase, command points and stratagems,
+      objectives and battle-shock, army rule / detachment / enhancements, deployment and a battle round
+      against the scripted AI, graduation free game
+- [x] Engine: stratagem CP spending with the once-per-phase limits; UI: stratagem panel, army rules panel, deployment controls
+- [x] Accept: every lesson completes in Playwright with the invented Rust Pilgrims army (`e2e/campaign.spec.ts`)
+- [ ] Real-roster manual run on the owner's machine: still to do. Run
+      `E2E_DATA=cache E2E_ROSTER=/path/to/your.ros npm run e2e` or play `#/learn` by hand.
+      Smoke run done here on 2026-11-17 against the real cache with a short hand-written Space
+      Marines text list (not committed): all 10 lessons passed.
+
+**Demo:** `#/learn` lists the campaign; each lesson highlights what to click, blocks everything else,
+shows the cached rule text for the step and saves progress.
 
 ## M10 - Polish
 

@@ -249,3 +249,22 @@ needed. On a new machine run `npx playwright install chromium` once.
   roles first, distinct units where possible. Missing roles use invented stand-ins and the lesson says
   so. Enemies in lessons are invented (`Practice Dummies`, `Sparring Partners`).
 - Lesson boards reuse the training ground without deployment zones; units start already placed.
+
+## D-035 (M9) Stratagems
+
+The engine's `useStratagem` action spends CP and enforces the 15.01 limits (same stratagem once per
+phase per player, one stratagem per unit per phase, no battle-shocked own targets). Effects are not
+simulated: the card text from the cache is shown and the player applies it. Timing (`turn`, `phase`)
+is shown on the card but not enforced, because it is free text in the data. Core stratagems are the
+ones with no faction and a type starting with "Core".
+
+## D-036 (M9) Lesson extensions
+
+- `near`: place a unit a set edge to edge gap from another (engaged, or a guaranteed charge), whatever
+  the base sizes of the player's units.
+- `free` steps: no dimming or blocking (playing a battle round, graduation).
+- `army: 'full'` lessons use the whole army against invented enemies, from deployment or
+  auto-deployed; `battleRounds`, `startCp` and side `panels` (stratagems, army rules) per lesson.
+- `npm run rules:check` verifies every engine and lesson rule id against the local cache (180 refs,
+  all resolve on the real data).
+- E2E can run against your own cache: `E2E_DATA=cache E2E_ROSTER=/path/roster npm run e2e`.
