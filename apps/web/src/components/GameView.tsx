@@ -5,6 +5,7 @@ import {
   eligibleMoveTypes,
 } from '@battle-drill/engine';
 import { type ReactNode, useMemo } from 'react';
+import { PIECE_LABEL, PieceArt, pieceType } from '../art/pieces.js';
 import { useData } from '../data/store.js';
 import { useGame } from '../game/store.js';
 import { ActionPanel } from './ActionPanel.js';
@@ -47,6 +48,41 @@ export function describeEvent(e: GameEvent, state: GameState): string | null {
     default:
       return null;
   }
+}
+
+/** The piece types on the board, with what they stand for. */
+function PieceLegend({ state }: { state: GameState }) {
+  const seen = new Map<
+    string,
+    { type: ReturnType<typeof pieceType>; side: 'p1' | 'p2'; names: string[] }
+  >();
+  for (const u of Object.values(state.units)) {
+    if (!aliveModels(u).some((m) => m.position)) continue;
+    const type = pieceType(u.keywords, u.datasheetId);
+    const key = `${u.player}-${type}`;
+    const entry = seen.get(key) ?? { type, side: u.player, names: [] };
+    entry.names.push(u.name);
+    seen.set(key, entry);
+  }
+  return (
+    <div className="piece-legend" data-tutorial-id="piece-legend">
+      {[...seen.values()].map((e) => (
+        <span
+          key={`${e.side}-${e.type}`}
+          className={`legend-item side-${e.side}`}
+          title={e.names.join(', ')}
+        >
+          <span className={`legend-token side-${e.side}`}>
+            <PieceArt type={e.type} side={e.side} size={30} />
+          </span>
+          {PIECE_LABEL[e.type]}
+        </span>
+      ))}
+      <span className="legend-note">
+        Red rim: yours. Green rim: enemy. Hatched terrain blocks sight; yellow coins are objectives.
+      </span>
+    </div>
+  );
 }
 
 /** Phase bar, battlefield, controls, dice and unit card: shared by the sandbox and lessons. */
@@ -102,10 +138,7 @@ export function GameView({ state, extra }: { state: GameState; extra?: ReactNode
               })
             }
           />
-          <p className="small muted legend">
-            <span className="swatch p1" /> your units <span className="swatch p2" /> opponent.
-            Hatched terrain blocks sight. Dashed rings: weapon ranges. Yellow circles: objectives.
-          </p>
+          <PieceLegend state={state} />
         </div>
         <aside className="side">
           <ActionPanel state={state} />

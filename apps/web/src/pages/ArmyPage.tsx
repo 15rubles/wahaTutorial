@@ -1,6 +1,7 @@
 import type { CatalogEntry } from '@battle-drill/data';
 import { type UnresolvedUnit, normalizeName } from '@battle-drill/roster';
 import { useEffect, useMemo, useState } from 'react';
+import { PieceArt, pieceType } from '../art/pieces.js';
 import { useArmy } from '../army/store.js';
 import { useData } from '../data/store.js';
 import { href } from '../router.js';
@@ -160,6 +161,18 @@ export function ArmyPage() {
             return (
               <tr key={u.key}>
                 <td>
+                  <span className="legend-token row-token">
+                    <PieceArt
+                      type={pieceType(
+                        ds
+                          ? ds.keywords.filter((k) => !k.model).map((k) => k.keyword.toUpperCase())
+                          : [],
+                        u.datasheetId,
+                      )}
+                      side="p1"
+                      size={26}
+                    />
+                  </span>
                   <a href={href('unit', u.datasheetId)}>{u.datasheetName}</a>
                   {u.isWarlord && <span className="tag">Warlord</span>}
                   {u.enhancementIds.map((id) => (

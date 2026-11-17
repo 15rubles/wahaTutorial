@@ -9,9 +9,8 @@ import {
   isObscuring,
 } from '@battle-drill/engine';
 import { type PointerEvent, useMemo, useRef, useState } from 'react';
+import { PieceDefs, pieceType } from '../art/pieces.js';
 import { useGame } from '../game/store.js';
-
-export const PLAYER_COLOR = { p1: 'var(--p1)', p2: 'var(--p2)' } as const;
 
 const TERRAIN_FILL: Record<string, string> = {
   dense: 'var(--terrain-dense)',
@@ -37,6 +36,27 @@ function svgPoint(svg: SVGSVGElement, e: { clientX: number; clientY: number }): 
   if (!ctm) return { x: 0, y: 0 };
   const p = new DOMPoint(e.clientX, e.clientY).matrixTransform(ctm.inverse());
   return { x: p.x, y: p.y };
+}
+
+/** Name plate above (your units) or below (enemy units) a unit: "Name 9/10". */
+function UnitPlate({ unit }: { unit: UnitState }) {
+  const ms = aliveModels(unit).filter((m) => m.position);
+  if (ms.length === 0) return null;
+  const cx = ms.reduce((n, m) => n + m.position!.x, 0) / ms.length;
+  const below = unit.player === 'p1';
+  const y = below
+    ? Math.max(...ms.map((m) => m.position!.y + m.baseRadius)) + 0.25
+    : Math.min(...ms.map((m) => m.position!.y - m.baseRadius)) - 1.1;
+  const label = `${unit.name} ${ms.length}/${unit.startingStrength}`;
+  const w = label.length * 0.37 + 0.8;
+  return (
+    <g className={`unit-plate plate-${unit.player}`} aria-hidden="true">
+      <rect x={cx - w / 2} y={y} width={w} height={0.9} />
+      <text x={cx} y={y + 0.66}>
+        {label}
+      </text>
+    </g>
+  );
 }
 
 export function Battlefield({
@@ -124,6 +144,14 @@ export function Battlefield({
         >
           <line x1="0" y1="0" x2="0" y2="1" stroke="var(--terrain-line)" strokeWidth="0.15" />
         </pattern>
+        <filter id="board-texture" x="0" y="0" width="100%" height="100%">
+          <feTurbulence type="fractalNoise" baseFrequency="0.18 0.26" numOctaves="4" seed="11" />
+          <feColorMatrix values="0 0 0 0 0.2  0 0 0 0 0.22  0 0 0 0 0.16  0 0 0 0.28 0" />
+        </filter>
+        <filter id="piece-shadow" x="-30%" y="-30%" width="160%" height="160%">
+          <feDropShadow dx="0.08" dy="0.16" stdDeviation="0.1" floodOpacity="0.55" />
+        </filter>
+        <PieceDefs />
       </defs>
       <rect
         x={0}
@@ -133,6 +161,14 @@ export function Battlefield({
         className="board"
         onClick={onBackgroundClick}
       />
+      <rect
+        x={0}
+        y={0}
+        width={width}
+        height={height}
+        filter="url(#board-texture)"
+        className="board-texture"
+      />
       {deploymentZones.map((z) => (
         <polygon
           key={z.player}
@@ -140,6 +176,20 @@ export function Battlefield({
           className={`zone zone-${z.player}`}
         />
       ))}
+      {deploymentZones.map((z) => {
+        const ys = z.polygon.map((p) => p.y);
+        const top = Math.min(...ys) < height / 2;
+        return (
+          <text
+            key={`label-${z.player}`}
+            x={width - 0.4}
+            y={top ? Math.max(...ys) + 0.9 : Math.min(...ys) - 0.4}
+            className={`zone-label zone-label-${z.player}`}
+          >
+            {z.player === 'p1' ? 'YOUR DEPLOYMENT ZONE' : 'ENEMY DEPLOYMENT ZONE'}
+          </text>
+        );
+      })}
       {terrain.map((t) => (
         <g key={t.id} data-tutorial-id={`terrain-${t.id}`}>
           <polygon
@@ -150,12 +200,23 @@ export function Battlefield({
           {isObscuring(t) && (
             <polygon points={t.polygon.map((p) => `${p.x},${p.y}`).join(' ')} fill="url(#hatch)" />
           )}
-          <text x={t.polygon[0]!.x + 0.3} y={t.polygon[0]!.y + 0.9} className="terrain-label">
-            {t.name}
+          <rect
+            x={Math.min(...t.polygon.map((p) => p.x))}
+            y={Math.min(...t.polygon.map((p) => p.y)) - 1.05}
+            width={(t.name.length + t.categories[0]!.length + 3) * 0.36 + 0.6}
+            height={0.95}
+            className="terrain-plate"
+          />
+          <text
+            x={Math.min(...t.polygon.map((p) => p.x)) + 0.3}
+            y={Math.min(...t.polygon.map((p) => p.y)) - 0.3}
+            className="terrain-label"
+          >
+            {`${t.name} \u00b7 ${t.categories[0] ?? ''}`.toUpperCase()}
           </text>
         </g>
       ))}
-      {objectives.map((o) => {
+      {objectives.map((o, index) => {
         const owner = state.objectiveControl[o.id];
         return (
           <g key={o.id} data-tutorial-id={`objective-${o.id}`}>
@@ -172,7 +233,15 @@ export function Battlefield({
               cy={o.position.y}
               r={0.79}
               className={`objective ${owner ? `objective-${owner}` : ''}`}
+              filter="url(#piece-shadow)"
             />
+            <text
+              x={o.position.x}
+              y={o.position.y + 0.33}
+              className={`objective-number ${owner ? 'held' : ''}`}
+            >
+              {index + 1}
+            </text>
           </g>
         );
       })}
@@ -201,7 +270,7 @@ export function Battlefield({
             className={`unit unit-${u.player} ${isSel ? 'selected' : ''} ${isHi ? 'highlight' : ''} ${dragLimit !== null && isSel ? 'draggable' : ''}`}
             role="button"
             tabIndex={0}
-            aria-label={`${u.player === 'p1' ? 'Your' : 'Enemy'} unit ${u.name}, ${ms.length} models`}
+            aria-label={`${u.name} ${ms.length}/${u.startingStrength}, ${u.player === 'p1' ? 'your unit' : 'enemy unit'}`}
             aria-pressed={isSel}
             data-tutorial-id={`unit-${u.id}`}
             data-testid={`unit-${u.id}`}
@@ -264,23 +333,31 @@ export function Battlefield({
             onPointerMove={onPointerMove}
             onPointerUp={onPointerUp}
           >
-            {ms.map((m: ModelState) => (
-              <circle
-                key={m.id}
-                cx={m.position!.x}
-                cy={m.position!.y}
-                r={m.baseRadius}
-                fill={PLAYER_COLOR[u.player]}
-                className={m.woundsLeft < m.wounds ? 'model wounded' : 'model'}
-              >
-                <title>{`${m.name}: ${m.woundsLeft}/${m.wounds} W`}</title>
-              </circle>
-            ))}
-            {ms.some((m) => m.isCharacter) && ms.length === 1 && (
-              <text x={ms[0]!.position!.x} y={ms[0]!.position!.y + 0.25} className="model-mark">
-                *
-              </text>
-            )}
+            {ms.map((m: ModelState) => {
+              const r = m.baseRadius;
+              const art = r * 1.7;
+              return (
+                <g key={m.id} className={`piece side-${u.player}`} filter="url(#piece-shadow)">
+                  <circle
+                    cx={m.position!.x}
+                    cy={m.position!.y}
+                    r={r}
+                    className={m.woundsLeft < m.wounds ? 'model wounded' : 'model'}
+                  >
+                    <title>{`${m.name}: ${m.woundsLeft}/${m.wounds} W`}</title>
+                  </circle>
+                  <use
+                    href={`#piece-${pieceType(u.keywords, u.datasheetId)}`}
+                    x={m.position!.x - art / 2}
+                    y={m.position!.y - art / 2 - r * 0.04}
+                    width={art}
+                    height={art}
+                    className="piece-figure"
+                  />
+                </g>
+              );
+            })}
+            <UnitPlate unit={u} />
           </g>
         );
       })}
