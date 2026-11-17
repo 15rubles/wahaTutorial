@@ -24,7 +24,10 @@ export default defineConfig({
     command: `npm run dev -w @battle-drill/web -- --port ${PORT} --strictPort`,
     url: `http://localhost:${PORT}`,
     reuseExistingServer: false,
-    env: { BATTLE_DRILL_DATA_DIR: 'fixtures/normalized' },
+    env: {
+      BATTLE_DRILL_DATA_DIR:
+        process.env['E2E_DATA'] === 'cache' ? 'data-cache/normalized' : 'fixtures/normalized',
+    },
     timeout: 60_000,
   },
 });

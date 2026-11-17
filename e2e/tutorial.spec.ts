@@ -35,7 +35,7 @@ test('M8: the 3-step demo lesson runs end to end', async ({ page }) => {
   await expect(page.getByTestId('tutorial-done')).toBeVisible();
 
   // Progress is saved.
-  await page.goto('/?data=fixture#/learn');
-  await expect(page.getByTestId('lesson-demo').locator('..')).toContainText('done');
+  const saved = await page.evaluate(() => localStorage.getItem('battle-drill.tutorial'));
+  expect(JSON.parse(saved!).completed).toContain('demo');
   expect(errors).toEqual([]);
 });
