@@ -98,9 +98,17 @@ synced and merged into the rules browser (390 sections).
 **Demo:** engine only (`npx vitest run --project engine`). The acceptance test plays a full first
 battle round between the Rust Pilgrims and the Glass Choir on the invented training ground.
 
-## M7 - Web UI: playable sandbox
+## M7 - Web UI: playable sandbox - DONE
 
-- [ ] Accept: import a roster and play one full turn against a dummy enemy unit
+- [x] SVG battlefield: terrain (hatched when it blocks sight), objectives with range rings, deployment zones, models by player
+- [x] Drag to move with a live ruler and the move's maximum enforced; weapon range rings in the shooting phase; target selection per weapon
+- [x] Unit card with the full datasheet from the cache; weapon and unit keywords open the rule popup
+- [x] Dice tray with roll animation (off with reduced motion) and a hit / wound / save / damage breakdown
+- [x] Phase bar (round, turn, phase, CP, VP, undo, end phase) and a battle log; the opponent plays itself
+- [x] Accept: Playwright imports the fixture roster and plays a full turn (move by drag, shoot, open a rule, charge, fight steps), then the opponent's turn, ending in round 2
+
+**Demo:** import a roster, open `#/sandbox`. Your army deploys against practice dummies. Select a
+unit, pick a move and drag it, shoot, charge, fight; `npm run e2e` plays a turn automatically.
 
 ## M8 - Tutorial framework
 

@@ -212,3 +212,23 @@ fixed, VP equal to 5 per objective you control at the end of your turn. The trai
 `nextAiAction(state, player)` is pure and deterministic. It proposes candidate actions in a fixed order
 and returns the first one `apply` accepts, so it can never break the rules. It drives the M6 acceptance
 test (both sides) and will be the M9 opponent.
+
+## D-032 (M7) Sandbox design
+
+- The enemy is an invented "Practice Dummies" unit (5 models, T4 Sv5+ W2, a weak melee weapon), so the
+  sandbox only needs the player's own army. Both sides are auto-deployed by the scripted deployment.
+- Units move as a whole: dragging translates every model by the same offset, clamped to the move's
+  maximum. Per model placement is supported by the engine but not by the UI yet.
+- Charges, pile ins and consolidations use engine helpers that compute positions (`closeTo`,
+  `stepModelsToward`); the player picks the target, the helper places the models, the engine
+  validates.
+- Whenever the game waits on the opponent (their turn, their pile in, their fights), the scripted AI
+  acts immediately. Undo rewinds to the player's previous decision.
+- Clicking a unit selects it; clicking empty board deselects (a toggle on click fought with dragging).
+- Colours use the Okabe-Ito palette (blue / vermillion for the players, yellow for objectives).
+
+## D-033 (M7) Playwright
+
+`@playwright/test` is pinned to the version of the browsers available here (1.63.0). E2E runs the dev
+server with `BATTLE_DRILL_DATA_DIR=fixtures/normalized` and the demo data source, so no GW data is
+needed. On a new machine run `npx playwright install chromium` once.

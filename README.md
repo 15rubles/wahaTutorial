@@ -31,11 +31,13 @@ npm run build        # type-check packages and build the web app
 npm test             # all unit tests (Vitest)
 npm run lint         # ESLint + long dash check
 npm run format       # Prettier
-npm run e2e          # Playwright (from M8)
-npm run data:sync    # fetch Wahapedia data into ./data-cache (from M1)
-npm run data:build   # normalize raw cache (from M2)
+npm run e2e          # Playwright end-to-end tests (fixture data only)
+npm run data:sync    # fetch Wahapedia data into ./data-cache (manual, rate limited)
+npm run data:build   # normalize raw cache -> data-cache/normalized
+npm run fixtures:build # regenerate the invented fixture data
 ```
 
-Requires Node 20 or newer (`.nvmrc` pins 22).
+Requires Node 20 or newer (`.nvmrc` pins 22). For `npm run e2e` on a new machine, run
+`npx playwright install chromium` once.
 
 See `CLAUDE.md` for the full plan and `docs/progress.md` for status.
