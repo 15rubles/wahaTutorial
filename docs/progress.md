@@ -72,9 +72,18 @@ links). Without a cache the app explains the two commands and offers demo data.
 mode, click a demo roster). The army page lists every unit with models, weapons, points, warlord and
 enhancement tags, and a detachment picker. Unknown units show up in "Fix me".
 
-## M5 - Engine core: dice and the attack sequence
+## M5 - Engine core: dice and the attack sequence - DONE
 
-- [ ] Accept: property tests for the wound chart; every implemented keyword has tests; no rule text in engine
+- [x] Seedable dice (mulberry32, state is a plain object), scripted roller for tutorials
+- [x] Attack sequence as pure functions, one file per step: gather dice, hit roll, wound roll, allocation, save roll, inflict damage, mortal wounds, hazard rolls
+- [x] Events for every step (`AttackDiceGathered`, `HitRolled`, `WoundRolled`, `SaveRolled`, `DamageInflicted`, `ModelDestroyed`, `HazardRolled`, `AttacksResolved`)
+- [x] Weapon keyword registry with 22 modules: every keyword in the fixture army plus the common ones in the real data
+- [x] Accept: fast-check property tests for the wound chart; one test per implemented keyword (enforced by a coverage test); a test fails on any prose string literal in engine code
+
+**Demo:** engine only so far (`npm test -w @battle-drill/engine`). Mechanics follow the cached
+11th edition text, for example cover worsening BS, saves resolved from the lowest roll against
+allocation groups, and devastating wounds hitting one model at most. The rules appendix is now
+synced and merged into the rules browser (390 sections).
 
 ## M6 - Engine: battlefield and phases
 

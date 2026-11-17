@@ -154,3 +154,29 @@ points)" are configuration, not units. Unknown lines are skipped, never fatal.
 
 The resolved army is saved in localStorage (wrapped in try/catch). Datasheets are loaded per faction
 file on demand.
+
+## D-025 (M5) Rules appendix and glossary
+
+The core rules page refers to many numbered sub-rules (for example 02.02.01 Modifiers) that live on
+`/wh40k11ed/the-rules/rules-appendix/` (allowed by robots.txt). `data:sync` now fetches that page too.
+Its coded sections are merged into the tree by code, with their sub-headings. Codes still missing
+are filled from the glossary tooltips at the bottom of the core page. Real build: 390 sections.
+
+## D-026 (M5) Engine choices where a player would choose
+
+The engine needs a default whenever the rules let a player decide. All are deterministic and can be
+overridden later through the attack context:
+
+- Lethal hits: auto wound, except when the weapon also has devastating wounds or an applicable anti
+  (then the attacker rolls to wound, looking for critical wounds).
+- Twin-linked: re-roll failed wound rolls only.
+- Psychic: ignore harmful hit / BS modifiers, keep helpful ones.
+- Allocation order ties (defender's choice): keep the unit's model order. Precision: pick the first
+  visible CHARACTER.
+- Random A is rolled per weapon copy; random D is rolled when a model is selected, as 02.02.03 says.
+
+## D-027 (M5) Engine depends on data types only
+
+`packages/engine` imports types (no runtime code) from `@battle-drill/data` to map datasheets to
+units. Keyword behaviour is a registry of modules, one per keyword, each exporting `ruleRefs`.
+Keywords the engine does not simulate are reported by `unimplementedKeywords()` so the UI can say so.
