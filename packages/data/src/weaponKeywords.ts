@@ -22,7 +22,7 @@ const PARAM = /^(\d+\+?|\d*d\d+(?:\+\d+)?)$/i;
 export function slugify(s: string): string {
   return s
     .normalize('NFKD')
-    .replace(/[̀-ͯ]/g, '')
+    .replace(/\p{M}/gu, '')
     .toLowerCase()
     .replace(/['’]/g, '')
     .replace(/[^a-z0-9]+/g, '-')
