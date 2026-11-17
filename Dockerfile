@@ -27,9 +27,10 @@ COPY . .
 RUN npm run build \
     && mkdir -p data-cache node_modules/.vite-temp \
     && chown -R node:node /app/data-cache node_modules/.vite-temp \
-    && chmod +x docker/entrypoint.sh
+    && sed -i 's/\r$//' docker/entrypoint.sh
 
 USER node
 VOLUME ["/app/data-cache"]
 EXPOSE 5173
-ENTRYPOINT ["docker/entrypoint.sh"]
+# Run through sh and strip CR above, so a Windows (CRLF) checkout still works.
+ENTRYPOINT ["sh", "docker/entrypoint.sh"]
