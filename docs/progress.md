@@ -35,9 +35,17 @@ source has not changed. `--force` rechecks every file with conditional GETs.
 Real run on 2026-11-17: 24 requests, all downloaded; second run 0 requests; third run with
 `--max-age-hours 0` made 2 requests and skipped 22 files.
 
-## M2 - Normalize datasheets
+## M2 - Normalize datasheets - DONE
 
-- [ ] Accept: all factions load; validation report has zero unexplained errors; tests use invented fixtures only
+- [x] Zod schema for Faction, Datasheet, ModelProfile, WeaponProfile, Ability, Keyword, Stratagem, Detachment, Enhancement, RuleSection (plus Publication, DetachmentAbility, CatalogEntry)
+- [x] Tolerant CSV parser (BOM, mixed line endings, trailing pipe, newlines inside fields)
+- [x] `npm run data:build` writes `data-cache/normalized/` and `_report.json`; broken rows are reported, never crash
+- [x] Invented fixture export (`fixtures/wahapedia/`) and its normalized output (`fixtures/normalized/`)
+- [x] Accept: all 25 real factions load; 0 errors; every warning category explained; unit tests use fixtures only
+
+**Demo:** `npm run data:build` turns the raw cache into normalized JSON in about a second:
+25 factions, 1485 datasheets, 7488 weapon profiles, 0 errors, 98 explained warnings.
+`npm run fixtures:build` does the same for the invented Rust Pilgrims and Glass Choir.
 
 ## M3 - Core rules tree
 

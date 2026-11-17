@@ -79,6 +79,49 @@ starting hint only.
   like `24.03`) rather than headings.
 - Body text uses `span.kwb` for keywords and tooltip spans; ads and scripts must be stripped.
 
-## Part 2: Normalized schema (M2, not started)
+## Part 2: Normalized schema (M2)
 
-Zod schemas in `packages/data/src/schema.ts`. Every entity keeps `sourceId` and `sourceUrl`.
+Zod schemas live in `packages/data/src/schema.ts` and are exported (with inferred types) from the
+browser-safe entry `@battle-drill/data`. Node-only code (sync, build) is in `@battle-drill/data/node`.
+
+`npm run data:build` reads `data-cache/raw/` and writes `data-cache/normalized/`:
+
+| File                                                                                                       | Content                                                                                                                                          |
+| ---------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------ |
+| `meta.json`                                                                                                | schema version, build time, source `last_update`, oldest raw fetch time, fixture flag                                                            |
+| `factions.json`                                                                                            | `Faction[]` with datasheet counts                                                                                                                |
+| `datasheets/<factionId>.json`                                                                              | `Datasheet[]`: models, weapons, abilities, keywords, composition, costs, options, leader links, stratagem / enhancement / detachment ability ids |
+| `catalog.json`                                                                                             | light `CatalogEntry[]` (id, name, faction, role, keywords) for roster matching and pickers                                                       |
+| `detachments.json`                                                                                         | `Detachment[]` with detachment points, force dispositions, keyword point overrides, linked ids                                                   |
+| `stratagems.json`, `enhancements.json`, `detachment-abilities.json`, `abilities.json`, `publications.json` | one array each                                                                                                                                   |
+| `keywords.json`                                                                                            | `Keyword[]`: every unit keyword and weapon keyword with use counts (rule links added in M3)                                                      |
+| `_report.json`                                                                                             | counts, errors, warnings (file, line, id, category, message) and an explanation per category                                                     |
+
+Conventions:
+
+- Every entity has `id`, `sourceId` (the Wahapedia id) and `sourceUrl`.
+- Fields ending in `Html` are the export HTML as is (GW text, cache only).
+- Characteristics are parsed: `movement` (inches or null), `save` / `leadership` / `skill` as the target
+  number (3 for 3+), `invuln` or null, `ap` as a non-positive integer, `attacks` / `strength` / `damage`
+  as `DiceExpr` `{ dice, sides, plus, raw }` (`D6+1` is `{1, 6, 1}`, a flat 3 is `{0, 0, 3}`).
+- `range` is null for melee weapons; `skill` is null when the weapon has no BS / WS (for example
+  weapons that hit automatically).
+- Weapon keywords are `{ id, param?, target?, condition?, raw }`, for example `anti-infantry 4+` is
+  `{ id: 'anti', target: 'infantry', param: '4+' }`.
+
+Report categories (`_report.json` `explanations` repeats these):
+
+| Category                  | Level   | Meaning                                                                  |
+| ------------------------- | ------- | ------------------------------------------------------------------------ |
+| `missing-file`            | error   | expected CSV not in the raw cache                                        |
+| `malformed-record`        | error   | wrong number of fields, record skipped                                   |
+| `invalid-row`             | error   | failed schema validation, dropped                                        |
+| `orphan-reference`        | warning | child row points at a missing datasheet / enhancement / ability, ignored |
+| `wargear-without-profile` | warning | wargear row with no Ranged / Melee type (notes, not weapons)             |
+| `unparsed-value`          | warning | characteristic not parseable, safe default used                          |
+| `model-without-profile`   | warning | model row without Toughness / Wounds, dropped                            |
+| `duplicate-id`            | warning | repeated id, first kept                                                  |
+
+Real build on 2026-11-17: 25 factions, 1485 datasheets, 7488 weapon profiles, 0 errors, 98 warnings
+(60 orphan references: rows in child tables for datasheets that are not in `Datasheets.csv`;
+38 wargear rows without a profile type).

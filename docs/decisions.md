@@ -48,3 +48,32 @@ treated the same as HTML pages for robots purposes, which is stricter than requi
 
 Node's built-in `fetch` ignores `HTTPS_PROXY`. When a proxy variable is set the CLI installs undici's
 `EnvHttpProxyAgent`; with no proxy variable nothing changes.
+
+## D-009 (M2) Parse CSV by field count, map columns by header name
+
+Some description fields contain raw newlines, so the parser counts fields (each record ends with a
+trailing `|`) instead of splitting lines. The real column order differs from the spec sheet (for
+example `Stratagems.id` is the third column), so every column is read by header name.
+
+## D-010 (M2) Shared abilities merged
+
+`Abilities.csv` repeats an id once per faction that has the ability. These rows are merged into one
+`Ability` with `factionIds: string[]` instead of being reported as duplicates.
+
+## D-011 (M2) Lenient characteristics
+
+A `-` characteristic means "no value" (for example OC on fortifications) and maps to a default
+(OC 0, movement null, invuln null) without a warning. Anything else unparseable maps to a default
+with an `unparsed-value` warning. Only structural problems are errors.
+
+## D-012 (M2) Fixtures in the raw export shape
+
+`scripts/make-fixtures.mjs` generates two invented factions (Rust Pilgrims, Glass Choir) as CSVs with
+the real headers, BOM, trailing pipes and mixed line endings. `npm run fixtures:build` runs the real
+normalizer on them into `fixtures/normalized/` (committed, fixed timestamp). Engine, web and E2E tests
+use that output, so the whole pipeline is tested without any GW text.
+
+## D-013 (M2) Two package entries
+
+`@battle-drill/data` is browser safe (schema and pure parsers, Zod only); `@battle-drill/data/node`
+has sync and the file system build.
