@@ -283,3 +283,11 @@ ones with no faction and a type starting with "Core".
   (headings, CSV headers, rule ids and number runs excluded). It found three engine comments and two
   doc lines worded too close to the rules; they were rewritten, plus template wording in a fixture
   column. Now clean.
+
+## D-038 Docker
+
+One image (node:22-slim) installs, builds and serves with `vite preview` (which keeps the `/data`
+plugin). The rules data is downloaded at container start into a named volume, never baked into the
+image, so the image itself holds no GW content. Restarts make no requests thanks to the sync freshness
+window. If the sync fails the app still starts with demo data. The container runs as the `node` user.
+An optional `ca` build secret supports TLS-intercepting proxies.

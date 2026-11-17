@@ -12,6 +12,23 @@ Rules, datasheets, stratagems and ability text are Games Workshop IP. This repo 
 They are fetched on demand by `npm run data:sync` into `./data-cache/`, which is gitignored.
 Tests use the invented "Rust Pilgrims" faction in `fixtures/`.
 
+## Quick start with Docker (one command)
+
+```bash
+docker compose up --build
+```
+
+Then open http://localhost:5173. The first start installs and builds everything, downloads the rules
+data from Wahapedia (rate limited, about 30 seconds) into a Docker volume and builds the local
+cache. Later starts reuse the volume and make no requests for 24 hours. Without network the app
+still starts and offers invented demo data.
+
+Behind a proxy that intercepts TLS, give the build its CA certificate:
+`docker build --secret id=ca,src=/path/to/ca.crt -t battle-drill .`
+
+To refresh the rules data, restart the container after a day, or wipe the volume:
+`docker compose down -v`.
+
 ## What you can do
 
 - `#/import`: import a BattleScribe / New Recruit roster (`.ros`, `.rosz`) or a text export; fix unknown units
