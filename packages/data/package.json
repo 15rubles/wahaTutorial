@@ -9,9 +9,14 @@
     ".": {
       "types": "./dist/index.d.ts",
       "default": "./dist/index.js"
+    },
+    "./node": {
+      "types": "./dist/node.d.ts",
+      "default": "./dist/node.js"
     }
   },
   "dependencies": {
-    "undici": "^8.12.4"
+    "undici": "^8.12.4",
+    "zod": "^4.6.7"
   }
 }

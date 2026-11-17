@@ -20,7 +20,8 @@
     "format:check": "prettier --check .",
     "e2e": "node scripts/not-yet.mjs e2e M8",
     "data:sync": "tsx packages/data/src/cli.ts sync",
-    "data:build": "node scripts/not-yet.mjs data:build M2"
+    "data:build": "tsx packages/data/src/cli.ts build",
+    "fixtures:build": "node scripts/make-fixtures.mjs && tsx packages/data/src/cli.ts build --fixture --raw-dir fixtures/wahapedia --out-dir fixtures/normalized"
   },
   "devDependencies": {
     "@eslint/js": "^10.0.1",
