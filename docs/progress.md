@@ -20,11 +20,20 @@ Each milestone ends with tests green, this file updated, and a short demo note.
 `npm run e2e`, `npm run data:sync` and `npm run data:build` exist as placeholders that print
 which milestone implements them.
 
-## M1 - Data recon and sync
+## M1 - Data recon and sync - DONE
 
-- [ ] Recon of Wahapedia 11th edition data (CSV export, page structure, robots.txt) written to `docs/data-schema.md`
-- [ ] `npm run data:sync` with rate limiting, User-Agent, ETag / timestamp cache
-- [ ] Accept: second run with no changes makes zero network requests; sync log lists changes
+- [x] Recon of Wahapedia 11th edition data (CSV export, page structure, robots.txt) written to `docs/data-schema.md`
+- [x] `npm run data:sync` with rate limiting (1.1 s spacing), User-Agent, retries, ETag / Last-Modified conditional GET, manifest with sha256
+- [x] robots.txt fetched first and obeyed for every URL
+- [x] Accept: second run with no changes makes zero network requests; `data-cache/raw/sync-log.json` lists what changed
+
+**Demo:** `npm run data:sync` downloads 21 CSV files plus the core rules page (24 requests, about 26 s).
+Running it again prints "Nothing to do" and makes 0 requests. After 24 hours (or with
+`--max-age-hours 0`) it makes 2 requests (robots.txt and Last_update.csv) and skips the rest if the
+source has not changed. `--force` rechecks every file with conditional GETs.
+
+Real run on 2026-11-17: 24 requests, all downloaded; second run 0 requests; third run with
+`--max-age-hours 0` made 2 requests and skipped 22 files.
 
 ## M2 - Normalize datasheets
 
