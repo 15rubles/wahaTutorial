@@ -22,6 +22,7 @@ import * as charge from './phases/charge.js';
 import * as command from './phases/command.js';
 import * as deployment from './phases/deployment.js';
 import * as fight from './phases/fight.js';
+import * as legal from './phases/legalActions.js';
 import * as movement from './phases/movement.js';
 import * as objectives from './phases/objectives.js';
 import * as shooting from './phases/shooting.js';
@@ -51,6 +52,7 @@ const modules: Record<string, { ruleRefs: readonly string[] }> = {
   command,
   deployment,
   fight,
+  legal,
   movement,
   objectives,
   shooting,

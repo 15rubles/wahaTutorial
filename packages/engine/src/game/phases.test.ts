@@ -435,3 +435,22 @@ describe('stratagems', () => {
     expect(s.log.at(-1)).toMatchObject({ type: 'StratagemUsed', stratagemId: 'x', cpLeft: 0 });
   });
 });
+
+describe('legalActions', () => {
+  it('lists what a unit can do in each phase', async () => {
+    const { legalActions } = await import('../phases/legalActions.js');
+    let s = started([squad('a', 'p1', { x: 10, y: 10 }), squad('b', 'p2', { x: 10, y: 16 })]);
+    expect(legalActions(s, 'a')).toEqual([{ kind: 'none', reason: 'nothing-this-phase' }]);
+    s = run(s, { type: 'endPhase' });
+    expect(legalActions(s, 'a')).toEqual([
+      { kind: 'move', moveTypes: ['stationary', 'normal', 'advance'] },
+    ]);
+    expect(legalActions(s, 'b')).toEqual([{ kind: 'none', reason: 'not-your-turn' }]);
+    s = run(s, { type: 'move', unitId: 'a', moveType: 'stationary' });
+    expect(legalActions(s, 'a')).toEqual([{ kind: 'none', reason: 'already-acted' }]);
+    s = run(s, { type: 'endPhase' });
+    expect(legalActions(s, 'a')).toEqual([{ kind: 'shoot', shootingTypes: ['normal'] }]);
+    s = run(s, { type: 'endPhase' });
+    expect(legalActions(s, 'a')).toEqual([{ kind: 'declare-charge' }]);
+  });
+});

@@ -11,7 +11,7 @@ export function modifiedRoll(roll: number, modifier: number): number {
   return Math.max(1, roll + modifier);
 }
 
-/** BS / WS cannot be 1+ or better, or 7+ or worse. */
+/** Keep a skill target between 2 and 6. */
 export function clampSkill(skill: number): number {
   return Math.max(2, Math.min(6, skill));
 }

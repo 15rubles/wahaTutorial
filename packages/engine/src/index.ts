@@ -113,3 +113,4 @@ export { controlLevels } from './phases/objectives.js';
 export { engagedEnemies, isEngaged } from './phases/validateMove.js';
 export { nextAiAction, actingPlayer } from './ai/scriptedAi.js';
 export { engineRuleRefs } from './ruleRefs.js';
+export { legalActions, type LegalOption } from './phases/legalActions.js';

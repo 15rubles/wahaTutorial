@@ -49,7 +49,7 @@ export const PILE_IN_SEARCH = 5;
 
 const onTable = (u: UnitState) => aliveModels(u).some((m) => m.position);
 
-/** Fights First: units that made a charge move this turn (11.04). Other sources are not simulated. */
+/** Fights First here means: charged this turn (11.04). Other sources are not simulated. */
 export const fightsFirst = (state: GameState, unitId: string): boolean =>
   !!state.status[unitId]?.charged;
 
@@ -96,7 +96,7 @@ function closingMove(
     if (closestEnemyDistance(b, targets) >= closestEnemyDistance(a, targets) - 1e-6)
       return err('NOT_CLOSER', b.id);
   }
-  // Each model that started engaged with an enemy unit must still be engaged with that unit.
+  // Models that began this move in combat with a unit have to stay in combat with it.
   for (let i = 0; i < before.length; i++) {
     for (const t of targets) {
       const was = aliveModels(t).some((e) => within(modelDistance(before[i]!, e), 2));
