@@ -1,0 +1,21 @@
+{
+  "extends": "./tsconfig.base.json",
+  "compilerOptions": {
+    "composite": false,
+    "declaration": false,
+    "declarationMap": false,
+    "noEmit": true,
+    "types": ["node"],
+    "module": "ESNext",
+    "moduleResolution": "Bundler",
+    "allowImportingTsExtensions": false,
+    "paths": {
+      "@battle-drill/data": ["./packages/data/src/index.ts"],
+      "@battle-drill/data/node": ["./packages/data/src/node.ts"],
+      "@battle-drill/engine": ["./packages/engine/src/index.ts"],
+      "@battle-drill/roster": ["./packages/roster/src/index.ts"],
+      "@battle-drill/tutorial": ["./packages/tutorial/src/index.ts"]
+    }
+  },
+  "include": ["packages/*/src/**/*.test.ts", "packages/*/src/testing.ts"]
+}
