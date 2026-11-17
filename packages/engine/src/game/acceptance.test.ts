@@ -108,3 +108,16 @@ describe('M6 acceptance: scripted game through battle round 1', () => {
     expect(JSON.parse(JSON.stringify(final))).toEqual(final);
   });
 });
+
+describe('history with forced dice', () => {
+  it('replays scripted dice exactly', () => {
+    const { actions, initial } = playRoundOne(2026);
+    let h = startHistory(initial);
+    actions.forEach((a, i) => {
+      h = record(h, a, i === actions.length - 1 ? [6, 6, 6] : undefined).history;
+    });
+    expect(JSON.stringify(replay(h.initial, h.actions, h.scripted))).toBe(
+      JSON.stringify(h.current),
+    );
+  });
+});
