@@ -1,7 +1,17 @@
 import type { GameAction, GameEvent, GameState, Phase, UnitState } from '@battle-drill/engine';
 
 /** Unit roles a lesson can ask for. Filled from the player's army (roles.ts). */
-export type Role = 'melee' | 'shooter' | 'fast' | 'character' | 'target' | 'enemyMelee';
+export type Role =
+  | 'melee'
+  | 'shooter'
+  | 'fast'
+  | 'character'
+  /** A leader attached to its bodyguard unit (one merged unit). */
+  | 'leader'
+  /** A unit with the Deep Strike ability, starting in reserves. */
+  | 'deepStriker'
+  | 'target'
+  | 'enemyMelee';
 
 /** Something on screen to highlight. Elements carry `data-tutorial-id`. */
 export type UiTarget =
@@ -60,6 +70,8 @@ export interface LessonUnitSpec {
   readonly at: { readonly x: number; readonly y: number };
   /** Instead of `at.y`: place this unit `gap` inches (edge to edge) beyond the named role's unit. */
   readonly near?: { readonly role: Role; readonly gap: number };
+  /** Start off the board in strategic reserves (`at` is ignored). */
+  readonly reserves?: boolean;
 }
 
 export type LessonPanel = 'stratagems' | 'army-rules';

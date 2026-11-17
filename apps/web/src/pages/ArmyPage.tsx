@@ -1,5 +1,5 @@
 import type { CatalogEntry } from '@battle-drill/data';
-import { type UnresolvedUnit, normalizeName } from '@battle-drill/roster';
+import { type UnresolvedUnit, bodyguardOptions, normalizeName } from '@battle-drill/roster';
 import { useEffect, useMemo, useState } from 'react';
 import { PieceArt, pieceType } from '../art/pieces.js';
 import { useArmy } from '../army/store.js';
@@ -82,8 +82,42 @@ function FixMe({ entry }: { entry: UnresolvedUnit }) {
   );
 }
 
+/** Leaders pick a bodyguard unit to join; bodyguards show who leads them. */
+function LeaderCell({
+  options,
+  attachedTo,
+  leaders,
+  unitName,
+  onChange,
+}: {
+  options: readonly { key: string; datasheetName: string }[];
+  attachedTo: string | undefined;
+  leaders: readonly string[];
+  unitName: string;
+  onChange: (bodyguardKey: string | null) => void;
+}) {
+  if (options.length > 0)
+    return (
+      <select
+        aria-label={`Unit for ${unitName} to lead`}
+        value={attachedTo ?? ''}
+        onChange={(e) => onChange(e.target.value || null)}
+        data-testid="attach-select"
+      >
+        <option value="">Not attached</option>
+        {options.map((o) => (
+          <option key={o.key} value={o.key}>
+            Leads {o.datasheetName}
+          </option>
+        ))}
+      </select>
+    );
+  if (leaders.length > 0) return <span>Led by {leaders.join(' and ')}</span>;
+  return <span className="muted">-</span>;
+}
+
 export function ArmyPage() {
-  const { army, setDetachment, clear, hydrate } = useArmy();
+  const { army, setDetachment, setAttachment, clear, hydrate } = useArmy();
   const { game, datasheets } = useData();
   useEffect(() => {
     void hydrate();
@@ -100,6 +134,8 @@ export function ArmyPage() {
   const faction = game?.factions.find((f) => f.id === army.factionId);
   const detachments = game?.detachments.filter((d) => d.factionId === army.factionId) ?? [];
   const enhancementName = (id: string) => game?.enhancements.find((e) => e.id === id)?.name ?? id;
+  const attachments = army.attachments ?? {};
+  const unitName = (key: string) => army.units.find((u) => u.key === key)?.datasheetName ?? key;
 
   return (
     <section className="army-page">
@@ -152,6 +188,7 @@ export function ArmyPage() {
             <th>Unit</th>
             <th>Models</th>
             <th>Weapons</th>
+            <th>Leader</th>
             <th>Points</th>
           </tr>
         </thead>
@@ -194,6 +231,17 @@ export function ArmyPage() {
                   {u.wargearDefaulted && (
                     <div className="muted">(no wargear in roster: all datasheet weapons shown)</div>
                   )}
+                </td>
+                <td className="small">
+                  <LeaderCell
+                    options={bodyguardOptions(army, u.key, (id) => datasheets.get(id))}
+                    attachedTo={attachments[u.key]}
+                    leaders={Object.entries(attachments)
+                      .filter(([, b]) => b === u.key)
+                      .map(([l]) => unitName(l))}
+                    unitName={u.datasheetName}
+                    onChange={(b) => setAttachment(u.key, b)}
+                  />
                 </td>
                 <td>{u.points ?? '-'}</td>
               </tr>

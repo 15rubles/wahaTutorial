@@ -4,6 +4,7 @@ import {
   type UnitState,
   actingPlayer,
   apply,
+  attachUnits,
   createGame,
   flat,
   nextAiAction,
@@ -56,10 +57,15 @@ export function practiceDummies(id = 'dummy'): UnitState {
   };
 }
 
+/**
+ * Engine units for the army. With `attached`, leaders are merged into their bodyguard units
+ * (the merged unit keeps the bodyguard's key as its id).
+ */
 export function armyUnits(
   army: ResolvedArmy,
   datasheet: (id: string) => Datasheet | undefined,
   abilityName: (id: string) => string | undefined,
+  options: { attached?: boolean } = {},
 ): UnitState[] {
   const out: UnitState[] = [];
   for (const u of army.units) {
@@ -78,7 +84,22 @@ export function armyUnits(
       }),
     );
   }
-  return out;
+  if (!options.attached) return out;
+  const attachments = army.attachments ?? {};
+  const byId = new Map(out.map((u) => [u.id, u]));
+  const leadersOf = new Map<string, UnitState[]>();
+  for (const [leader, bodyguard] of Object.entries(attachments)) {
+    const l = byId.get(leader);
+    if (!l || !byId.has(bodyguard)) continue;
+    leadersOf.set(bodyguard, [...(leadersOf.get(bodyguard) ?? []), l]);
+  }
+  const attachedLeaders = new Set([...leadersOf.values()].flat().map((u) => u.id));
+  return out
+    .filter((u) => !attachedLeaders.has(u.id))
+    .map((u) => {
+      const leaders = leadersOf.get(u.id);
+      return leaders ? attachUnits(u, leaders) : u;
+    });
 }
 
 /** Deploys every unit with the scripted deployment and starts battle round 1. */

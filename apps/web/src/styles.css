@@ -1426,3 +1426,36 @@ pre {
 .tutorial-rules summary {
   font-weight: 600;
 }
+
+/* Reserves: where the selected unit may arrive. */
+.battlefield .arrival {
+  pointer-events: none;
+}
+.battlefield .arrival-edge {
+  fill: rgba(196, 160, 52, 0.28);
+  stroke: #8a6d12;
+  stroke-width: 0.08;
+  stroke-dasharray: 0.4 0.3;
+}
+.battlefield .arrival-nogo {
+  fill: rgba(150, 30, 20, 0.16);
+  stroke: rgba(150, 30, 20, 0.6);
+  stroke-width: 0.08;
+  stroke-dasharray: 0.3 0.25;
+}
+.reserve-list {
+  list-style: none;
+  padding: 0;
+  margin: 0.3rem 0;
+}
+.reserve-list li {
+  display: flex;
+  gap: 0.4rem;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.15rem 0;
+}
+.attached-cards {
+  display: grid;
+  gap: 0.6rem;
+}

@@ -50,6 +50,21 @@ export function pieceType(keywords: readonly string[], datasheetId = ''): PieceT
   return 'infantry';
 }
 
+/** Piece for one model: in an attached unit, each model keeps its own unit's look. */
+export function modelPieceType(
+  unit: {
+    keywords: readonly string[];
+    datasheetId: string;
+    components?:
+      | readonly { keywords: readonly string[]; datasheetId: string; modelIds: readonly string[] }[]
+      | undefined;
+  },
+  modelId: string,
+): PieceType {
+  const c = unit.components?.find((x) => x.modelIds.includes(modelId));
+  return c ? pieceType(c.keywords, c.datasheetId) : pieceType(unit.keywords, unit.datasheetId);
+}
+
 const M = 'var(--pm)';
 const D = 'var(--pd)';
 const E = 'var(--pe)';

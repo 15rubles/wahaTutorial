@@ -19,7 +19,7 @@ import { href } from '../router.js';
 import { TutorialOverlay } from '../tutorial/Overlay.js';
 import { useTutorial } from '../tutorial/store.js';
 
-function useArmyUnits(): { units: UnitState[]; ready: boolean } {
+function useArmyUnits(): { units: UnitState[]; attached: UnitState[]; ready: boolean } {
   const army = useArmy((s) => s.army);
   const hydrate = useArmy((s) => s.hydrate);
   const { datasheets, game } = useData();
@@ -27,16 +27,14 @@ function useArmyUnits(): { units: UnitState[]; ready: boolean } {
     void hydrate();
   }, [hydrate]);
   return useMemo(() => {
-    if (!army) return { units: [], ready: true };
+    if (!army) return { units: [], attached: [], ready: true };
     const ready = army.units.every((u) => datasheets.has(u.datasheetId));
+    if (!ready) return { units: [], attached: [], ready };
+    const ds = (id: string) => datasheets.get(id);
+    const ab = (id: string) => game?.abilities.find((a) => a.id === id)?.name;
     return {
-      units: ready
-        ? armyUnits(
-            army,
-            (id) => datasheets.get(id),
-            (id) => game?.abilities.find((a) => a.id === id)?.name,
-          )
-        : [],
+      units: armyUnits(army, ds, ab),
+      attached: armyUnits(army, ds, ab, { attached: true }),
       ready,
     };
   }, [army, datasheets, game]);
@@ -72,14 +70,14 @@ export function LessonList() {
 
 export function LessonPage({ lessonId }: { lessonId: string }) {
   const lesson = lessonById(lessonId);
-  const { units, ready } = useArmyUnits();
+  const { units, attached, ready } = useArmyUnits();
   const { history, start, setGuard, setDice, select } = useGame();
   const tutorial = useTutorial();
 
   // Build the lesson game once the army's datasheets are loaded.
   useEffect(() => {
     if (!lesson || !ready) return;
-    const { state, ctx } = buildLessonGame(lesson, units);
+    const { state, ctx } = buildLessonGame(lesson, units, attached);
     start(state);
     const resume =
       tutorial.progress.current?.lessonId === lesson.id ? tutorial.progress.current.stepIndex : 0;

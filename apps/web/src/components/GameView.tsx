@@ -1,8 +1,12 @@
 import {
+  ARRIVAL_ENEMY_DISTANCE,
   type GameEvent,
   type GameState,
+  INGRESS_EDGE_DISTANCE,
   aliveModels,
   eligibleMoveTypes,
+  formation,
+  hasDeepStrike,
 } from '@battle-drill/engine';
 import { type ReactNode, useMemo } from 'react';
 import { PIECE_LABEL, PieceArt, pieceType } from '../art/pieces.js';
@@ -13,13 +17,19 @@ import { Battlefield } from './Battlefield.js';
 import { DiceTray } from './DiceTray.js';
 import { PhaseBar } from './PhaseBar.js';
 import { UnitCard } from './UnitCard.js';
+import { componentUnits } from '../game/components.js';
 
 export function describeEvent(e: GameEvent, state: GameState): string | null {
   const name = (id: string) => state.units[id]?.name ?? id;
   switch (e.type) {
     case 'TurnStarted':
       return `Round ${e.round}: ${e.player === 'p1' ? 'your' : 'opponent'} turn`;
+    case 'UnitPlacedInReserves':
+      return `${name(e.unitId)} was placed in strategic reserves`;
+    case 'UnitArrived':
+      return `${name(e.unitId)} arrived from reserves${e.deepStrike ? ' by Deep Strike' : ''}`;
     case 'UnitMoved':
+      if (e.moveType === 'ingress') return null;
       return e.moveType === 'stationary'
         ? `${name(e.unitId)} remained stationary`
         : `${name(e.unitId)} made a ${e.moveType} move (${e.moved.toFixed(1)}")`;
@@ -58,11 +68,13 @@ function PieceLegend({ state }: { state: GameState }) {
   >();
   for (const u of Object.values(state.units)) {
     if (!aliveModels(u).some((m) => m.position)) continue;
-    const type = pieceType(u.keywords, u.datasheetId);
-    const key = `${u.player}-${type}`;
-    const entry = seen.get(key) ?? { type, side: u.player, names: [] };
-    entry.names.push(u.name);
-    seen.set(key, entry);
+    for (const part of componentUnits(u)) {
+      const type = pieceType(part.keywords, part.datasheetId);
+      const key = `${u.player}-${type}`;
+      const entry = seen.get(key) ?? { type, side: u.player, names: [] };
+      entry.names.push(part.name);
+      seen.set(key, entry);
+    }
   }
   return (
     <div className="piece-legend" data-tutorial-id="piece-legend">
@@ -115,6 +127,18 @@ export function GameView({ state, extra }: { state: GameState; extra?: ReactNode
       ),
     ].map((r) => ({ radius: r, label: `${r}"` }));
   }, [state, selected]);
+  const arrival =
+    selected &&
+    selected.player === 'p1' &&
+    state.phase === 'movement' &&
+    state.activePlayer === 'p1' &&
+    eligibleMoveTypes(state, selected.id).includes('ingress')
+      ? {
+          deepStrike: hasDeepStrike(selected),
+          edge: INGRESS_EDGE_DISTANCE,
+          enemyGap: ARRIVAL_ENEMY_DISTANCE,
+        }
+      : null;
   const log = state.log.map((e) => describeEvent(e, state)).filter((x): x is string => !!x);
 
   return (
@@ -127,7 +151,17 @@ export function GameView({ state, extra }: { state: GameState; extra?: ReactNode
             dragLimit={dragLimit}
             rings={rings}
             onUnitClick={(id) => select(id)}
-            onBackgroundClick={() => select(null)}
+            arrival={arrival}
+            onBackgroundClick={(at) => {
+              if (at && arrival && selected)
+                act({
+                  type: 'move',
+                  unitId: selected.id,
+                  moveType: 'ingress',
+                  positions: formation(selected, at),
+                });
+              else select(null);
+            }}
             onConfirm={() =>
               pending &&
               act({
@@ -145,12 +179,15 @@ export function GameView({ state, extra }: { state: GameState; extra?: ReactNode
           {extra}
           <DiceTray events={lastEvents} />
           {selected && (
-            <UnitCard
-              unit={selected}
-              datasheet={
-                selected.player === 'p1' ? datasheets.get(selected.datasheetId) : undefined
-              }
-            />
+            <div className="attached-cards">
+              {componentUnits(selected).map((part) => (
+                <UnitCard
+                  key={part.datasheetId + part.name}
+                  unit={part}
+                  datasheet={part.player === 'p1' ? datasheets.get(part.datasheetId) : undefined}
+                />
+              ))}
+            </div>
           )}
         </aside>
       </div>

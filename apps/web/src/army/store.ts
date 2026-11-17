@@ -1,10 +1,13 @@
 import {
   type ResolvedArmy,
   assignDatasheet,
+  canAttach,
+  cleanAttachments,
   dropUnresolved,
   factionsToLoad,
   readRoster,
   resolveRoster,
+  suggestAttachments,
 } from '@battle-drill/roster';
 import { create } from 'zustand';
 import { rosterLookup, useData } from '../data/store.js';
@@ -37,6 +40,8 @@ interface ArmyState {
   assign(key: string, datasheetId: string): Promise<void>;
   drop(key: string): void;
   setDetachment(id: string | null): void;
+  /** Attach a leader unit to a bodyguard unit, or detach it with null. */
+  setAttachment(leaderKey: string, bodyguardKey: string | null): void;
   clear(): void;
   /** Makes sure the datasheets the army uses are loaded. */
   hydrate(): Promise<void>;
@@ -52,7 +57,9 @@ export const useArmy = create<ArmyState>((set, get) => ({
       const { game, ensureFactions } = useData.getState();
       if (!game) throw new Error('Rules data is not loaded yet');
       await ensureFactions(factionsToLoad(draft, game));
-      const army = resolveRoster(draft, rosterLookup());
+      const lookup = rosterLookup();
+      const resolved = resolveRoster(draft, lookup);
+      const army = { ...resolved, attachments: suggestAttachments(resolved, lookup.datasheet) };
       save(army);
       set({ army, importing: false });
       return army;
@@ -66,14 +73,17 @@ export const useArmy = create<ArmyState>((set, get) => ({
     if (!army) return;
     const entry = useData.getState().game?.catalog.find((c) => c.id === datasheetId);
     if (entry) await useData.getState().ensureFactions([entry.factionId]);
-    const next = assignDatasheet(army, key, datasheetId, rosterLookup());
+    const lookup = rosterLookup();
+    const assigned = assignDatasheet(army, key, datasheetId, lookup);
+    const next = { ...assigned, attachments: cleanAttachments(assigned, lookup.datasheet) };
     save(next);
     set({ army: next });
   },
   drop(key) {
     const { army } = get();
     if (!army) return;
-    const next = dropUnresolved(army, key);
+    const dropped = dropUnresolved(army, key);
+    const next = { ...dropped, attachments: cleanAttachments(dropped, rosterLookup().datasheet) };
     save(next);
     set({ army: next });
   },
@@ -81,6 +91,21 @@ export const useArmy = create<ArmyState>((set, get) => ({
     const { army } = get();
     if (!army) return;
     const next = { ...army, detachmentId: id };
+    save(next);
+    set({ army: next });
+  },
+  setAttachment(leaderKey, bodyguardKey) {
+    const { army } = get();
+    if (!army) return;
+    const { datasheet } = rosterLookup();
+    const rest = Object.fromEntries(
+      Object.entries(army.attachments ?? {}).filter(([l]) => l !== leaderKey),
+    );
+    if (bodyguardKey && !canAttach(army, rest, leaderKey, bodyguardKey, datasheet)) return;
+    const next = {
+      ...army,
+      attachments: bodyguardKey ? { ...rest, [leaderKey]: bodyguardKey } : rest,
+    };
     save(next);
     set({ army: next });
   },
@@ -92,5 +117,11 @@ export const useArmy = create<ArmyState>((set, get) => ({
     const { army } = get();
     if (!army) return;
     await useData.getState().ensureFactions(army.units.map((u) => u.factionId));
+    // Armies saved before attachments existed get the suggested ones once.
+    if (!army.attachments) {
+      const next = { ...army, attachments: suggestAttachments(army, rosterLookup().datasheet) };
+      save(next);
+      set({ army: next });
+    }
   },
 }));

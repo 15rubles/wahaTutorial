@@ -27,6 +27,7 @@ export function SandboxPage() {
       army,
       (id) => datasheets.get(id),
       (id) => data?.abilities.find((a) => a.id === id)?.name,
+      { attached: true },
     );
     const seedParam = Number(new URLSearchParams(window.location.search).get('seed'));
     start(

@@ -20,6 +20,7 @@ import {
   stepModelsToward,
   weaponAllowed,
   apply,
+  hasDeepStrike,
 } from '@battle-drill/engine';
 import { useState } from 'react';
 import { ERROR_TEXT } from '../game/messages.js';
@@ -35,6 +36,18 @@ function MovementControls({ state, unit }: { state: GameState; unit: UnitState }
   const { act, pending, dragMode, setDragMode } = useGame();
   const types = eligibleMoveTypes(state, unit.id);
   const st = state.status[unit.id]!;
+  if (st.inReserves)
+    return types.includes('ingress') ? (
+      <p className="small" data-testid="arrive-hint">
+        {hasDeepStrike(unit)
+          ? 'Deep Strike: click anywhere on the battlefield more than 8" from every enemy (outside the red rings).'
+          : 'Click inside the yellow band, within 6" of a battlefield edge and more than 8" from every enemy.'}
+      </p>
+    ) : (
+      <p className="muted small">
+        In reserves. It can arrive in the movement phase from battle round 2.
+      </p>
+    );
   if (types.length === 0) return <p className="muted small">This unit has already moved.</p>;
   const mine = pending?.unitId === unit.id ? pending : null;
   return (
@@ -325,11 +338,49 @@ function FightControls({ state, unit }: { state: GameState; unit: UnitState }) {
   );
 }
 
+/** Units waiting off the board cannot be clicked there, so they are listed here. */
+function ReserveList({ state }: { state: GameState }) {
+  const { select, selectedUnitId } = useGame();
+  const waiting = Object.values(state.units).filter(
+    (u) => u.player === 'p1' && state.status[u.id]?.inReserves && aliveModels(u).length > 0,
+  );
+  if (waiting.length === 0) return null;
+  return (
+    <div className="controls" data-tutorial-id="reserve-list">
+      <h4>Strategic reserves</h4>
+      <ul className="reserve-list">
+        {waiting.map((u) => (
+          <li key={u.id}>
+            <span>
+              {u.name}
+              {hasDeepStrike(u) && <span className="tag">Deep Strike</span>}
+            </span>
+            <button
+              type="button"
+              aria-pressed={selectedUnitId === u.id}
+              data-testid={`select-reserve-${u.id}`}
+              onClick={() => select(u.id)}
+            >
+              Select
+            </button>
+          </li>
+        ))}
+      </ul>
+    </div>
+  );
+}
+
 function DeploymentControls({ state }: { state: GameState }) {
   const act = useGame((s) => s.act);
   const pending = Object.values(state.units).filter(
     (u) =>
-      u.player === 'p1' && aliveModels(u).length > 0 && !aliveModels(u).some((m) => m.position),
+      u.player === 'p1' &&
+      aliveModels(u).length > 0 &&
+      !aliveModels(u).some((m) => m.position) &&
+      !state.status[u.id]?.inReserves,
+  );
+  const reserves = Object.values(state.units).filter(
+    (u) => u.player === 'p1' && state.status[u.id]?.inReserves,
   );
   const zone = state.battlefield.deploymentZones.find((z) => z.player === 'p1');
   const place = (unit: UnitState): boolean => {
@@ -361,6 +412,14 @@ function DeploymentControls({ state }: { state: GameState }) {
                 {u.name}{' '}
                 <button type="button" onClick={() => place(u)}>
                   Deploy
+                </button>{' '}
+                <button
+                  type="button"
+                  className="link"
+                  data-testid={`reserve-${u.id}`}
+                  onClick={() => act({ type: 'placeInReserves', unitId: u.id })}
+                >
+                  Reserves
                 </button>
               </li>
             ))}
@@ -381,6 +440,9 @@ function DeploymentControls({ state }: { state: GameState }) {
             Deploy all
           </button>
         </>
+      )}
+      {reserves.length > 0 && (
+        <p className="small">In strategic reserves: {reserves.map((u) => u.name).join(', ')}.</p>
       )}
     </div>
   );
@@ -404,6 +466,7 @@ export function ActionPanel({ state }: { state: GameState }) {
           {ERROR_TEXT[lastError.code]}
         </p>
       )}
+      <ReserveList state={state} />
       {!unit && <p className="muted small">Select one of your units on the battlefield.</p>}
       {unit && !yours && <p className="small">Enemy unit. Select one of yours to act.</p>}
       {unit && yours && aliveModels(unit).length === 0 && (

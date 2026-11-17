@@ -81,4 +81,6 @@ export interface ResolvedArmy {
   readonly units: readonly ResolvedUnit[];
   readonly unresolved: readonly UnresolvedUnit[];
   readonly warnings: readonly string[];
+  /** Leader unit key -> bodyguard unit key (attached units, 19). Missing on armies saved before this existed. */
+  readonly attachments?: Readonly<Record<string, string>>;
 }

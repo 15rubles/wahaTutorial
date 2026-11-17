@@ -67,6 +67,13 @@ add('Abilities', {
   description: 'Invented fixture text: this model may join a bodyguard unit listed on its card.',
 });
 add('Abilities', {
+  id: '900000105',
+  name: 'Deep Strike',
+  legend: '',
+  faction_id: '',
+  description: 'Invented fixture text: this unit may wait in reserves and arrive far from the enemy.',
+});
+add('Abilities', {
   id: '900000102',
   name: 'Pilgrim Toll',
   legend: 'The road is paid in rust.',
@@ -575,7 +582,10 @@ datasheet({
     },
     { name: 'Gutter knife', kw: '', range: 'Melee', A: '2', skill: '4', S: '3', AP: '0', D: '1' },
   ],
-  abilities: [{ ref: '900000102', type: 'Faction' }],
+  abilities: [
+    { ref: '900000105', type: 'Core' },
+    { ref: '900000102', type: 'Faction' },
+  ],
   keywords: ['Infantry', 'Gutter Marksman'],
   composition: ['1 Gutter Marksman model'],
   costs: [['1 model', 40]],

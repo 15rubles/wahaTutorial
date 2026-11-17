@@ -21,14 +21,17 @@ const ENEMY_ROLES: readonly Role[] = ['target', 'enemyMelee'];
 export function buildLessonGame(
   lesson: Lesson,
   army: readonly UnitState[],
+  /** The army with leaders attached to their bodyguards; defaults to `army`. */
+  attached: readonly UnitState[] = army,
 ): { state: GameState; ctx: LessonContext } {
-  if (lesson.army === 'full') return buildFullArmyGame(lesson, army);
+  if (lesson.army === 'full') return buildFullArmyGame(lesson, attached);
   const playerRoles = lesson.units.map((u) => u.role).filter((r) => !ENEMY_ROLES.includes(r));
-  const { picked, fallbacks } = pickRoles(army, playerRoles);
+  const { picked, fallbacks } = pickRoles(army, playerRoles, attached);
   const units: UnitState[] = [];
   const ids: Partial<Record<Role, string>> = {};
   const names: Partial<Record<Role, string>> = {};
   const missing: Role[] = [];
+  const reserves: string[] = [];
 
   for (const spec of lesson.units) {
     const base = ENEMY_ROLES.includes(spec.role)
@@ -37,18 +40,18 @@ export function buildLessonGame(
     const unit = base ?? standIn(spec.role, `stand-in-${spec.role}`);
     if (!base) missing.push(spec.role);
     const id = ENEMY_ROLES.includes(spec.role) ? spec.role : `${spec.role}-${unit.id}`;
-    const fresh = {
-      ...unit,
+    const fresh = renumber(
+      unit,
       id,
-      player: ENEMY_ROLES.includes(spec.role) ? ('p2' as const) : ('p1' as const),
-      models: unit.models.map((m, i) => ({
-        ...m,
-        id: `${id}-m${i + 1}`,
-        position: null,
-        destroyed: false,
-        woundsLeft: m.wounds,
-      })),
-    };
+      ENEMY_ROLES.includes(spec.role) ? ('p2' as const) : ('p1' as const),
+    );
+    if (spec.reserves) {
+      units.push(fresh);
+      reserves.push(id);
+      ids[spec.role] = id;
+      names[spec.role] = fresh.name;
+      continue;
+    }
     let positions = formation(fresh, spec.at);
     const other = spec.near ? units.find((u) => u.id === ids[spec.near!.role]) : undefined;
     if (spec.near && other) positions = placeNear(fresh, other, spec.at.x, spec.near.gap);
@@ -66,6 +69,10 @@ export function buildLessonGame(
     units,
     playerNames: { p1: 'You', p2: 'Drill opponent' },
   });
+  for (const id of reserves) {
+    const r = apply(state, { type: 'placeInReserves', unitId: id });
+    if (r.ok) state = r.state;
+  }
   // Leave deployment (units are already placed) and walk to the lesson's starting phase.
   const go = () => {
     const r = apply(state, { type: 'endPhase' });
@@ -77,6 +84,31 @@ export function buildLessonGame(
   for (let i = 0; i < 10 && state.phase !== target; i++) go();
   state = withCp(state, lesson.startCp);
   return { state, ctx: { units: ids, names, fallbacks: [...new Set([...fallbacks, ...missing])] } };
+}
+
+/** A fresh copy of a unit for a lesson: new ids (attached components follow), off the board. */
+function renumber(unit: UnitState, id: string, player: 'p1' | 'p2'): UnitState {
+  const newId = new Map(unit.models.map((m, i) => [m.id, `${id}-m${i + 1}`]));
+  return {
+    ...unit,
+    id,
+    player,
+    models: unit.models.map((m) => ({
+      ...m,
+      id: newId.get(m.id)!,
+      position: null,
+      destroyed: false,
+      woundsLeft: m.wounds,
+    })),
+    ...(unit.components
+      ? {
+          components: unit.components.map((c) => ({
+            ...c,
+            modelIds: c.modelIds.map((x) => newId.get(x) ?? x),
+          })),
+        }
+      : {}),
+  };
 }
 
 /** Formation below `other` (larger y) whose closest models are `gap` inches apart, edge to edge. */
@@ -116,18 +148,7 @@ function buildFullArmyGame(
     army.length > 0
       ? army
       : [standIn('shooter', 'stand-in-shooter'), standIn('melee', 'stand-in-melee')];
-  const units: UnitState[] = own.map((u) => ({
-    ...u,
-    id: `p1-${u.id}`,
-    player: 'p1' as const,
-    models: u.models.map((m, i) => ({
-      ...m,
-      id: `p1-${u.id}-m${i + 1}`,
-      position: null,
-      destroyed: false,
-      woundsLeft: m.wounds,
-    })),
-  }));
+  const units: UnitState[] = own.map((u) => renumber(u, `p1-${u.id}`, 'p1'));
   const ids: Partial<Record<Role, string>> = {};
   const names: Partial<Record<Role, string>> = {};
   for (const spec of lesson.units) {

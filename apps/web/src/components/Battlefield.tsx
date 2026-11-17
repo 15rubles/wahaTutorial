@@ -9,7 +9,7 @@ import {
   isObscuring,
 } from '@battle-drill/engine';
 import { type PointerEvent, useMemo, useRef, useState } from 'react';
-import { PieceDefs, pieceType } from '../art/pieces.js';
+import { PieceDefs, modelPieceType } from '../art/pieces.js';
 import { useGame } from '../game/store.js';
 
 const TERRAIN_FILL: Record<string, string> = {
@@ -25,7 +25,14 @@ interface Props {
   /** Range rings to draw around the selected unit's models (inches). */
   rings: readonly { radius: number; label: string }[];
   onUnitClick: (unitId: string) => void;
-  onBackgroundClick?: () => void;
+  /** Click on empty battlefield, with the point in inches (null: Escape key). */
+  onBackgroundClick?: (at: Point | null) => void;
+  /** Shows where the selected reserve unit may arrive. */
+  arrival?: {
+    readonly deepStrike: boolean;
+    readonly edge: number;
+    readonly enemyGap: number;
+  } | null;
   /** Enter on the selected unit with a pending move. */
   onConfirm?: () => void;
   highlightUnitIds?: readonly string[];
@@ -67,6 +74,7 @@ export function Battlefield({
   onBackgroundClick,
   onConfirm,
   highlightUnitIds = [],
+  arrival = null,
 }: Props) {
   const svgRef = useRef<SVGSVGElement>(null);
   const { selectedUnitId, pending, setPending } = useGame();
@@ -159,7 +167,7 @@ export function Battlefield({
         width={width}
         height={height}
         className="board"
-        onClick={onBackgroundClick}
+        onClick={(e) => svgRef.current && onBackgroundClick?.(svgPoint(svgRef.current, e))}
       />
       <rect
         x={0}
@@ -246,6 +254,29 @@ export function Battlefield({
         );
       })}
 
+      {arrival && (
+        <g className="arrival" data-testid="arrival-zone" aria-hidden="true">
+          {!arrival.deepStrike && (
+            <path
+              className="arrival-edge"
+              fillRule="evenodd"
+              d={`M0 0H${width}V${height}H0Z M${arrival.edge} ${arrival.edge}V${height - arrival.edge}H${width - arrival.edge}V${arrival.edge}Z`}
+            />
+          )}
+          {units
+            .filter((u) => selected && u.player !== selected.player)
+            .flatMap((u) => aliveModels(u).filter((m) => m.position))
+            .map((m) => (
+              <circle
+                key={`no-${m.id}`}
+                className="arrival-nogo"
+                cx={m.position!.x}
+                cy={m.position!.y}
+                r={m.baseRadius + arrival.enemyGap}
+              />
+            ))}
+        </g>
+      )}
       {selected &&
         rings.map((ring) =>
           aliveModels(selected).map((m) => (
@@ -316,7 +347,7 @@ export function Battlefield({
               if (e.key === 'Escape') {
                 e.preventDefault();
                 if (pending) setPending(null);
-                else onBackgroundClick?.();
+                else onBackgroundClick?.(null);
                 return;
               }
               if (e.key === 'Enter' && isSel && pending && pending.unitId === u.id && onConfirm) {
@@ -347,7 +378,7 @@ export function Battlefield({
                     <title>{`${m.name}: ${m.woundsLeft}/${m.wounds} W`}</title>
                   </circle>
                   <use
-                    href={`#piece-${pieceType(u.keywords, u.datasheetId)}`}
+                    href={`#piece-${modelPieceType(u, m.id)}`}
                     x={m.position!.x - art / 2}
                     y={m.position!.y - art / 2 - r * 0.04}
                     width={art}

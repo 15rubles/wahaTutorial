@@ -1,4 +1,11 @@
-import { type UnitState, type Weapon, aliveModels, flat } from '@battle-drill/engine';
+import {
+  type UnitState,
+  type Weapon,
+  aliveModels,
+  attachUnits,
+  flat,
+  hasDeepStrike,
+} from '@battle-drill/engine';
 import type { Role } from './types.js';
 
 const avg = (e: Weapon['attacks']) => e.dice * ((e.sides + 1) / 2) + e.plus;
@@ -41,6 +48,8 @@ const fastKeyword = (u: UnitState) =>
 export function pickRoles(
   army: readonly UnitState[],
   roles: readonly Role[],
+  /** The army with leaders attached to bodyguards (for the `leader` role). */
+  attached: readonly UnitState[] = [],
 ): { picked: Partial<Record<Role, UnitState>>; fallbacks: Role[] } {
   const picked: Partial<Record<Role, UnitState>> = {};
   const used = new Set<string>();
@@ -54,8 +63,16 @@ export function pickRoles(
     } else fallbacks.push(role);
   };
   // Scarce roles first, so they are not taken by a role with more candidates.
-  const order: Role[] = ['character', 'fast', 'shooter', 'melee'];
+  const order: Role[] = ['leader', 'deepStriker', 'character', 'fast', 'shooter', 'melee'];
   for (const role of order.filter((r) => roles.includes(r))) {
+    if (role === 'leader')
+      choose(
+        role,
+        attached.filter((u) => (u.components?.length ?? 0) > 1),
+        (u) => u.models.length,
+      );
+    if (role === 'deepStriker')
+      choose(role, army.filter(hasDeepStrike), (u) => shooting(u) + melee(u));
     if (role === 'character') choose(role, army.filter(isChar), (u) => melee(u) + shooting(u));
     if (role === 'shooter')
       choose(
@@ -107,6 +124,18 @@ function standInModel(id: string, i: number, partial: Partial<UnitState['models'
 
 /** Invented generic units used when the army has no unit for a role, and as enemies. */
 export function standIn(role: Role, id: string): UnitState {
+  if (role === 'leader') {
+    const sergeant = standIn('character', `${id}-leader`);
+    const brawlers = standIn('melee', `${id}-bodyguard`);
+    return { ...attachUnits(brawlers, [sergeant]), id };
+  }
+  if (role === 'deepStriker')
+    return {
+      ...standIn('shooter', id),
+      name: 'Drill Drop Squad (stand-in)',
+      datasheetId: 'stand-in-deepStriker',
+      abilities: ['deep-strike'],
+    };
   const gun: Weapon = {
     name: 'Drill carbine',
     type: 'ranged',
@@ -141,7 +170,7 @@ export function standIn(role: Role, id: string): UnitState {
     keywords: [],
   };
   const spec: Record<
-    Role,
+    Exclude<Role, 'leader' | 'deepStriker'>,
     {
       name: string;
       n: number;
@@ -220,7 +249,7 @@ export function standIn(role: Role, id: string): UnitState {
       player: 'p2',
     },
   };
-  const s = spec[role];
+  const s = spec[role as Exclude<Role, 'leader' | 'deepStriker'>];
   return {
     id,
     name: s.name,

@@ -11,3 +11,9 @@ export {
   FUZZY_THRESHOLD,
   type RosterLookup,
 } from './resolve.js';
+export {
+  bodyguardOptions,
+  canAttach,
+  suggestAttachments,
+  cleanAttachments,
+} from './attachments.js';

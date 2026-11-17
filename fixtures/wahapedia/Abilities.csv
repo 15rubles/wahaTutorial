@@ -1,5 +1,6 @@
 ﻿id|name|legend|faction_id|description|
 900000101|Leader|||Invented fixture text: this model may join a bodyguard unit listed on its card.|
+900000105|Deep Strike|||Invented fixture text: this unit may wait in reserves and arrive far from the enemy.|
 900000102|Pilgrim Toll|The road is paid in rust.|RP|Invented fixture text: once per turn, a <span class="kwb">RUST</span> <span class="kwb">PILGRIMS</span> unit may re-roll one hit roll.|
 900000103|Resonant Chorus||GC|Invented fixture text: friendly units within 6" add 1 to their Leadership.|
 900000104|Old Oaths||RP|Invented fixture text: shared by two factions.|
