@@ -270,7 +270,7 @@ function datasheet(d) {
     transport: '',
     virtual: 'false',
     is_support: 'false',
-    leader_head: d.leads ? 'This model can be attached to the following unit:' : '',
+    leader_head: d.leads ? 'Invented fixture text: leads these units.' : '',
     leader_footer: '',
     damaged_w: d.damaged ?? '',
     damaged_description: d.damaged ? 'Invented fixture text: subtract 1 from hit rolls.' : '',
