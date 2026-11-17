@@ -1,0 +1,16 @@
+node_modules/
+dist/
+coverage/
+*.tsbuildinfo
+playwright-report/
+test-results/
+.vite/
+
+# Games Workshop content fetched at runtime. Never commit.
+data-cache/
+
+# Real rosters stay on the owner's machine. Only invented fixtures are committed.
+*.ros
+*.rosz
+!fixtures/**/*.ros
+!fixtures/**/*.rosz
