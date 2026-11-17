@@ -1,0 +1,69 @@
+import { expect, test } from '@playwright/test';
+import { dragUnit, endPhase, importFixtureArmy } from './helpers.js';
+
+test('M7: import a roster and play one full turn against the practice dummies', async ({
+  page,
+}) => {
+  const errors: string[] = [];
+  page.on('pageerror', (e) => errors.push(e.message));
+
+  await importFixtureArmy(page);
+  await page.goto('/?data=fixture&seed=42#/sandbox');
+  await expect(page.getByTestId('phase')).toHaveText('Command phase');
+  await expect(page.getByTestId('round')).toHaveText('Round 1');
+
+  // Command phase -> Movement.
+  await endPhase(page);
+  await expect(page.getByTestId('phase')).toHaveText('Movement phase');
+
+  // Move the Furnace Walker (u4) 6" forward with a drag, then confirm.
+  await page.getByTestId('unit-u4').click();
+  await expect(page.getByTestId('unit-card')).toContainText('Furnace Walker');
+  await dragUnit(page, 'u4', 0, 6);
+  await expect(page.getByTestId('ruler')).toBeVisible();
+  await page.getByTestId('confirm-move').click();
+  await expect(page.getByTestId('battle-log')).toContainText('Furnace Walker made a normal move', {
+    useInnerText: false,
+  });
+
+  // Shooting: the walker fires at the dummies if anything is in range.
+  await endPhase(page);
+  await expect(page.getByTestId('phase')).toHaveText('Shooting phase');
+  await page.getByTestId('unit-u4').click();
+  const fire = page.getByTestId('fire');
+  if (await fire.isEnabled()) {
+    await fire.click();
+    await expect(page.getByTestId('hit-rolls')).toBeVisible();
+  }
+
+  // Tapping a weapon keyword opens its rule from the local (fixture) cache.
+  await page.getByTestId('unit-card').getByRole('button', { name: 'blast' }).click();
+  await expect(page.getByTestId('rule-popup')).toContainText('BLAST');
+  await page.getByTestId('rule-popup').getByRole('button', { name: 'Close' }).click();
+
+  // Charge, fight steps, then the opponent's turn plays out automatically.
+  await endPhase(page);
+  await expect(page.getByTestId('phase')).toHaveText('Charge phase');
+  await endPhase(page);
+  await expect(page.getByTestId('phase')).toContainText('Fight phase');
+  for (let i = 0; i < 6; i++) {
+    const text = await page.getByTestId('phase').textContent();
+    if (text === 'Command phase') break;
+    await endPhase(page);
+  }
+  await expect(page.getByTestId('round')).toHaveText('Round 2');
+  await expect(page.getByTestId('phase')).toHaveText('Command phase');
+  await expect(page.getByTestId('battle-log')).toContainText('Round 1: opponent turn', {
+    useInnerText: false,
+  });
+  expect(errors).toEqual([]);
+});
+
+test('the fix-me screen resolves an unknown unit', async ({ page }) => {
+  await importFixtureArmy(page, 'broken.txt');
+  await expect(page.getByTestId('fixme-entry')).toHaveCount(1);
+  await page.getByLabel('Find a datasheet for Totally Unknown Battle Robot').fill('furnace');
+  await page.getByRole('button', { name: /Furnace Walker/ }).click();
+  await expect(page.getByTestId('fixme')).toHaveCount(0);
+  await expect(page.getByTestId('army-units')).toContainText('Furnace Walker');
+});

@@ -18,13 +18,14 @@
     "lint": "eslint . && node scripts/check-dashes.mjs",
     "format": "prettier --write .",
     "format:check": "prettier --check .",
-    "e2e": "node scripts/not-yet.mjs e2e M8",
+    "e2e": "playwright test --trace off",
     "data:sync": "tsx packages/data/src/cli.ts sync",
     "data:build": "tsx packages/data/src/cli.ts build",
     "fixtures:build": "node scripts/make-fixtures.mjs && tsx packages/data/src/cli.ts build --fixture --raw-dir fixtures/wahapedia --out-dir fixtures/normalized"
   },
   "devDependencies": {
     "@eslint/js": "^10.0.1",
+    "@playwright/test": "^1.63.0",
     "@testing-library/dom": "^10.4.2",
     "@testing-library/jest-dom": "^7.0.1",
     "@testing-library/react": "^16.3.3",

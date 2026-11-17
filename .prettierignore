@@ -10,3 +10,5 @@ CLAUDE.md
 fixtures/normalized
 fixtures/wahapedia
 fixtures/rosters
+playwright-report
+test-results

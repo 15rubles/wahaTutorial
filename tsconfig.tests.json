@@ -17,5 +17,10 @@
       "@battle-drill/tutorial": ["./packages/tutorial/src/index.ts"]
     }
   },
-  "include": ["packages/*/src/**/*.test.ts", "packages/*/src/testing.ts"]
+  "include": [
+    "packages/*/src/**/*.test.ts",
+    "packages/*/src/testing.ts",
+    "e2e/**/*.ts",
+    "playwright.config.ts"
+  ]
 }
