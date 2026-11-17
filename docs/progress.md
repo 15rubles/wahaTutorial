@@ -60,9 +60,17 @@ of 1087 keywords, 34 resolve to a section, 809 are identity keywords, 244 are li
 (mostly faction sub-keywords and unit types like Infantry; the most common ones get "mentioned in"
 links). Without a cache the app explains the two commands and offers demo data.
 
-## M4 - Roster import
+## M4 - Roster import - DONE
 
-- [ ] Accept: invented fixture roster fully resolves; unmatched units never crash the app
+- [x] `.ros` (BattleScribe / New Recruit XML) and `.rosz` (zipped) importer
+- [x] Plain text importer for the official app and New Recruit exports (tolerant)
+- [x] Resolution to datasheet, wargear, model count, enhancements, warlord, detachment; fuzzy name matching
+- [x] "Fix me" screen: suggestions, datasheet search (own faction or all), remove
+- [x] Accept: invented fixture rosters (`fixtures/rosters/`) resolve fully in every format; broken and garbage input never throws (unit tests), and an invented roster against the real data shows 5 fix-me entries in the browser without errors
+
+**Demo:** `npm run dev`, open `#/import`, drop a `.ros`, `.rosz` or text export (or, in demo data
+mode, click a demo roster). The army page lists every unit with models, weapons, points, warlord and
+enhancement tags, and a detachment picker. Unknown units show up in "Fix me".
 
 ## M5 - Engine core: dice and the attack sequence
 

@@ -119,3 +119,38 @@ missing the app explains how to run the sync and offers the invented demo data.
 ## D-019 (M3) exactOptionalPropertyTypes off in the web app
 
 It stays on for the pure packages. In React code it mostly forces `prop={x ?? undefined}` noise.
+
+## D-020 (M4) Separate roster package
+
+`packages/roster` is pure and runs in the browser (fast-xml-parser, fflate). Parsing produces a format
+independent `RosterDraft`; `resolveRoster` matches it against normalized data into a serializable
+`ResolvedArmy` that stores ids only, never datasheet text.
+
+## D-021 (M4) Matching rules
+
+Names are normalized (case, accents, apostrophes, punctuation, `&`). Exact normalized match wins;
+otherwise a similarity score (edit distance, token overlap, singular / plural) of at least 0.85
+counts as a fuzzy match and adds a "check it" warning. Ties prefer the roster's faction and real
+(non virtual) datasheets. Below the threshold the unit goes to the "fix me" list with up to five
+suggestions. The faction comes from the roster's catalogue / header hints, else from a majority vote
+of exact unit matches.
+
+## D-022 (M4) Wargear and model counts
+
+Roster wargear names are matched to datasheet weapon profile names (multi-profile weapons named
+"Group - Profile" match "Group"). If nothing matches, every datasheet weapon is assumed and the unit
+is flagged `wargearDefaulted`. Model count is the sum of model lines; compact text exports without
+model lines use the datasheet cost line with the same points, else the largest wargear count.
+In XML, points are the sum of `pts` costs over a selection and its children.
+
+## D-023 (M4) Text exports
+
+One tolerant line parser handles the official app style (title line, faction / detachment lines,
+section headers, bullet model and wargear lines) and New Recruit styles (`+ KEY: value` headers,
+`Char1: 1x Name (N pts): items`, `Enhancement:` lines). Battle size lines such as "Incursion (1000
+points)" are configuration, not units. Unknown lines are skipped, never fatal.
+
+## D-024 (M4) Army persistence
+
+The resolved army is saved in localStorage (wrapped in try/catch). Datasheets are loaded per faction
+file on demand.
