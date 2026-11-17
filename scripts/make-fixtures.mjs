@@ -71,7 +71,8 @@ add('Abilities', {
   name: 'Deep Strike',
   legend: '',
   faction_id: '',
-  description: 'Invented fixture text: this unit may wait in reserves and arrive far from the enemy.',
+  description:
+    'Invented fixture text: this unit may wait in reserves and arrive far from the enemy.',
 });
 add('Abilities', {
   id: '900000102',

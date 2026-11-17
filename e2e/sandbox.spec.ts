@@ -1,5 +1,5 @@
 import { expect, test } from '@playwright/test';
-import { dragUnit, endPhase, importFixtureArmy } from './helpers.js';
+import { FIXTURE, dragUnit, endPhase, importFixtureArmy } from './helpers.js';
 
 test('M7: import a roster and play one full turn against the practice dummies', async ({
   page,
@@ -66,4 +66,20 @@ test('the fix-me screen resolves an unknown unit', async ({ page }) => {
   await page.getByRole('button', { name: /Furnace Walker/ }).click();
   await expect(page.getByTestId('fixme')).toHaveCount(0);
   await expect(page.getByTestId('army-units')).toContainText('Furnace Walker');
+});
+
+test('leaders are attached on import and can be detached on the army page', async ({ page }) => {
+  await importFixtureArmy(page);
+  test.skip(!FIXTURE, 'fixture roster only');
+  const select = page.getByTestId('attach-select');
+  await expect(select).toHaveCount(1);
+  await expect(select.locator('option:checked')).toHaveText('Leads Rustbound Devotees');
+  await expect(page.getByTestId('army-units')).toContainText('Led by Pilgrim Scrapwarden');
+  await page.goto('/?data=fixture#/sandbox');
+  await expect(
+    page.locator('[data-testid^="unit-"][aria-label*="Pilgrim Scrapwarden + Rustbound Devotees"]'),
+  ).toHaveCount(1);
+  await page.goto('/?data=fixture#/army');
+  await select.selectOption('');
+  await expect(page.getByTestId('army-units')).not.toContainText('Led by');
 });

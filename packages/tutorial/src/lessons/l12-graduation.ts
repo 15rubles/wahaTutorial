@@ -2,7 +2,7 @@ import type { Lesson } from '../types.js';
 
 export const graduationLesson: Lesson = {
   id: 'graduation',
-  title: '10. Graduation',
+  title: '12. Graduation',
   summary: 'A short free game. Hints are there when you want them.',
   army: 'full',
   battleRounds: 2,

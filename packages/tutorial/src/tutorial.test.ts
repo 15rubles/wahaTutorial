@@ -5,7 +5,7 @@ import { demoLesson } from './lessons/demo.js';
 import { completeLesson, parseProgress, saveStep } from './progress.js';
 import { pickRoles, standIn } from './roles.js';
 import { actionAllowed, currentStep, runStep, startRunner } from './runner.js';
-import { fixtureArmy } from './testing.js';
+import { fixtureArmy, fixtureAttachedArmy } from './testing.js';
 
 describe('roles', () => {
   it('picks distinct units from the army by role', () => {
@@ -127,8 +127,8 @@ describe('campaign lessons', () => {
   });
 
   it('start full army lessons in deployment, or deployed', async () => {
-    const { battleRoundLesson } = await import('./lessons/l09-battle-round.js');
-    const { graduationLesson } = await import('./lessons/l10-graduation.js');
+    const { battleRoundLesson } = await import('./lessons/l11-battle-round.js');
+    const { graduationLesson } = await import('./lessons/l12-graduation.js');
     const a = buildLessonGame(battleRoundLesson, fixtureArmy());
     expect(a.state.phase).toBe('deployment');
     expect(Object.values(a.state.units).filter((u) => u.player === 'p1')).toHaveLength(5);
@@ -143,5 +143,47 @@ describe('campaign lessons', () => {
   it('every lesson builds with an empty army (stand-ins)', async () => {
     const { LESSONS } = await import('./lessons/index.js');
     for (const lesson of LESSONS) expect(() => buildLessonGame(lesson, [])).not.toThrow();
+  });
+
+  it('use an attached unit for the leaders lesson', async () => {
+    const { attachedLesson } = await import('./lessons/l09-attached.js');
+    const { state, ctx } = buildLessonGame(attachedLesson, fixtureArmy(), fixtureAttachedArmy());
+    const unit = state.units[ctx.units.leader!]!;
+    expect(ctx.fallbacks).toEqual([]);
+    expect(unit.components?.map((c) => c.name)).toEqual([
+      'Rustbound Devotees',
+      'Pilgrim Scrapwarden',
+    ]);
+    // Component model ids follow the lesson's renumbering.
+    const ids = new Set(unit.models.map((m) => m.id));
+    expect(unit.components!.every((c) => c.modelIds.every((id) => ids.has(id)))).toBe(true);
+    expect(fillText('{leader.leaderName} leads {leader.bodyguard}', ctx)).toBe(
+      'Pilgrim Scrapwarden leads Rustbound Devotees',
+    );
+    // Without an attached unit in the army, an invented pair stands in.
+    const fallback = buildLessonGame(attachedLesson, fixtureArmy());
+    expect(fallback.ctx.fallbacks).toEqual(['leader']);
+  });
+
+  it('start the reserves lesson in round 2 with the Deep Strike unit off the board', async () => {
+    const { reservesLesson } = await import('./lessons/l10-reserves.js');
+    const { state, ctx } = buildLessonGame(reservesLesson, fixtureArmy());
+    expect([state.phase, state.battleRound, state.activePlayer]).toEqual(['movement', 2, 'p1']);
+    expect(ctx.names.deepStriker).toBe('Gutter Marksman');
+    expect(state.status[ctx.units.deepStriker!]!.inReserves).toBe(true);
+    expect(fillText('{deepStriker.arrival}', ctx)).toContain('Deep Strike');
+    const r = apply(state, {
+      type: 'move',
+      unitId: ctx.units.deepStriker!,
+      moveType: 'ingress',
+      positions: [{ x: 22, y: 6 }],
+    });
+    expect(r.ok).toBe(true);
+  });
+
+  it('fill unit facts from the player units', () => {
+    const { ctx } = buildLessonGame(demoLesson, fixtureArmy());
+    expect(fillText('{shooter.weaponAbilities}', ctx)).not.toContain('{');
+    expect(fillText('{shooter.nonsense}', ctx)).toBe('{shooter.nonsense}');
   });
 });

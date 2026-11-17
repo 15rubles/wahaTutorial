@@ -9,6 +9,7 @@ import {
   trainingGround,
   unitDistance,
 } from '@battle-drill/engine';
+import { unitFacts } from './facts.js';
 import { pickRoles, standIn } from './roles.js';
 import type { Lesson, LessonContext, Role } from './types.js';
 
@@ -81,9 +82,20 @@ export function buildLessonGame(
   };
   go();
   const target = lesson.startPhase ?? 'command';
-  for (let i = 0; i < 10 && state.phase !== target; i++) go();
+  const round = lesson.startRound ?? 1;
+  const there = () =>
+    state.phase === target && state.battleRound === round && state.activePlayer === 'p1';
+  for (let i = 0; i < 20 * round && !there(); i++) go();
   state = withCp(state, lesson.startCp);
-  return { state, ctx: { units: ids, names, fallbacks: [...new Set([...fallbacks, ...missing])] } };
+  return {
+    state,
+    ctx: {
+      units: ids,
+      names,
+      fallbacks: [...new Set([...fallbacks, ...missing])],
+      facts: factsFor(state, ids),
+    },
+  };
 }
 
 /** A fresh copy of a unit for a lesson: new ids (attached components follow), off the board. */
@@ -176,7 +188,12 @@ function buildFullArmyGame(
   state = withCp(state, lesson.startCp);
   return {
     state,
-    ctx: { units: ids, names, fallbacks: army.length > 0 ? [] : ['shooter', 'melee'] },
+    ctx: {
+      units: ids,
+      names,
+      fallbacks: army.length > 0 ? [] : ['shooter', 'melee'],
+      facts: factsFor(state, ids),
+    },
   };
 }
 
@@ -194,7 +211,19 @@ export function autoDeploy(state: GameState): GameState {
   return s;
 }
 
-/** Replaces `{role}` tokens with the unit names from the lesson context. */
+function factsFor(state: GameState, ids: Partial<Record<Role, string>>): Record<string, string> {
+  return Object.assign(
+    {},
+    ...Object.entries(ids).map(([role, id]) => {
+      const u = id ? state.units[id] : undefined;
+      return u ? unitFacts(role, u) : {};
+    }),
+  );
+}
+
+/** Replaces `{role}` tokens with unit names and `{role.fact}` tokens with unit facts. */
 export function fillText(text: string, ctx: LessonContext): string {
-  return text.replace(/\{(\w+)\}/g, (all, role: string) => ctx.names[role as Role] ?? all);
+  return text.replace(/\{(\w+)(?:\.(\w+))?\}/g, (all, role: string, fact?: string) =>
+    fact ? (ctx.facts?.[`${role}.${fact}`] ?? all) : (ctx.names[role as Role] ?? all),
+  );
 }

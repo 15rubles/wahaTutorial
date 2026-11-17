@@ -59,6 +59,23 @@ rules, then record the resolution here.
 - Current interpretation: `nextFightSelector()` alternates; a player with no eligible unit passes.
 - Status: open
 
+### RQ-6: Strategic reserves points limit
+
+- Rule ref: `core.strategic-reserves.placing-units-in-strategic-reserves`
+- Question: the limit on how many points may start in reserves needs unit points, which engine units
+  do not carry.
+- Current interpretation: not checked. Any unit except fortifications can be placed in reserves.
+- Status: open (simplification)
+
+### RQ-7: More than one leader in a bodyguard unit
+
+- Rule ref: `core.attached-units.forming-attached-units`, `core.core-abilities.leader-support`
+- Question: some datasheets allow extra leaders beyond one leader plus one support unit; those
+  exceptions live in ability text the app does not interpret.
+- Current interpretation: a bodyguard takes one leader, plus one more only when exactly one of the two
+  is a support unit (`canAttach` in packages/roster/src/attachments.ts).
+- Status: open (simplification)
+
 ## Resolved
 
 None yet.

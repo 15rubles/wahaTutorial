@@ -25,6 +25,8 @@ export interface LessonContext {
   readonly names: Readonly<Partial<Record<Role, string>>>;
   /** Roles the army could not fill, played by an invented stand-in unit. */
   readonly fallbacks: readonly Role[];
+  /** `{role.fact}` values, e.g. `shooter.rangedWeapon` (see facts.ts). */
+  readonly facts?: Readonly<Record<string, string>>;
 }
 
 /** What the player has to do to finish a step. */
@@ -49,7 +51,10 @@ export interface Step {
   readonly id: string;
   /** RuleSection ids; the text is pulled from the local cache. */
   readonly ruleRefs: readonly string[];
-  /** Our own short explanation in plain words. `{role}` is replaced by the unit's name. */
+  /**
+   * Our own short explanation in plain words. `{role}` is replaced by the unit's name and
+   * `{role.fact}` by a fact about it (facts.ts), e.g. `{shooter.rangedWeapon}`.
+   */
   readonly say: string;
   /** Elements to highlight; everything else is dimmed and blocked. */
   readonly focus?: readonly UiTarget[];
@@ -95,6 +100,8 @@ export interface Lesson {
   readonly panels?: readonly LessonPanel[];
   /** Phase (of player 1, round 1) the lesson starts in. */
   readonly startPhase?: Phase;
+  /** Battle round the lesson starts in (default 1); earlier turns pass with no actions. */
+  readonly startRound?: number;
   readonly seed?: number;
   readonly steps: readonly Step[];
 }

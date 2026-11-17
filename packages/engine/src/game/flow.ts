@@ -22,6 +22,7 @@ export const ruleRefs = [
   'core.the-battle-round.end-of-battle-round',
   'core.moving.coherency',
   'core.strategic-reserves.placing-units-in-strategic-reserves.strategic-reserves-at-the-end-of-the-battle',
+  'core.strategic-reserves.ingress-move',
 ];
 
 type Step = { state: GameState; events: GameEvent[] };
@@ -168,17 +169,19 @@ export function endPhase(state: GameState, roller: Roller): Step {
     const t = startTurn(next, opponent(next.activePlayer), roller);
     return { state: t.state, events: [...events, ...t.events] };
   }
+  // 20.04: reserves that have not arrived by the end of battle round 3 are destroyed;
+  // 20.01.02: so are any still waiting when the final turn ends.
+  if (
+    next.battleRound === RESERVES_DEADLINE_ROUND ||
+    next.battleRound >= next.mission.battleRounds
+  ) {
+    const r = destroyReserves(next);
+    next = r.state;
+    events.push(...r.events);
+  }
   if (next.battleRound >= next.mission.battleRounds) {
     const { p1, p2 } = next.players;
     const winner = p1.vp > p2.vp ? 'p1' : p2.vp > p1.vp ? 'p2' : null;
-    // 20.01.02: reserve units that never arrived count as destroyed when the game ends.
-    for (const [id, st] of Object.entries(next.status)) {
-      if (!st.inReserves) continue;
-      const u = next.units[id]!;
-      const models = u.models.map((m) => ({ ...m, destroyed: true }));
-      next = { ...next, units: { ...next.units, [id]: { ...u, models } } };
-      events.push({ type: 'UnitDestroyed', unitId: id });
-    }
     return {
       state: { ...next, phase: 'game-over' },
       events: [...events, { type: 'GameEnded', winner }],
@@ -188,6 +191,23 @@ export function endPhase(state: GameState, roller: Roller): Step {
   events.push({ type: 'BattleRoundStarted', round: next.battleRound });
   const t = startTurn(next, next.firstPlayer, roller);
   return { state: t.state, events: [...events, ...t.events] };
+}
+
+/** Battle round at whose end units still in strategic reserves are destroyed (20.04). */
+export const RESERVES_DEADLINE_ROUND = 3;
+
+function destroyReserves(state: GameState): { state: GameState; events: GameEvent[] } {
+  let next = state;
+  const events: GameEvent[] = [];
+  for (const [id, st] of Object.entries(next.status)) {
+    if (!st.inReserves) continue;
+    const u = next.units[id]!;
+    const models = u.models.map((m) => ({ ...m, destroyed: true }));
+    next = { ...next, units: { ...next.units, [id]: { ...u, models } } };
+    next = { ...next, status: { ...next.status, [id]: { ...st, inReserves: false } } };
+    events.push({ type: 'UnitDestroyed', unitId: id });
+  }
+  return { state: next, events };
 }
 
 /** True when the fight step has no more units to fight. */

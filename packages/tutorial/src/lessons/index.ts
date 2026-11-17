@@ -8,8 +8,10 @@ import { chargeLesson } from './l05-charge.js';
 import { commandLesson } from './l06-command.js';
 import { objectivesLesson } from './l07-objectives.js';
 import { armyRulesLesson } from './l08-army-rules.js';
-import { battleRoundLesson } from './l09-battle-round.js';
-import { graduationLesson } from './l10-graduation.js';
+import { attachedLesson } from './l09-attached.js';
+import { reservesLesson } from './l10-reserves.js';
+import { battleRoundLesson } from './l11-battle-round.js';
+import { graduationLesson } from './l12-graduation.js';
 
 /** The campaign, in order. */
 export const LESSONS: readonly Lesson[] = [
@@ -21,6 +23,8 @@ export const LESSONS: readonly Lesson[] = [
   commandLesson,
   objectivesLesson,
   armyRulesLesson,
+  attachedLesson,
+  reservesLesson,
   battleRoundLesson,
   graduationLesson,
 ];

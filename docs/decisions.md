@@ -309,3 +309,36 @@ and all piece art are our own simple shapes. Game pieces are chosen per unit TYP
 (character, infantry, mounted, walker, vehicle, monster, beast, swarm, aircraft, fortification,
 practice target), so every faction is covered without per-model art; the rim colour shows the side.
 Single light theme on purpose (it reads like a printed sheet). No data, engine or lesson changes.
+
+## D-041 Attached units
+
+`attachUnits` (engine) merges leader and bodyguard units into one `UnitState`: bodyguard models first,
+then leaders, each model tagged with `attachedRole`; keywords are the union, core abilities the
+intersection (so Deep Strike only applies when every part has it); a leader weapon whose name clashes
+with a different bodyguard profile is renamed `Name (Leader)`. `components` remembers each part so the
+UI can draw each model with its own piece and show one datasheet card per part. Wound rolls use the
+bodyguard Toughness while a bodyguard model is alive, and keyword checks (anti-X, conditions) use only
+parts with living models, as the cached FAQ on attached unit keywords says. Attachments are stored on
+the army (`ResolvedArmy.attachments`, leader key to bodyguard key), suggested on import from the
+datasheet leader lists, and editable on the Army page. The sandbox and full-army lessons use attached
+units; role lessons use units on their own, except the new leaders lesson.
+
+## D-042 Strategic reserves and Deep Strike
+
+Units can be placed in reserves during deployment (`placeInReserves`) and arrive with an `ingress`
+move from battle round 2, as read from the cached rules: wholly within 6" of an edge, more than 8"
+from every enemy, not in the enemy deployment zone before round 3, or anywhere more than 8" away with
+Deep Strike. Units still in reserves at the end of battle round 3, or at the end of the battle, are
+destroyed. Core abilities (Deep Strike, Leader and a few others) are derived from datasheet ability
+names into `UnitState.abilities`. In the UI, units in reserves are listed in the action panel; selecting
+one in the movement phase shows the legal arrival area and a click on the board sets it up. The
+invented fixture Gutter Marksman gained an invented Deep Strike ability for tests.
+
+## D-043 Lesson text with the player's unit details
+
+Lesson text can use `{role.fact}` tokens (facts.ts), for example `{shooter.rangedWeapon}`,
+`{leader.bodyguard}` or `{deepStriker.arrival}`, so explanations name the player's own weapons and
+units. Every fact always has a value, so text never shows a raw token. Two new lessons were added
+before the full battle round: 9. Leaders and bodyguards, 10. Reserves and Deep Strike (new roles
+`leader` and `deepStriker`, with invented stand-ins when the army has none). The old lessons 9 and 10
+are now 11 and 12. Lessons can start in a later battle round (`startRound`) and with units in reserves.

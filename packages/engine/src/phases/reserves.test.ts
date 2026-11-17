@@ -82,6 +82,14 @@ describe('strategic reserves', () => {
     expect(code(ingressAt(s, { x: 22, y: 21 }))).toBe('TOO_CLOSE_TO_ENEMY');
   });
 
+  it('destroys units that have not arrived by the end of battle round 3', () => {
+    let s = toMovement([], 3);
+    expect(s.units['pilgrims']!.models.some((m) => !m.destroyed)).toBe(true);
+    while (s.battleRound === 3) s = run(s, endPhase);
+    expect(s.units['pilgrims']!.models.every((m) => m.destroyed)).toBe(true);
+    expect(s.status['pilgrims']!.inReserves).toBe(false);
+  });
+
   it('destroys units still in reserves at the end of the battle', () => {
     let s = toMovement([], 1);
     while (s.phase !== 'game-over') s = run(s, endPhase);

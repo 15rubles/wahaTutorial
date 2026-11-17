@@ -2,7 +2,7 @@ import type { Lesson } from '../types.js';
 
 export const battleRoundLesson: Lesson = {
   id: 'battle-round',
-  title: '9. Deployment and a full battle round',
+  title: '11. Deployment and a full battle round',
   summary: 'Set up your whole army and play a battle round against the drill opponent.',
   army: 'full',
   deployment: true,

@@ -1446,7 +1446,7 @@ pre {
 .reserve-list {
   list-style: none;
   padding: 0;
-  margin: 0.3rem 0;
+  margin: 0.3rem 0 0.9rem;
 }
 .reserve-list li {
   display: flex;

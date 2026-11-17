@@ -149,7 +149,20 @@ shows the cached rule text for the step and saves progress.
 **Demo:** press "Quick rules" anywhere; in the sandbox select a unit and press "What can I do now?";
 Tab to a unit, Enter, then arrow keys and Enter to move it.
 
+## Rules depth and army lessons (branch claude/rules-depth-and-army-lessons)
+
+- [x] Attached units: leaders join bodyguards (engine merge, bodyguard Toughness, live keywords)
+- [x] Army page: choose which unit each leader leads (suggested on import)
+- [x] Strategic reserves, ingress moves and Deep Strike in engine, AI and UI
+- [x] Reserves destroyed at the end of battle round 3 and at the end of the battle
+- [x] Lesson text tokens with the player's unit details (`{role.fact}`)
+- [x] New lessons: 9. Leaders and bodyguards, 10. Reserves and Deep Strike (unit tests and E2E)
+
+**Demo:** import a roster with a character: the Army page shows "Leads ..." for it and the sandbox
+shows the joined unit. In the sandbox deployment press "Reserves" next to a unit, then bring it in
+from round 2 by selecting it in the reserves list and clicking the board.
+
 ## Still open for the owner
 
 - Manual run of the campaign with your real roster (see M9).
-- Open rules questions in `docs/rules-questions.md` (RQ-1 to RQ-5).
+- Open rules questions in `docs/rules-questions.md` (RQ-1 to RQ-7).

@@ -147,7 +147,49 @@ test.describe('M9 campaign', () => {
     await expectDone(page);
   });
 
-  test('9. deployment and a full battle round', async ({ page }) => {
+  test('9. leaders and bodyguards', async ({ page }) => {
+    await openLesson(page, 'attached');
+    // The text names the player's own leader and bodyguard.
+    if (FIXTURE)
+      await expect(page.getByTestId('tutorial-box')).toContainText(
+        'Pilgrim Scrapwarden has joined Rustbound Devotees',
+      );
+    await next(page);
+    await role(page, 'leader').locator('circle').first().click();
+    await expectStep(page, 3);
+    if (FIXTURE) {
+      // One datasheet card per part of the joined unit.
+      await expect(page.getByTestId('unit-card')).toHaveCount(2);
+    }
+    await next(page);
+    await page.getByTestId('fire').click();
+    await expectStep(page, 5);
+    await next(page);
+    await next(page);
+    await expectDone(page);
+  });
+
+  test('10. reserves and deep strike', async ({ page }) => {
+    await openLesson(page, 'reserves');
+    await expect(page.getByTestId('round')).toHaveText('Round 2');
+    await next(page);
+    await page.locator('[data-testid^="select-reserve-"]').click();
+    await expectStep(page, 3);
+    await expect(page.getByTestId('arrival-zone')).toBeVisible();
+    // Click empty board 22" across, 5" down: far from the enemy, clear of terrain.
+    const box = (await page.getByTestId('battlefield').boundingBox())!;
+    const px = box.width / 45;
+    await page.mouse.click(box.x + 22.5 * px, box.y + 5.5 * px);
+    await expectStep(page, 4);
+    await expect(page.getByTestId('battle-log')).toContainText('arrived from reserves', {
+      useInnerText: false,
+    });
+    await next(page);
+    await next(page);
+    await expectDone(page);
+  });
+
+  test('11. deployment and a full battle round', async ({ page }) => {
     await openLesson(page, 'battle-round');
     await expect(page.getByTestId('phase')).toHaveText('Deployment');
     await next(page);
@@ -160,7 +202,7 @@ test.describe('M9 campaign', () => {
     await expect(page.getByTestId('round')).toHaveText('Round 2');
   });
 
-  test('10. graduation', async ({ page }) => {
+  test('12. graduation', async ({ page }) => {
     await openLesson(page, 'graduation');
     await next(page);
     await endPhasesUntil(
