@@ -1,8 +1,11 @@
 import { DataGate } from './components/DataGate.js';
+import { RulePopup } from './components/RulePopup.js';
 import { useData } from './data/store.js';
 import { ArmyPage } from './pages/ArmyPage.js';
 import { ImportPage } from './pages/ImportPage.js';
 import { RulesPage } from './pages/RulesPage.js';
+import { SandboxPage } from './pages/SandboxPage.js';
+import { UnitPage } from './pages/UnitPage.js';
 import { href, useRoute } from './router.js';
 
 function Home() {
@@ -12,6 +15,9 @@ function Home() {
       <ul>
         <li>
           <a href={href('import')}>Import your army</a>
+        </li>
+        <li>
+          <a href={href('sandbox')}>Sandbox: play a turn against practice dummies</a>
         </li>
         <li>
           <a href={href('rules')}>Rules browser</a>
@@ -50,6 +56,7 @@ export function App() {
         </h1>
         <nav aria-label="Main">
           <a href={href('army')}>Army</a>
+          <a href={href('sandbox')}>Sandbox</a>
           <a href={href('rules')}>Rules</a>
         </nav>
         <DataSourceBadge />
@@ -67,10 +74,19 @@ export function App() {
           <DataGate>
             <ArmyPage />
           </DataGate>
+        ) : page === 'sandbox' ? (
+          <DataGate>
+            <SandboxPage />
+          </DataGate>
+        ) : page === 'unit' && rest[0] ? (
+          <DataGate>
+            <UnitPage datasheetId={rest[0]} />
+          </DataGate>
         ) : (
           <Home />
         )}
       </main>
+      <RulePopup />
     </div>
   );
 }
