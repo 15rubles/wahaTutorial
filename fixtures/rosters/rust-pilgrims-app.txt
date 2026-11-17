@@ -1,0 +1,36 @@
+Rust Pilgrims Test List (455 points)
+
+Rust Pilgrims
+Scrap Procession
+Incursion (1000 points)
+
+CHARACTERS
+
+Pilgrim Scrapwarden (75 points)
+  • Warlord
+  • 1x Rivet pistol
+  • 1x Scrap maul
+  • Enhancement: Lantern of Last Miles
+
+BATTLELINE
+
+Rustbound Devotees (80 points)
+  • 10x Rustbound Devotee
+    ◦ 8x Nail caster
+    ◦ 10x Corroded blade
+
+OTHER DATASHEETS
+
+Cinder Lancer's (70 points)
+  • 3x Cinder Lancer
+    ◦ 3x Spark carbine
+    ◦ 3x Ember lance
+
+Furnace Walker (150 points)
+  • 1x Slag cannon
+  • 1x Melta spigot
+  • 1x Crushing claws
+
+Gutter Marksman (40 points)
+
+Exported with App Version: v0.0 (fixture)

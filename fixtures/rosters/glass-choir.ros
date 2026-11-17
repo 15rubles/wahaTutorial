@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<roster id="fx-0055" name="Glass Choir Test List" battleScribeVersion="2.03" generatedBy="fixture" gameSystemId="fixture-system" gameSystemName="Fixture System" gameSystemRevision="1" xmlns="http://www.battlescribe.net/schema/rosterSchema">
+  <costs><cost name="pts" typeId="points" value="400"/></costs>
+  <forces>
+    <force id="fx-0056" name="Army Roster" entryId="fx-0057" catalogueId="fx-0058" catalogueRevision="1" catalogueName="Fixture - Glass Choir">
+      <selections>
+        <selection id="fx-0039" name="Detachment" entryId="fx-003a" number="1" type="upgrade"><selections><selection id="fx-0037" name="Shard Cantata" entryId="fx-0038" number="1" type="upgrade"></selection></selections></selection>
+        <selection id="fx-0041" name="Choir Precentor" entryId="fx-0042" number="1" type="model"><costs><cost name="pts" typeId="points" value="65"/></costs><selections><selection id="fx-003b" name="Warlord" entryId="fx-003c" number="1" type="upgrade"></selection><selection id="fx-003d" name="Shard blade" entryId="fx-003e" number="1" type="upgrade"></selection><selection id="fx-003f" name="Resonance pistol" entryId="fx-0040" number="1" type="upgrade"></selection></selections></selection>
+        <selection id="fx-0049" name="Glass Wardens" entryId="fx-004a" number="1" type="unit"><costs><cost name="pts" typeId="points" value="90"/></costs><selections><selection id="fx-0047" name="Glass Warden" entryId="fx-0048" number="5" type="model"><selections><selection id="fx-0043" name="Splinter repeater" entryId="fx-0044" number="5" type="upgrade"></selection><selection id="fx-0045" name="Glass edge" entryId="fx-0046" number="5" type="upgrade"></selection></selections></selection></selections></selection>
+        <selection id="fx-004f" name="Prism Engine" entryId="fx-0050" number="1" type="model"><costs><cost name="pts" typeId="points" value="170"/></costs><selections><selection id="fx-004b" name="Refractor beam" entryId="fx-004c" number="1" type="upgrade"></selection><selection id="fx-004d" name="Shard spray" entryId="fx-004e" number="1" type="upgrade"></selection></selections></selection>
+        <selection id="fx-0053" name="Echo Skimmers" entryId="fx-0054" number="1" type="unit"><costs><cost name="pts" typeId="points" value="75"/></costs><selections><selection id="fx-0051" name="Echo Skimmer" entryId="fx-0052" number="3" type="model"></selection></selections></selection>
+      </selections>
+    </force>
+  </forces>
+</roster>

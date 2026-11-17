@@ -4,6 +4,7 @@
 import { mkdirSync, writeFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { strToU8, zipSync } from 'fflate';
 
 const OUT = join(dirname(fileURLToPath(import.meta.url)), '..', 'fixtures', 'wahapedia');
 const BOM = String.fromCharCode(0xfeff);
@@ -181,7 +182,7 @@ strat(
   'HOLD THE ROAD',
   'Scrap Procession - Strategic Ploy Stratagem',
   2,
-  'Either player’s turn'.replace('’', "'"),
+  "Either player's turn",
   'Command phase',
   'Scrap Procession',
   '900000801',
@@ -357,7 +358,7 @@ function datasheet(d) {
     add('Datasheets_options', {
       datasheet_id: id,
       line: String(i + 1),
-      button: '•'.replace('•', '*'),
+      button: '*',
       description: o,
     }),
   );
@@ -750,6 +751,7 @@ for (const [table, header] of Object.entries(HEADERS)) {
   writeFileSync(join(OUT, `${table}.csv`), BOM + lines.join(eol) + eol, 'utf8');
 }
 writeFileSync(join(OUT, 'core-rules.html'), coreRulesHtml(), 'utf8');
+writeRosters();
 console.log(
   `Wrote ${Object.keys(HEADERS).length} fixture CSVs + core-rules.html (${ds} datasheets) to ${OUT}`,
 );
@@ -917,4 +919,218 @@ function coreRulesHtml() {
 ${parts.join('\n')}
 <!--noindex--><div class="tooltip_templates"><form id="disable-ads"><h4>Disable Ads</h4></form></div><!--/noindex--></body></html>
 `;
+}
+
+// ---- Rosters -----------------------------------------------------------------------------
+// Invented army lists in the shapes of BattleScribe / New Recruit XML and two text export styles.
+function writeRosters() {
+  const dir = join(OUT, '..', 'rosters');
+  mkdirSync(dir, { recursive: true });
+  const esc = (v) => String(v).replace(/&/g, '&amp;').replace(/"/g, '&quot;').replace(/</g, '&lt;');
+  let n = 0;
+  const id = () => `fx-${(++n).toString(16).padStart(4, '0')}`;
+  const cost = (v) => `<costs><cost name="pts" typeId="points" value="${v}"/></costs>`;
+  const sel = (name, type, number, children = '', pts = 0) =>
+    `<selection id="${id()}" name="${esc(name)}" entryId="${id()}" number="${number}" type="${type}">${pts ? cost(pts) : ''}${children ? `<selections>${children}</selections>` : ''}</selection>`;
+  const ros = (
+    name,
+    catalogue,
+    total,
+    config,
+    units,
+  ) => `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<roster id="${id()}" name="${esc(name)}" battleScribeVersion="2.03" generatedBy="fixture" gameSystemId="fixture-system" gameSystemName="Fixture System" gameSystemRevision="1" xmlns="http://www.battlescribe.net/schema/rosterSchema">
+  ${cost(total)}
+  <forces>
+    <force id="${id()}" name="Army Roster" entryId="${id()}" catalogueId="${id()}" catalogueRevision="1" catalogueName="${esc(catalogue)}">
+      <selections>
+        ${config}
+        ${units.join('\n        ')}
+      </selections>
+    </force>
+  </forces>
+</roster>
+`;
+
+  const rp = ros(
+    'Rust Pilgrims Test List',
+    'Fixture - Rust Pilgrims',
+    455,
+    sel('Battle Size', 'upgrade', 1, sel('Incursion (1000 Point limit)', 'upgrade', 1)) +
+      sel('Detachment', 'upgrade', 1, sel('Scrap Procession', 'upgrade', 1)),
+    [
+      sel(
+        'Pilgrim Scrapwarden',
+        'model',
+        1,
+        sel('Warlord', 'upgrade', 1) +
+          sel('Rivet Pistol', 'upgrade', 1) +
+          sel('Scrap maul', 'upgrade', 1) +
+          sel('Enhancements', 'upgrade', 1, sel('Lantern of Last Miles', 'upgrade', 1, '', 15)),
+        60,
+      ),
+      sel(
+        'Rustbound Devotees',
+        'unit',
+        1,
+        sel(
+          'Rustbound Devotee',
+          'model',
+          8,
+          sel('Nail caster', 'upgrade', 8) + sel('Corroded blade', 'upgrade', 8),
+        ) + sel('Rustbound Devotee w/ blade', 'model', 2, sel('Corroded blade', 'upgrade', 2)),
+        80,
+      ),
+      sel(
+        'Cinder Lancers',
+        'unit',
+        1,
+        sel(
+          'Cinder Lancer',
+          'model',
+          3,
+          sel('Spark carbine', 'upgrade', 3) + sel('Ember lance', 'upgrade', 3),
+        ),
+        70,
+      ),
+      sel(
+        'Furnace Walker',
+        'model',
+        1,
+        sel('Slag cannon', 'upgrade', 1) +
+          sel('Melta spigot', 'upgrade', 1) +
+          sel('Crushing claws', 'upgrade', 1),
+        150,
+      ),
+      sel('Gutter Marksmen', 'model', 1, '', 40),
+    ],
+  );
+  writeFileSync(join(dir, 'rust-pilgrims.ros'), rp, 'utf8');
+  writeFileSync(
+    join(dir, 'rust-pilgrims.rosz'),
+    zipSync({ 'rust-pilgrims.ros': strToU8(rp) }, { mtime: new Date('2026-01-01T00:00:00Z') }),
+  );
+
+  const gc = ros(
+    'Glass Choir Test List',
+    'Fixture - Glass Choir',
+    400,
+    sel('Detachment', 'upgrade', 1, sel('Shard Cantata', 'upgrade', 1)),
+    [
+      sel(
+        'Choir Precentor',
+        'model',
+        1,
+        sel('Warlord', 'upgrade', 1) +
+          sel('Shard blade', 'upgrade', 1) +
+          sel('Resonance pistol', 'upgrade', 1),
+        65,
+      ),
+      sel(
+        'Glass Wardens',
+        'unit',
+        1,
+        sel(
+          'Glass Warden',
+          'model',
+          5,
+          sel('Splinter repeater', 'upgrade', 5) + sel('Glass edge', 'upgrade', 5),
+        ),
+        90,
+      ),
+      sel(
+        'Prism Engine',
+        'model',
+        1,
+        sel('Refractor beam', 'upgrade', 1) + sel('Shard spray', 'upgrade', 1),
+        170,
+      ),
+      sel('Echo Skimmers', 'unit', 1, sel('Echo Skimmer', 'model', 3), 75),
+    ],
+  );
+  writeFileSync(join(dir, 'glass-choir.ros'), gc, 'utf8');
+
+  // Official app style text export.
+  writeFileSync(
+    join(dir, 'rust-pilgrims-app.txt'),
+    [
+      'Rust Pilgrims Test List (455 points)',
+      '',
+      'Rust Pilgrims',
+      'Scrap Procession',
+      'Incursion (1000 points)',
+      '',
+      'CHARACTERS',
+      '',
+      'Pilgrim Scrapwarden (75 points)',
+      '  \u2022 Warlord',
+      '  \u2022 1x Rivet pistol',
+      '  \u2022 1x Scrap maul',
+      '  \u2022 Enhancement: Lantern of Last Miles',
+      '',
+      'BATTLELINE',
+      '',
+      'Rustbound Devotees (80 points)',
+      '  \u2022 10x Rustbound Devotee',
+      '    \u25e6 8x Nail caster',
+      '    \u25e6 10x Corroded blade',
+      '',
+      'OTHER DATASHEETS',
+      '',
+      "Cinder Lancer's (70 points)",
+      '  \u2022 3x Cinder Lancer',
+      '    \u25e6 3x Spark carbine',
+      '    \u25e6 3x Ember lance',
+      '',
+      'Furnace Walker (150 points)',
+      '  \u2022 1x Slag cannon',
+      '  \u2022 1x Melta spigot',
+      '  \u2022 1x Crushing claws',
+      '',
+      'Gutter Marksman (40 points)',
+      '',
+      'Exported with App Version: v0.0 (fixture)',
+      '',
+    ].join('\n'),
+    'utf8',
+  );
+
+  // New Recruit style text export.
+  writeFileSync(
+    join(dir, 'rust-pilgrims-newrecruit.txt'),
+    [
+      '+++++++++++++++++++++++++++++++++++++++++++++++',
+      '+ FACTION KEYWORD: Fixture - Rust Pilgrims',
+      '+ DETACHMENT: Scrap Procession',
+      '+ TOTAL ARMY POINTS: 455pts',
+      '+++++++++++++++++++++++++++++++++++++++++++++++',
+      '',
+      'Char1: 1x Pilgrim Scrapwarden (75 pts): Warlord, Rivet pistol, Scrap maul',
+      'Enhancement: Lantern of Last Miles (+15 pts)',
+      '',
+      '1x Rustbound Devotees (80 pts): 8x Nail caster, 10x Corroded blade',
+      '1x Cinder Lancers (70 pts): 3x Spark carbine, 3x Ember lance',
+      '1x Furnace Walker (150 pts): Slag cannon, Melta spigot, Crushing claws',
+      '1x Gutter Marksman (40 pts)',
+      '',
+    ].join('\n'),
+    'utf8',
+  );
+
+  // A roster with problems: an unknown unit, a typo, a garbage line, an unknown enhancement.
+  writeFileSync(
+    join(dir, 'broken.txt'),
+    [
+      'Broken Test List (300 points)',
+      'Rust Pilgrims',
+      '',
+      'Pilgrim Scrapwardn (60 points)',
+      '  \u2022 Enhancement: Crown of Nothing',
+      'Totally Unknown Battle Robot (200 points)',
+      '%%% not a roster line %%%',
+      'Rustbound Devotees (80 points)',
+      '',
+    ].join('\n'),
+    'utf8',
+  );
 }

@@ -1,0 +1,13 @@
++++++++++++++++++++++++++++++++++++++++++++++++
++ FACTION KEYWORD: Fixture - Rust Pilgrims
++ DETACHMENT: Scrap Procession
++ TOTAL ARMY POINTS: 455pts
++++++++++++++++++++++++++++++++++++++++++++++++
+
+Char1: 1x Pilgrim Scrapwarden (75 pts): Warlord, Rivet pistol, Scrap maul
+Enhancement: Lantern of Last Miles (+15 pts)
+
+1x Rustbound Devotees (80 pts): 8x Nail caster, 10x Corroded blade
+1x Cinder Lancers (70 pts): 3x Spark carbine, 3x Ember lance
+1x Furnace Walker (150 pts): Slag cannon, Melta spigot, Crushing claws
+1x Gutter Marksman (40 pts)
