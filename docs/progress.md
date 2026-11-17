@@ -47,9 +47,18 @@ Real run on 2026-11-17: 24 requests, all downloaded; second run 0 requests; thir
 25 factions, 1485 datasheets, 7488 weapon profiles, 0 errors, 98 explained warnings.
 `npm run fixtures:build` does the same for the invented Rust Pilgrims and Glass Choir.
 
-## M3 - Core rules tree
+## M3 - Core rules tree - DONE
 
-- [ ] Accept: every datasheet keyword resolves to a rule section or is listed as unresolved
+- [x] Core rules page parsed into a `RuleSection` tree with stable ids (`data-cache/normalized/rules.json`)
+- [x] Keyword index: weapon keywords, unit keywords, shared abilities, section codes, page anchors -> rule ids (`rules-index.json`)
+- [x] Rules browser in the web app (tree, search, breadcrumbs, in-page rule links), reading the local cache
+- [x] Demo data mode using the invented fixture rules page
+- [x] Accept: every keyword on any datasheet resolves to a rule section, is an identity keyword (faction or unit name), or is listed in `_report.json` `unresolvedKeywords`
+
+**Demo:** after `npm run data:build`, `npm run dev` and open `#/rules`. Real build: 231 sections;
+of 1087 keywords, 34 resolve to a section, 809 are identity keywords, 244 are listed as unresolved
+(mostly faction sub-keywords and unit types like Infantry; the most common ones get "mentioned in"
+links). Without a cache the app explains the two commands and offers demo data.
 
 ## M4 - Roster import
 

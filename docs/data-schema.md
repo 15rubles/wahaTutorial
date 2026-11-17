@@ -125,3 +125,17 @@ Report categories (`_report.json` `explanations` repeats these):
 Real build on 2026-11-17: 25 factions, 1485 datasheets, 7488 weapon profiles, 0 errors, 98 warnings
 (60 orphan references: rows in child tables for datasheets that are not in `Datasheets.csv`;
 38 wargear rows without a profile type).
+
+## Part 3: Core rules (M3)
+
+`npm run data:build` also parses `core-rules.html` into:
+
+- `rules.json`: `RuleSection[]` roots (groups such as "BASIC RULES"), each node
+  `{ id, number, title, kind: group | section | ability, html, text, anchor, sourceUrl, keywords, children }`.
+  `html` is sanitized (see decisions D-016), `text` is the plain text for search.
+- `rules-index.json`: `anchors` (page anchor -> id), `codes` (`05.01` -> id), `weaponKeywords`,
+  `unitKeywords`, `abilities` (shared ability id -> id) and `mentions` (unresolved keyword -> sections
+  that use it).
+- `keywords.json` entries gain `ruleId` when resolved.
+
+Rule ids are described in decisions D-014. Lessons and engine files refer to these ids only.

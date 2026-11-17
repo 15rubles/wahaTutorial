@@ -77,3 +77,45 @@ use that output, so the whole pipeline is tested without any GW text.
 
 `@battle-drill/data` is browser safe (schema and pure parsers, Zod only); `@battle-drill/data/node`
 has sync and the file system build.
+
+## D-014 (M3) Rule ids
+
+`core.` + the slug path of section titles following the dotted section codes (numbering like "1." and
+the code are stripped, brackets dropped). Example: `core.attack-sequence.hit-roll`,
+`core.core-abilities.lethal-hits`, `core.fight-phase.pile-in-move`. Super headers are groups:
+`core.group.basic-rules`. Uncoded sub-headings hang under the previous coded section. A collision
+gets the code appended. Ids depend only on titles and codes, so they survive text errata.
+
+## D-015 (M3) Section boundaries by markers
+
+Four marker types carry a section code: h2, h3, `div.abName` (core abilities) and `div.str11Name`
+(rule boxes such as move types). Bodies are cut by string offset between markers and repaired with
+node-html-parser. Tooltip templates are removed before searching for markers because they repeat
+ability boxes. When a box appears before its parent section (LEADER / SUPPORT shows up in Attached
+Units first), it is placed under its code parent anyway.
+
+## D-016 (M3) Sanitizing rule HTML
+
+Removed: scripts, styles, images, iframes, forms, tooltip wrappers, all attributes except class / href /
+target / rel / colspan / rowspan. Dice face sprites become `<span class="die">N</span>`. FAQ and errata
+spoilers become `<details>`. In-page links become `#rule:<id>`; other site links become absolute
+https links; any non http(s) link is turned into plain text.
+
+## D-017 (M3) Keyword resolution
+
+Weapon keywords match core ability sections by slug. Unit keywords match a section title, its plural,
+or a small alias table (our own mapping of keyword slug to section slug, for example `monster` ->
+`monsters-and-vehicles`). Faction keywords and keywords equal to a datasheet name are "identity"
+keywords and are not expected to have a rule. Everything else is listed in `_report.json`
+`unresolvedKeywords`; for those, `rules-index.json` `mentions` lists up to 5 sections that use the
+keyword, for "see also" links.
+
+## D-018 (M3) Data served by the dev server only
+
+A Vite plugin serves `/data/*` from `BATTLE_DRILL_DATA_DIR` (default `data-cache/normalized`) and
+`/fixture-data/*` from `fixtures/normalized`. The production bundle contains no data. If the cache is
+missing the app explains how to run the sync and offers the invented demo data.
+
+## D-019 (M3) exactOptionalPropertyTypes off in the web app
+
+It stays on for the pure packages. In React code it mostly forces `prop={x ?? undefined}` noise.
