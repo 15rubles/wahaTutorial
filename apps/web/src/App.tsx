@@ -1,12 +1,62 @@
-import { createEmptyGameState } from '@battle-drill/engine';
+import { DataGate } from './components/DataGate.js';
+import { useData } from './data/store.js';
+import { RulesPage } from './pages/RulesPage.js';
+import { href, useRoute } from './router.js';
+
+function Home() {
+  return (
+    <section>
+      <p>An interactive core rules tutorial that uses your own army.</p>
+      <ul>
+        <li>
+          <a href={href('rules')}>Rules browser</a>
+        </li>
+      </ul>
+    </section>
+  );
+}
+
+function DataSourceBadge() {
+  const { source, setSource, meta } = useData();
+  return (
+    <div className="data-badge small">
+      {source === 'fixture' ? 'Demo data (invented)' : 'Your local cache'}
+      {meta?.sourceLastUpdate && (
+        <span className="muted"> - source {meta.sourceLastUpdate}</span>
+      )}{' '}
+      <button
+        type="button"
+        className="link"
+        onClick={() => setSource(source === 'fixture' ? 'cache' : 'fixture')}
+      >
+        switch
+      </button>
+    </div>
+  );
+}
 
 export function App() {
-  const state = createEmptyGameState();
+  const [page, ...rest] = useRoute();
   return (
-    <main className="app">
-      <h1>Battle Drill</h1>
-      <p>An interactive core rules tutorial that uses your own army.</p>
-      <p className="muted">Engine ready. Battle round {state.battleRound}.</p>
-    </main>
+    <div className="app">
+      <header className="app-header">
+        <h1>
+          <a href={href()}>Battle Drill</a>
+        </h1>
+        <nav aria-label="Main">
+          <a href={href('rules')}>Rules</a>
+        </nav>
+        <DataSourceBadge />
+      </header>
+      <main>
+        {page === 'rules' ? (
+          <DataGate>
+            <RulesPage {...(rest[0] ? { selectedId: rest[0] } : {})} />
+          </DataGate>
+        ) : (
+          <Home />
+        )}
+      </main>
+    </div>
   );
 }
