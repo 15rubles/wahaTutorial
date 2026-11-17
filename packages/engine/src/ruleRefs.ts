@@ -25,9 +25,11 @@ import * as fight from './phases/fight.js';
 import * as legal from './phases/legalActions.js';
 import * as movement from './phases/movement.js';
 import * as objectives from './phases/objectives.js';
+import * as reserves from './phases/reserves.js';
 import * as shooting from './phases/shooting.js';
 import * as stratagems from './phases/stratagems.js';
 import * as validateMove from './phases/validateMove.js';
+import * as attach from './units/attach.js';
 
 const modules: Record<string, { ruleRefs: readonly string[] }> = {
   allocation,
@@ -55,9 +57,11 @@ const modules: Record<string, { ruleRefs: readonly string[] }> = {
   legal,
   movement,
   objectives,
+  reserves,
   shooting,
   stratagems,
   validateMove,
+  attach,
 };
 
 export const engineRuleRefs: Readonly<Record<string, readonly string[]>> = {

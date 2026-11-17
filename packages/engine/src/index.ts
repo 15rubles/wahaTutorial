@@ -114,3 +114,11 @@ export { engagedEnemies, isEngaged } from './phases/validateMove.js';
 export { nextAiAction, actingPlayer } from './ai/scriptedAi.js';
 export { engineRuleRefs } from './ruleRefs.js';
 export { legalActions, type LegalOption } from './phases/legalActions.js';
+export { attachUnits, liveKeywords } from './units/attach.js';
+export {
+  placeInReserves,
+  canIngress,
+  hasDeepStrike,
+  INGRESS_EDGE_DISTANCE,
+  ARRIVAL_ENEMY_DISTANCE,
+} from './phases/reserves.js';

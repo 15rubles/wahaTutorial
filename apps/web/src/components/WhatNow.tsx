@@ -6,6 +6,7 @@ const MOVE: Record<string, string> = {
   normal: 'make a normal move',
   advance: 'advance (roll a D6 for extra distance)',
   'fall-back': 'fall back out of combat',
+  ingress: 'arrive from reserves',
 };
 const SHOOT: Record<string, string> = {
   normal: 'shoot normally',
@@ -19,6 +20,10 @@ export function describeOption(o: LegalOption, state: GameState): string {
       return `It can ${o.moveTypes.map((t) => MOVE[t] ?? t).join(', or ')}.`;
     case 'shoot':
       return `It can ${o.shootingTypes.map((t) => SHOOT[t] ?? t).join(', or ')}.`;
+    case 'in-reserves':
+      return o.canArrive
+        ? 'It is in reserves: it can arrive now with an ingress move. Click the board to set it up.'
+        : 'It is in reserves, waiting off the battlefield. Reserves can arrive from battle round 2.';
     case 'declare-charge':
       return 'It can declare a charge: an enemy is within 12".';
     case 'charge-move':

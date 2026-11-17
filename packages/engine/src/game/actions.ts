@@ -4,6 +4,7 @@ import type { MoveType, ShootingType } from './state.js';
 /** Positions are given for the unit's alive models, in model order. */
 export type GameAction =
   | { readonly type: 'deploy'; readonly unitId: string; readonly positions: readonly Point[] }
+  | { readonly type: 'placeInReserves'; readonly unitId: string }
   | { readonly type: 'endPhase' }
   | { readonly type: 'advanceRoll'; readonly unitId: string }
   | {

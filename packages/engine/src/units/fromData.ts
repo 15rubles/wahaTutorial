@@ -67,6 +67,28 @@ function feelNoPain(
   return null;
 }
 
+/** Core abilities the engine knows about, as slugs. */
+const CORE_ABILITIES = [
+  'deep-strike',
+  'infiltrators',
+  'scouts',
+  'stealth',
+  'lone-operative',
+  'fights-first',
+  'leader',
+  'support',
+];
+
+function coreAbilities(ds: Datasheet, abilityName?: (id: string) => string | undefined): string[] {
+  const out = new Set<string>();
+  for (const a of ds.abilities) {
+    const name = (a.name || (a.abilityId ? abilityName?.(a.abilityId) : '') || '').toLowerCase();
+    const slug = name.replace(/[^a-z]+/g, '-').replace(/^-|-$/g, '');
+    for (const c of CORE_ABILITIES) if (slug === c || slug.startsWith(`${c}-`)) out.add(c);
+  }
+  return [...out];
+}
+
 function pickProfile(profiles: readonly ModelProfile[], name: string): ModelProfile {
   const n = norm(name);
   return (
@@ -132,5 +154,6 @@ export function unitFromDatasheet(ds: Datasheet, choices: UnitChoices): UnitStat
     weapons,
     models: models.map((m, i) => ({ ...m, weapons: carried[i]! })),
     startingStrength: models.length,
+    abilities: coreAbilities(ds, choices.abilityName),
   };
 }

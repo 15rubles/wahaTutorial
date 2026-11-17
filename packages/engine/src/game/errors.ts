@@ -24,6 +24,8 @@ export type RuleErrorCode =
   | 'NOT_CLOSER'
   | 'NOT_ALL_TARGETS_ENGAGED'
   | 'ENGAGED_NON_TARGET'
+  | 'NOT_NEAR_EDGE'
+  | 'TOO_CLOSE_TO_ENEMY'
   | 'NOT_ENOUGH_CP'
   | 'STRATAGEM_USED'
   | 'GAME_OVER';

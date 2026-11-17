@@ -11,6 +11,7 @@ import { requiredWoundRoll } from './woundChart.js';
 export const ruleRefs = [
   'core.attack-sequence.wound-roll',
   'core.attack-sequence.wound-roll.multiple-toughness-characteristics',
+  'core.attached-units.attacking-attached-units',
 ];
 
 /**
@@ -19,7 +20,10 @@ export const ruleRefs = [
  */
 export function unitToughness(unit: UnitState): number {
   const alive = aliveModels(unit);
-  const bodyguards = alive.filter((m) => !m.isCharacter);
+  // Attached units (19.02): the bodyguard models' highest T while any are left.
+  const bodyguards = alive.some((m) => m.attachedRole)
+    ? alive.filter((m) => m.attachedRole === 'bodyguard')
+    : alive.filter((m) => !m.isCharacter);
   const pool = bodyguards.length > 0 && bodyguards.length < alive.length ? bodyguards : alive;
   return Math.max(1, ...pool.map((m) => m.toughness));
 }

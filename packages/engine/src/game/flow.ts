@@ -21,6 +21,7 @@ export const ruleRefs = [
   'core.the-battle-round.player-turns',
   'core.the-battle-round.end-of-battle-round',
   'core.moving.coherency',
+  'core.strategic-reserves.placing-units-in-strategic-reserves.strategic-reserves-at-the-end-of-the-battle',
 ];
 
 type Step = { state: GameState; events: GameEvent[] };
@@ -60,7 +61,7 @@ function enterPhase(state: GameState, phase: Phase, roller: Roller): Step {
 
 function startTurn(state: GameState, player: typeof state.activePlayer, roller: Roller): Step {
   const status = Object.fromEntries(
-    Object.entries(state.status).map(([id, s]) => [id, freshStatus(s.battleShocked)]),
+    Object.entries(state.status).map(([id, s]) => [id, freshStatus(s.battleShocked, s.inReserves)]),
   );
   const base: GameState = { ...state, activePlayer: player, status };
   const entered = enterPhase(base, 'command', roller);
@@ -107,7 +108,11 @@ export function endPhase(state: GameState, roller: Roller): Step {
   if (state.phase === 'movement') {
     // Every unit must be selected to move; any that were not remain stationary (09.02).
     for (const u of unitsOf(next, next.activePlayer)) {
-      if (!next.status[u.id]!.moved && aliveModels(u).some((m) => m.position)) {
+      if (
+        !next.status[u.id]!.moved &&
+        !next.status[u.id]!.inReserves &&
+        aliveModels(u).some((m) => m.position)
+      ) {
         next = withStatus(next, u.id, { moved: 'stationary' });
         events.push({
           type: 'UnitMoved',
@@ -166,6 +171,14 @@ export function endPhase(state: GameState, roller: Roller): Step {
   if (next.battleRound >= next.mission.battleRounds) {
     const { p1, p2 } = next.players;
     const winner = p1.vp > p2.vp ? 'p1' : p2.vp > p1.vp ? 'p2' : null;
+    // 20.01.02: reserve units that never arrived count as destroyed when the game ends.
+    for (const [id, st] of Object.entries(next.status)) {
+      if (!st.inReserves) continue;
+      const u = next.units[id]!;
+      const models = u.models.map((m) => ({ ...m, destroyed: true }));
+      next = { ...next, units: { ...next.units, [id]: { ...u, models } } };
+      events.push({ type: 'UnitDestroyed', unitId: id });
+    }
     return {
       state: { ...next, phase: 'game-over' },
       events: [...events, { type: 'GameEnded', winner }],

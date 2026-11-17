@@ -8,7 +8,7 @@ export const ruleRefs = ['core.the-battle-round', 'core.the-battle-round.player-
 export type Phase =
   'deployment' | 'command' | 'movement' | 'shooting' | 'charge' | 'fight' | 'game-over';
 export type FightStep = 'pile-in' | 'fight' | 'consolidate';
-export type MoveType = 'stationary' | 'normal' | 'advance' | 'fall-back';
+export type MoveType = 'stationary' | 'normal' | 'advance' | 'fall-back' | 'ingress';
 export type ShootingType = 'normal' | 'assault' | 'close-quarters';
 
 /** Per unit flags that reset every turn (or phase, where noted). */
@@ -29,9 +29,11 @@ export interface UnitStatus {
   readonly eligibleToFight: boolean;
   /** Persists across turns until a battle-shock roll is passed. */
   readonly battleShocked: boolean;
+  /** In strategic reserves (20): off the battlefield until an ingress move. Persists across turns. */
+  readonly inReserves: boolean;
 }
 
-export const freshStatus = (battleShocked = false): UnitStatus => ({
+export const freshStatus = (battleShocked = false, inReserves = false): UnitStatus => ({
   moved: null,
   advanceRoll: null,
   maxMoved: 0,
@@ -45,6 +47,7 @@ export const freshStatus = (battleShocked = false): UnitStatus => ({
   consolidated: false,
   eligibleToFight: false,
   battleShocked,
+  inReserves,
 });
 
 export interface PlayerState {
@@ -63,6 +66,8 @@ export interface Mission {
 export type GameEvent =
   | AttackEvent
   | { readonly type: 'UnitDeployed'; readonly unitId: string }
+  | { readonly type: 'UnitPlacedInReserves'; readonly unitId: string }
+  | { readonly type: 'UnitArrived'; readonly unitId: string; readonly deepStrike: boolean }
   | { readonly type: 'BattleRoundStarted'; readonly round: number }
   | { readonly type: 'TurnStarted'; readonly player: PlayerId; readonly round: number }
   | { readonly type: 'PhaseStarted'; readonly phase: Phase; readonly player: PlayerId }

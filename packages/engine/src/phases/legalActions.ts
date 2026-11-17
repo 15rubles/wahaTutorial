@@ -10,6 +10,7 @@ export const ruleRefs = ['core.the-battle-round.player-turns'];
 /** Machine readable options for "What can I do now?". The UI words them. */
 export type LegalOption =
   | { readonly kind: 'move'; readonly moveTypes: readonly string[] }
+  | { readonly kind: 'in-reserves'; readonly canArrive: boolean }
   | { readonly kind: 'shoot'; readonly shootingTypes: readonly string[] }
   | { readonly kind: 'declare-charge' }
   | { readonly kind: 'charge-move'; readonly targets: readonly string[] }
@@ -28,6 +29,16 @@ export function legalActions(state: GameState, unitId: string): LegalOption[] {
     return [{ kind: 'none', reason: 'destroyed' }];
   const out: LegalOption[] = [];
   const active = unit.player === state.activePlayer;
+  if (st.inReserves)
+    return [
+      {
+        kind: 'in-reserves',
+        canArrive:
+          active &&
+          state.phase === 'movement' &&
+          eligibleMoveTypes(state, unitId).includes('ingress'),
+      },
+    ];
   switch (state.phase) {
     case 'movement': {
       const types = active ? eligibleMoveTypes(state, unitId) : [];

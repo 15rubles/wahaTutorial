@@ -9,6 +9,7 @@ import {
   withUnit,
 } from '../game/state.js';
 import { type Point, aliveModels } from '../types.js';
+import { canIngress, ingress } from './reserves.js';
 import { isEngaged, validateMove } from './validateMove.js';
 
 export const ruleRefs = [
@@ -26,7 +27,9 @@ type Result = { state: GameState; events: GameEvent[] } | RuleError;
 export function eligibleMoveTypes(state: GameState, unitId: string): MoveType[] {
   const unit = state.units[unitId];
   const st = state.status[unitId];
-  if (!unit || !st || st.moved || !aliveModels(unit).some((m) => m.position)) return [];
+  if (!unit || !st || st.moved) return [];
+  if (!aliveModels(unit).some((m) => m.position))
+    return canIngress(state, unitId) ? ['ingress'] : [];
   const engaged = isEngaged(state, unit);
   return engaged ? ['stationary', 'fall-back'] : ['stationary', 'normal', 'advance'];
 }
@@ -56,6 +59,15 @@ export function move(
   if (!unit || !st) return err('UNKNOWN_UNIT', unitId);
   if (!eligibleMoveTypes(state, unitId).includes(moveType)) return err('NOT_ELIGIBLE', moveType);
 
+  if (moveType === 'ingress') {
+    if (!positions) return err('BAD_POSITIONS', 'positions required');
+    const r = ingress(state, unitId, positions);
+    if ('code' in r) return r;
+    return {
+      state: r.state,
+      events: [...r.events, { type: 'UnitMoved', unitId, moveType, maxDistance: 0, moved: 0 }],
+    };
+  }
   if (moveType === 'stationary') {
     return {
       state: withStatus(state, unitId, { moved: 'stationary' }),

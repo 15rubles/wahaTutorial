@@ -15,6 +15,7 @@ export function deploy(
   const unit = state.units[unitId];
   if (!unit) return err('UNKNOWN_UNIT', unitId);
   if (aliveModels(unit).some((m) => m.position)) return err('ALREADY_ACTED', 'already deployed');
+  if (state.status[unitId]?.inReserves) return err('ALREADY_ACTED', 'in reserves');
   const zone = state.battlefield.deploymentZones.find((z) => z.player === unit.player);
   const models = aliveModels(unit);
   if (zone) {

@@ -1,4 +1,5 @@
 import type { UnitState, Weapon, WeaponKeyword } from '../types.js';
+import { liveKeywords } from '../units/attach.js';
 
 /** Facts about the attack that the battlefield / phase layer works out. */
 export interface AttackContext {
@@ -64,5 +65,5 @@ export function keywordApplies(kw: WeaponKeyword, target: UnitState): boolean {
   // RULES-QUESTION: RQ-1 conditional keyword forms other than `non-X` are treated as always applying.
   if (!m) return true;
   const excluded = m[1]!.split('/').map((k) => k.trim().toUpperCase());
-  return !excluded.some((k) => target.keywords.includes(k));
+  return !excluded.some((k) => liveKeywords(target).includes(k));
 }

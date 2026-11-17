@@ -53,6 +53,8 @@ export interface ModelState {
   readonly baseRadius: number;
   readonly position: Point | null;
   readonly destroyed: boolean;
+  /** In an attached unit: whether this model came from the leader / support unit or the bodyguard. */
+  readonly attachedRole?: 'leader' | 'bodyguard';
 }
 
 export interface UnitState {
@@ -66,6 +68,18 @@ export interface UnitState {
   readonly models: readonly ModelState[];
   /** Model count when the unit was set up (for half-strength). */
   readonly startingStrength: number;
+  /** Slugs of core abilities the unit has, e.g. `deep-strike` (only those the engine uses). */
+  readonly abilities?: readonly string[];
+  /** For attached units (19): the units it was formed from, in order (bodyguard first). */
+  readonly components?: readonly UnitComponent[];
+}
+
+export interface UnitComponent {
+  readonly datasheetId: string;
+  readonly name: string;
+  readonly role: 'leader' | 'bodyguard';
+  readonly keywords: readonly string[];
+  readonly modelIds: readonly string[];
 }
 
 export type PlayerId = 'p1' | 'p2';

@@ -2,6 +2,7 @@ import { seededRoller } from '../dice/roller.js';
 import type { Roller } from '../dice/roller.js';
 import { chargeMove, declareCharge, skipCharge } from '../phases/charge.js';
 import { deploy } from '../phases/deployment.js';
+import { placeInReserves } from '../phases/reserves.js';
 import { consolidate, fight, pileIn } from '../phases/fight.js';
 import { advanceRoll, move } from '../phases/movement.js';
 import { shoot } from '../phases/shooting.js';
@@ -18,6 +19,7 @@ export type ApplyResult =
 
 const PHASE_OF: Partial<Record<GameAction['type'], Phase>> = {
   deploy: 'deployment',
+  placeInReserves: 'deployment',
   advanceRoll: 'movement',
   move: 'movement',
   shoot: 'shooting',
@@ -59,6 +61,8 @@ function dispatch(
   switch (action.type) {
     case 'deploy':
       return deploy(state, action.unitId, action.positions);
+    case 'placeInReserves':
+      return placeInReserves(state, action.unitId);
     case 'endPhase':
       return endPhase(state, roller);
     case 'advanceRoll':
