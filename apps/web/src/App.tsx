@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import { DataGate } from './components/DataGate.js';
 import { QuickReference } from './components/QuickReference.js';
 import { cacheAgeDays, isStale } from './data/freshness.js';
@@ -54,7 +55,9 @@ function DataSourceBadge() {
 
 function FreshnessBanner() {
   const meta = useData((s) => s.meta);
-  const age = cacheAgeDays(meta, Date.now());
+  // Read the clock once per mount, not on every render.
+  const [now] = useState(() => Date.now());
+  const age = cacheAgeDays(meta, now);
   if (!isStale(age)) return null;
   return (
     <p className="banner" role="status" data-testid="freshness-banner">
