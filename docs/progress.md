@@ -110,9 +110,17 @@ battle round between the Rust Pilgrims and the Glass Choir on the invented train
 **Demo:** import a roster, open `#/sandbox`. Your army deploys against practice dummies. Select a
 unit, pick a move and drag it, shoot, charge, fight; `npm run e2e` plays a turn automatically.
 
-## M8 - Tutorial framework
+## M8 - Tutorial framework - DONE
 
-- [ ] Accept: a 3-step demo lesson runs end to end in Playwright
+- [x] Lesson format (`Lesson`, `Step` with `ruleRefs`, `say`, `focus`, `expect`, `onWrong`, `setup`, plus `allow` and `dice`)
+- [x] Pure step runner: advances on the expected action, hints on wrong or blocked input, explain again, skip, restart
+- [x] Role picking from the player's army with invented stand-ins and a notice when a role is missing
+- [x] Spotlight overlay: dims everything, highlights the focused elements, blocks input elsewhere
+- [x] Progress saved in localStorage (try/catch), lesson list shows completed lessons
+- [x] Accept: Playwright runs the 3-step demo lesson end to end (including a blocked click that produces a hint)
+
+**Demo:** `#/learn` lists lessons; "Drill zero" walks through selecting your unit, ending the command
+phase and making your first move.
 
 ## M9 - The tutorial campaign
 

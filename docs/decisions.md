@@ -232,3 +232,20 @@ test (both sides) and will be the M9 opponent.
 `@playwright/test` is pinned to the version of the browsers available here (1.63.0). E2E runs the dev
 server with `BATTLE_DRILL_DATA_DIR=fixtures/normalized` and the demo data source, so no GW data is
 needed. On a new machine run `npx playwright install chromium` once.
+
+## D-034 (M8) Tutorial framework shape
+
+- Lessons are TypeScript objects (`packages/tutorial/src/lessons/`). Steps hold our own short `say`
+  text with `{role}` tokens (replaced by the player's unit names) and `ruleRefs`; the overlay shows the
+  cached rule text under each step ("Explain again" opens them all).
+- `expect` is one of: press Next, a UI signal (unit selected, rule opened), or an engine event with an
+  optional predicate. The runner is a pure reducer; progress is `{ completed, current }` in
+  localStorage behind try/catch.
+- Blocking: a capture-phase listener cancels pointer and click events outside the focused elements,
+  the tutorial box and the rule popup, and turns the attempt into a hint. Steps can also restrict
+  engine actions (`allow`) and force dice (`dice`); forced dice are stored in the history so undo and
+  replay stay exact.
+- Roles (`character`, `fast`, `shooter`, `melee`) are picked from the army by simple scores, scarce
+  roles first, distinct units where possible. Missing roles use invented stand-ins and the lesson says
+  so. Enemies in lessons are invented (`Practice Dummies`, `Sparring Partners`).
+- Lesson boards reuse the training ground without deployment zones; units start already placed.
