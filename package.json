@@ -22,9 +22,11 @@
     "data:sync": "tsx packages/data/src/cli.ts sync",
     "data:build": "tsx packages/data/src/cli.ts build",
     "fixtures:build": "node scripts/make-fixtures.mjs && tsx packages/data/src/cli.ts build --fixture --raw-dir fixtures/wahapedia --out-dir fixtures/normalized",
-    "rules:check": "tsx scripts/check-rule-refs.ts"
+    "rules:check": "tsx scripts/check-rule-refs.ts",
+    "check:no-gw-text": "node scripts/check-no-gw-text.mjs"
   },
   "devDependencies": {
+    "@axe-core/playwright": "^4.14.0",
     "@eslint/js": "^10.0.1",
     "@playwright/test": "^1.63.0",
     "@testing-library/dom": "^10.4.2",
