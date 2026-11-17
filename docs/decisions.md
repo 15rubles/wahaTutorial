@@ -299,3 +299,13 @@ Git on Windows can check files out with CRLF, which turns the entrypoint's sheba
 LF (raw fixtures excluded, they keep their exact bytes), the image strips CR from the script, and the
 entrypoint runs through `sh` so the shebang is not used. Compose no longer restarts a failing
 container in a loop.
+
+## D-040 UI redesign: datasheet style and unit-type pieces
+
+The app now follows the look of printed datasheets: dark top bar, red title bands, white stat boxes,
+olive section bars, grid paper, condensed headings (Barlow / Barlow Condensed, bundled via
+@fontsource so it works offline). No Games Workshop logos, icons or artwork are used: section icons
+and all piece art are our own simple shapes. Game pieces are chosen per unit TYPE from keywords
+(character, infantry, mounted, walker, vehicle, monster, beast, swarm, aircraft, fortification,
+practice target), so every faction is covered without per-model art; the rim colour shows the side.
+Single light theme on purpose (it reads like a printed sheet). No data, engine or lesson changes.
