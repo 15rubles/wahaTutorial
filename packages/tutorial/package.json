@@ -1,0 +1,17 @@
+{
+  "name": "@battle-drill/tutorial",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "default": "./dist/index.js"
+    }
+  },
+  "dependencies": {
+    "@battle-drill/engine": "0.0.0"
+  }
+}
