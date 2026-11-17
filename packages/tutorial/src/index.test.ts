@@ -1,4 +1,4 @@
-import { createEmptyGameState } from '@battle-drill/engine';
+import { createGame, trainingGround } from '@battle-drill/engine';
 import { describe, expect, it } from 'vitest';
 import { lessonStepIds, type Lesson } from './index.js';
 
@@ -22,7 +22,7 @@ describe('tutorial skeleton', () => {
   });
 
   it('can run a step setup against an engine state', () => {
-    const state = createEmptyGameState();
+    const state = createGame({ seed: 1, battlefield: trainingGround(), units: [] });
     expect(demo.steps[1]?.setup?.(state)).toBe(state);
   });
 });

@@ -39,14 +39,77 @@ export {
 export type { KeywordModule } from './keywords/types.js';
 export { unitFromDatasheet, toWeapon, baseRadius, type UnitChoices } from './units/fromData.js';
 
-/** Kept from M0 for the web shell and tutorial skeleton; M6 replaces it with the full game state. */
-export interface LegacyGameState {
-  readonly version: 1;
-  readonly battleRound: number;
-  readonly events: readonly { readonly type: string }[];
-}
-
-export function createEmptyGameState(): LegacyGameState {
-  return Object.freeze({ version: 1, battleRound: 0, events: Object.freeze([]) });
-}
-export type GameState = LegacyGameState;
+export * from './board/geometry.js';
+export {
+  type TerrainCategory,
+  type TerrainArea,
+  type Objective,
+  type DeploymentZone,
+  type Battlefield,
+  isObscuring,
+  OBJECTIVE_MARKER_RADIUS,
+  OBJECTIVE_RANGE,
+  trainingGround,
+} from './board/battlefield.js';
+export {
+  ENGAGEMENT_RANGE,
+  modelDistance,
+  unitDistance,
+  within,
+  modelsEngaged,
+  unitsEngaged,
+  onBattlefield,
+  inBaseContact,
+} from './board/measure.js';
+export {
+  MODELS_BLOCK_LOS,
+  terrainContaining,
+  modelVisible,
+  modelFullyVisible,
+  unitVisibleTo,
+  hasBenefitOfCover,
+} from './board/visibility.js';
+export { inCoherency } from './board/coherency.js';
+export {
+  type Phase,
+  type FightStep,
+  type MoveType,
+  type ShootingType,
+  type UnitStatus,
+  freshStatus,
+  type PlayerState,
+  type Mission,
+  type GameEvent,
+  type GameState,
+  type NewGameOptions,
+  createGame,
+  opponent,
+  unitsOf,
+  withUnit,
+  withStatus,
+  moveModels,
+} from './game/state.js';
+export * from './game/actions.js';
+export * from './game/errors.js';
+export { apply, type ApplyResult } from './game/apply.js';
+export { endPhase, fightStepDone } from './game/flow.js';
+export * from './game/history.js';
+export * from './game/formation.js';
+export { eligibleMoveTypes } from './phases/movement.js';
+export { eligibleShootingTypes, weaponAllowed, checkTarget, shooters } from './phases/shooting.js';
+export { canDeclareCharge, possibleChargeTargets, CHARGE_DECLARE_RANGE } from './phases/charge.js';
+export {
+  canPileIn,
+  canConsolidate,
+  consolidationMode,
+  eligibleToFight,
+  fightsFirst,
+  nextFightSelector,
+  pileInTargets,
+  objectiveDistance,
+} from './phases/fight.js';
+export { atOrBelowHalfStrength } from './phases/command.js';
+export { controlLevels } from './phases/objectives.js';
+export { engagedEnemies, isEngaged } from './phases/validateMove.js';
+export { nextAiAction, actingPlayer } from './ai/scriptedAi.js';
+export { engineRuleRefs } from './ruleRefs.js';
