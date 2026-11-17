@@ -8,3 +8,5 @@ playwright-report
 test-results
 CLAUDE.md
 fixtures/normalized
+fixtures/wahapedia
+fixtures/rosters
