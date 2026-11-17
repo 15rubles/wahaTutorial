@@ -213,13 +213,13 @@ textarea {
   color: #fff;
 }
 
-.app-header button {
+.app-header button:not(.quick-ref *) {
   background: transparent;
   color: #fff;
   border-color: #6f7562;
 }
 
-.app-header button:hover:not(:disabled) {
+.app-header button:not(.quick-ref *):hover:not(:disabled) {
   background: #ffffff1a;
 }
 
