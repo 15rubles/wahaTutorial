@@ -6,5 +6,10 @@
     "tsBuildInfoFile": "dist/.tsbuildinfo"
   },
   "include": ["src"],
-  "references": [{ "path": "../engine" }]
+  "references": [
+    {
+      "path": "../engine"
+    }
+  ],
+  "exclude": ["src/**/*.test.ts", "src/testing.ts"]
 }
