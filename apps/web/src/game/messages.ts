@@ -10,6 +10,10 @@ export const ERROR_TEXT: Record<RuleErrorCode, string> = {
   NOT_ELIGIBLE: 'That unit is not allowed to do that right now.',
   BAD_POSITIONS: 'Some models were not placed.',
   TOO_FAR: 'That is further than this move allows.',
+  MUST_END_WITHIN_1:
+    'A charging model that can get within 1" of a charge target has to. Move it closer.',
+  MUST_END_ENGAGED:
+    'A charging model that can reach engagement range of a charge target has to. Move it closer.',
   NOT_NEAR_EDGE:
     'Too far from the edge: arriving models go wholly within 6" of a battlefield edge.',
   TOO_CLOSE_TO_ENEMY: 'Too close: keep arriving models over 8" from every enemy.',

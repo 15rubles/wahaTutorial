@@ -11,6 +11,7 @@ import { formation, translate } from './formation.js';
 import { type GameState, createGame } from './state.js';
 import { nextFightSelector } from '../phases/fight.js';
 import { atOrBelowHalfStrength } from '../phases/command.js';
+import { chargePositions } from '../phases/chargeProximity.js';
 
 const gun = weapon({ name: 'Rifle', range: 24, attacks: flat(2) });
 const blade = weapon({ name: 'Blade', type: 'melee', range: null, attacks: flat(2), skill: 3 });
@@ -318,13 +319,33 @@ describe('charge and fight', () => {
       },
       'TOO_FAR',
     );
+    // Engaged at 2", but every model could have ended within 1" (RQ-4).
+    expectError(
+      s,
+      {
+        type: 'chargeMove',
+        unitId: 'a',
+        targetIds: ['b'],
+        positions: translate(s.units['a']!, { x: 0, y: 3 }),
+      },
+      'MUST_END_WITHIN_1',
+    );
     const ok = apply(s, {
       type: 'chargeMove',
       unitId: 'a',
       targetIds: ['b'],
-      positions: translate(s.units['a']!, { x: 0, y: 3 }),
+      positions: translate(s.units['a']!, { x: 0, y: 4.2 }),
     });
     expect(ok.ok).toBe(true);
+  });
+
+  it('chargePositions packs models in so the move passes the 1" check', () => {
+    const s = toCharge([3, 3]);
+    const positions = chargePositions(s, s.units['a']!, [s.units['b']!], 6);
+    expect(positions).not.toBeNull();
+    expect(
+      apply(s, { type: 'chargeMove', unitId: 'a', targetIds: ['b'], positions: positions! }).ok,
+    ).toBe(true);
   });
 
   it('a short roll means no possible charge targets', () => {
@@ -350,7 +371,7 @@ describe('charge and fight', () => {
         type: 'chargeMove',
         unitId: 'a',
         targetIds: ['b'],
-        positions: translate(s.units['a']!, { x: 0, y: 3 }),
+        positions: translate(s.units['a']!, { x: 0, y: 4.2 }),
       },
       { type: 'endPhase' },
     );

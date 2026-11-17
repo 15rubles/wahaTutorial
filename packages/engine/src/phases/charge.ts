@@ -4,6 +4,7 @@ import type { Roller } from '../dice/roller.js';
 import { type RuleError, err } from '../game/errors.js';
 import { type GameEvent, type GameState, withStatus, withUnit } from '../game/state.js';
 import { type Point, type UnitState, aliveModels } from '../types.js';
+import { chargeProximityProblem } from './chargeProximity.js';
 import { engagedEnemies, isEngaged, validateMove } from './validateMove.js';
 
 export const ruleRefs = [
@@ -101,10 +102,11 @@ export function chargeMove(
     )
       return err('NOT_CLOSER', b.id);
   }
-  // RULES-QUESTION: RQ-4 "each model that can end within 1" / engaged must do so" is not enforced.
   const next = withUnit(state, result.unit);
   for (const t of targets)
     if (!unitsEngaged(result.unit, next.units[t.id]!)) return err('NOT_ALL_TARGETS_ENGAGED', t.id);
+  const close = chargeProximityProblem(state, unit, result.unit, targets, st.chargeRoll);
+  if (close) return err(close.code, close.modelId);
   for (const e of engagedEnemies(next, result.unit))
     if (!targetIds.includes(e.id)) return err('ENGAGED_NON_TARGET', e.id);
 

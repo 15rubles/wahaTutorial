@@ -45,11 +45,15 @@ rules, then record the resolution here.
 ### RQ-4: Charge move "must end within 1" / engaged if it can"
 
 - Rule ref: `core.charge-phase.charge-move`
-- Question: enforcing "each model that can end within 1" of a charge target must do so" needs a search
-  over all legal placements.
-- Current interpretation: not enforced. The engine enforces closer-to-target, engaged with every
-  target and not engaged with other units. The UI's charge helper always ends models as close as it can.
-- Status: open (simplification)
+- Question: enforcing "each model that can end within 1" (then: engaged) of a charge target must do
+  so" exactly needs a search over all legal placements.
+- Current interpretation: enforced conservatively (`phases/chargeProximity.ts`). A model breaks the
+  rule only if a straight-line spot next to a target model was free for it: on the battlefield,
+  outside terrain, no overlapping bases, unit still coherent, within the charge roll. Errors
+  `MUST_END_WITHIN_1` and `MUST_END_ENGAGED`. `chargePositions` builds moves that pass the check
+  (used by the AI and the UI charge buttons).
+- Flag: `ENFORCE_CHARGE_PROXIMITY` (on)
+- Status: open (approximation; paths around terrain are not searched)
 
 ### RQ-5: Selecting the next fighter after the Fights First units are used up
 

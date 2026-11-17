@@ -122,3 +122,4 @@ export {
   INGRESS_EDGE_DISTANCE,
   ARRIVAL_ENEMY_DISTANCE,
 } from './phases/reserves.js';
+export { chargePositions, ENFORCE_CHARGE_PROXIMITY } from './phases/chargeProximity.js';

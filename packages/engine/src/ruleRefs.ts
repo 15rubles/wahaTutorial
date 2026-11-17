@@ -26,6 +26,7 @@ import * as legal from './phases/legalActions.js';
 import * as movement from './phases/movement.js';
 import * as objectives from './phases/objectives.js';
 import * as reserves from './phases/reserves.js';
+import * as chargeProximity from './phases/chargeProximity.js';
 import * as shooting from './phases/shooting.js';
 import * as stratagems from './phases/stratagems.js';
 import * as validateMove from './phases/validateMove.js';
@@ -58,6 +59,7 @@ const modules: Record<string, { ruleRefs: readonly string[] }> = {
   movement,
   objectives,
   reserves,
+  chargeProximity,
   shooting,
   stratagems,
   validateMove,

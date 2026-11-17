@@ -3,10 +3,10 @@ import {
   type UnitState,
   aliveModels,
   canConsolidate,
+  chargePositions,
   canDeclareCharge,
   canPileIn,
   checkTarget,
-  closeTo,
   formation,
   consolidationMode,
   eligibleMoveTypes,
@@ -222,7 +222,7 @@ function ChargeControls({ state, unit }: { state: GameState; unit: UnitState }) 
   const tryCharge = (targetId: string) => {
     const target = state.units[targetId]!;
     for (const gap of [0.5, 1, 1.5, 0.2]) {
-      const positions = closeTo(unit, target, st.chargeRoll!, gap);
+      const positions = chargePositions(state, unit, [target], st.chargeRoll!, gap);
       if (
         positions &&
         apply(state, { type: 'chargeMove', unitId: unit.id, targetIds: [targetId], positions }).ok

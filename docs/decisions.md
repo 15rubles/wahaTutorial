@@ -342,3 +342,14 @@ units. Every fact always has a value, so text never shows a raw token. Two new l
 before the full battle round: 9. Leaders and bodyguards, 10. Reserves and Deep Strike (new roles
 `leader` and `deepStriker`, with invented stand-ins when the army has none). The old lessons 9 and 10
 are now 11 and 12. Lessons can start in a later battle round (`startRound`) and with units in reserves.
+
+## D-044 Charge proximity check (RQ-4)
+
+The charge move now checks the two "if it can, it must" requirements from the cached rule, in order:
+within 1" of a charge target, then engaged. "Can" is approximated per model by trying spots around
+each target model at 14 angles; a spot counts only if it is on the board, outside terrain areas, free
+of other bases, keeps the unit coherent and is within the charge roll in a straight line. This never
+demands a placement that does not exist, but it can miss one (a curved path around terrain), so it is
+on the lenient side. A greedy helper (`chargePositions`) packs models into such spots; the AI and the
+UI charge buttons use it. Measured on the real cache: the AI completed the same number of charges with
+the check on as off.

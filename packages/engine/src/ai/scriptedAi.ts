@@ -7,7 +7,7 @@ import { centroid } from '../board/geometry.js';
 import { unitDistance } from '../board/measure.js';
 import type { GameAction } from '../game/actions.js';
 import { apply } from '../game/apply.js';
-import { closeTo, formation, moveToward, stepModelsToward } from '../game/formation.js';
+import { formation, moveToward, stepModelsToward } from '../game/formation.js';
 import { type GameState, opponent, unitsOf } from '../game/state.js';
 import { possibleChargeTargets } from '../phases/charge.js';
 import {
@@ -23,6 +23,7 @@ import { checkTarget, eligibleShootingTypes, weaponAllowed } from '../phases/sho
 import { engagedEnemies } from '../phases/validateMove.js';
 import { type PlayerId, type Point, type UnitState, aliveModels } from '../types.js';
 import { hasDeepStrike } from '../phases/reserves.js';
+import { chargePositions } from '../phases/chargeProximity.js';
 
 const onTable = (u: UnitState) => aliveModels(u).some((m) => m.position);
 const alive = (u: UnitState) => aliveModels(u).length > 0;
@@ -155,7 +156,7 @@ function chargeCandidates(state: GameState, player: PlayerId): GameAction[] {
     if (st.declaredCharge && !st.charged && st.chargeRoll !== null) {
       for (const t of possibleChargeTargets(state, u.id)) {
         for (const gap of [0.5, 1, 1.5]) {
-          const positions = closeTo(u, t, st.chargeRoll, gap);
+          const positions = chargePositions(state, u, [t], st.chargeRoll, gap);
           if (positions)
             out.push({ type: 'chargeMove', unitId: u.id, targetIds: [t.id], positions });
         }
