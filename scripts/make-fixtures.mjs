@@ -749,4 +749,172 @@ for (const [table, header] of Object.entries(HEADERS)) {
   ];
   writeFileSync(join(OUT, `${table}.csv`), BOM + lines.join(eol) + eol, 'utf8');
 }
-console.log(`Wrote ${Object.keys(HEADERS).length} fixture CSVs (${ds} datasheets) to ${OUT}`);
+writeFileSync(join(OUT, 'core-rules.html'), coreRulesHtml(), 'utf8');
+console.log(
+  `Wrote ${Object.keys(HEADERS).length} fixture CSVs + core-rules.html (${ds} datasheets) to ${OUT}`,
+);
+
+// ---- Core rules page ---------------------------------------------------------------------
+// Same markup patterns as the real page (see docs/data-schema.md), with short section titles and
+// INVENTED placeholder bodies. Produces the same rule ids as the real page for these sections.
+function coreRulesHtml() {
+  const body = (title) =>
+    `<p>Fixture text for ${title}. This is invented placeholder text for tests, not a rule.</p>`;
+  const parts = [];
+  const anchor = (t) => t.replace(/[^A-Za-z0-9.]+/g, '-').replace(/-+$/, '');
+  const group = (t) =>
+    parts.push(`<h2 id="${anchor(t)}" class="super_header" style="display:flex;">${t}</h2>`);
+  const top = (t, code, tag = 'h3', red = 'h_number_red') =>
+    parts.push(
+      `<div class="BreakInsideAvoid"><a name="${anchor(t)}"></a><${tag} id="${anchor(t)}" class="outline_header" style="display:flex;">${t} <div class="${red}">${code}${red.endsWith('2') ? ' <div class="headerWrap"></div>' : ''}</div></${tag}><p class="legend">${body(t)}</p></div>`,
+    );
+  const sec = (t, code, tag = 'h2') =>
+    parts.push(
+      `<div class="BreakInsideAvoid"><a name="${anchor(t)}"></a><${tag} id="${anchor(t)}" style="display:flex;">${t} <span class="h_number">${code}</span></${tag}>${body(t)}<div><br></div></div>`,
+    );
+  const sub = (t) =>
+    parts.push(
+      `<div class="BreakInsideAvoid"><h3 id="${anchor(t)}" style="display:flex;">${t}</h3>${body(t)}</div>`,
+    );
+  const box = (t, code) =>
+    parts.push(
+      `<a name="${anchor(t)}"></a><div class=" BreakInsideAvoid"> <div class="str11Wrap"> <div class="str11BodyWrap"> <div id="${anchor(t)}" class="str11HeadBlock str11Name">${t}<span class="h_number">${code}</span></div> </div> <div class="str11BodyWrap"> <div class="str11TextWrap"> <div class="str11Text">${body(t)}</div> </div> </div> </div></div>`,
+    );
+  const ability = (t, code) =>
+    parts.push(
+      `<div class="abWrap BreakInsideAvoid"><div class="abNameWrap"><div class="abName">${t}<span class="h_number">${code}</span></div><div class="abIcon"></div></div><p class="ShowFluff abLegend">Invented flavour.</p>${body(t)}</div>`,
+    );
+  const faq = () =>
+    parts.push(
+      `<div class="faqErrataSpoiler faqErrataCollapsed"><div class="faqErrataHead"><h3>FAQ</h3><div class="btnFaqErrataToggle"><span class="FaqErrataToggleText">Show</span></div></div><div class="faqErrataSpoilerBody"><div class="faq">Q: Invented question? A: Invented answer.</div></div></div>`,
+    );
+  const junk = () =>
+    parts.push(
+      `<div class="tooltip_templates"><span id="tooltip_content00001"><div class="abName">[LETHAL HITS]<span class="h_number">24.23</span></div>Tooltip copy that must be ignored.</span></div><script>var ignored = 1;</script>`,
+    );
+
+  group('BASIC RULES');
+  top('Core Concepts', '01');
+  sec('Measuring Distances', '01.04');
+  sec('Dice', '01.05');
+  parts.push('<p>Dice faces: unmodified <div class="cruD6"></div> example.</p>');
+  sec('Battle-shock Rolls', '01.07');
+  top('Datasheets', '02');
+  sec('2. Profiles', '02.02', 'h3');
+  sec('4. Weapons', '02.04', 'h3');
+  sec('5. Keywords', '02.05', 'h3');
+  parts.push('<p>Keyword example: <span class="kwb">INFANTRY</span> units.</p>');
+  top('Moving', '03');
+  sec('Moving Units', '03.01');
+  sub('Ending a Move');
+  sec('Coherency', '03.03');
+  sec('Engagement', '03.04');
+  top('Making Attacks', '04');
+  sec('1. Select Weapons', '04.01');
+  sec('2. Select Targets', '04.02');
+  sec('3. Resolve Attacks', '04.03');
+  top('Attack Sequence', '05');
+  sec('1. Hit Roll', '05.01');
+  faq();
+  junk();
+  sec('Critical Hits and Critical Wounds', '05.01.01', 'h3');
+  sec('2. Wound Roll', '05.02');
+  parts.push(
+    '<p>See the <a href="/wh40k11ed/the-rules/core-rules/#1.-Hit-Roll">hit roll</a> and <a href="/wh40k11ed/factions/example/">a faction page</a>.</p>',
+  );
+  sec('3. Save Rolls', '05.03');
+  sec('Saving Throw', '05.03.01', 'h3');
+  sec('4. Inflict Damage', '05.04');
+  top('Other Concepts', '06', 'h2');
+  sec('Visibility', '06.01');
+  sec('Mortal Wounds', '06.02');
+  sec('Hazard Rolls', '06.03');
+
+  group('THE BATTLE ROUND');
+  parts.push(
+    `<div class="BreakInsideAvoid"><h2 id="The-Battle-Round-1" class="outline_header">The Battle Round <div class="h_number_red">07</div></h2>${body('The Battle Round')}</div>`,
+  );
+  sec('1. Start of Battle Round', '07.01');
+  sec('2. Player Turns', '07.02');
+  sec('3. End of Battle Round', '07.03');
+  top('Command Phase', '08', 'h2', 'h_number_red2');
+  sec('1. Start of Command Phase', '08.01');
+  sec('2. Gain Core CP', '08.02');
+  sec('3. Battle-shock Step', '08.03');
+  sec('4. Command Abilities', '08.04');
+  sec('5. End of Command Phase', '08.05');
+  top('Movement Phase', '09', 'h3', 'h_number_red2');
+  sec('1. Start of Movement Phase', '09.01');
+  sec('2. Move Units Step', '09.02');
+  sec('3. End of Movement Phase', '09.03');
+  box('REMAIN STATIONARY', '09.04');
+  box('NORMAL MOVE', '09.05');
+  box('ADVANCE MOVE', '09.06');
+  box('FALL-BACK MOVE', '09.07');
+  top('Shooting Phase', '10', 'h3', 'h_number_red2');
+  sec('1. Start of Shooting Phase', '10.01');
+  sec('2. Shoot', '10.02');
+  sec('3. End of Shooting Phase', '10.03');
+  box('NORMAL SHOOTING', '10.04');
+  box('ASSAULT SHOOTING', '10.05');
+  top('Charge Phase', '11', 'h3', 'h_number_red2');
+  sec('1. Start of Charge Phase', '11.01');
+  sec('2. Charge Step', '11.02');
+  sec('3. End of Charge Phase', '11.03');
+  box('CHARGE MOVE', '11.04');
+  top('Fight Phase', '12', 'h3', 'h_number_red2');
+  sec('1. Start of Fight Phase', '12.01');
+  sec('2. Pile In', '12.02');
+  box('PILE-IN MOVE', '12.03');
+  sec('3. Fight Step', '12.04');
+  box('NORMAL FIGHT', '12.05');
+  sec('4. Consolidate', '12.07');
+  box('CONSOLIDATION MOVE', '12.08');
+  sec('5. End of Fight Phase', '12.09');
+
+  group('BATTLEFIELDS AND TACTICS');
+  top('Terrain', '13', 'h2');
+  sec('Benefit of Cover', '13.08', 'h3');
+  sec('Obscuring', '13.10', 'h3');
+  top('Objectives', '14', 'h2');
+  sec('Level of Control', '14.02');
+  top('Stratagems', '15', 'h2');
+  sec('Using Stratagems', '15.01');
+
+  group('ADVANCED RULES');
+  top('Monsters and Vehicles', '17', 'h2');
+  top('Transports', '18', 'h3');
+  top('Attached Units', '19', 'h2');
+  sec('Forming Attached Units', '19.01');
+  ability('LEADER<span class="h_number">24.22</span> / SUPPORT', '24.34');
+  sec('Attacking Attached Units', '19.02');
+
+  group('REFERENCE');
+  top('Core Abilities', '24', 'h2');
+  for (const [t, c] of [
+    ['[ANTI]', '24.03'],
+    ['[ASSAULT]', '24.04'],
+    ['[BLAST]', '24.05'],
+    ['[DEVASTATING WOUNDS]', '24.10'],
+    ['[EXTRA ATTACKS]', '24.11'],
+    ['[HAZARDOUS]', '24.15'],
+    ['[HEAVY]', '24.16'],
+    ['[IGNORES COVER]', '24.18'],
+    ['[LANCE]', '24.21'],
+    ['[LETHAL HITS]', '24.23'],
+    ['[MELTA]', '24.25'],
+    ['[PISTOL]', '24.27'],
+    ['[PRECISION]', '24.28'],
+    ['[RAPID FIRE]', '24.30'],
+    ['[SUSTAINED HITS]', '24.36'],
+    ['[TORRENT]', '24.37'],
+    ['[TWIN-LINKED]', '24.38'],
+  ])
+    ability(t, c);
+
+  return `<!doctype html><html><head><title>Fixture core rules</title></head><body><!--noindex--><div>site menu</div><!--/noindex-->
+<h1 class="page_header">Core Rules</h1>
+${parts.join('\n')}
+<!--noindex--><div class="tooltip_templates"><form id="disable-ads"><h4>Disable Ads</h4></form></div><!--/noindex--></body></html>
+`;
+}

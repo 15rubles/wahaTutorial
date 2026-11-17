@@ -11,10 +11,47 @@
     "enhancements": 3,
     "detachmentAbilities": 2,
     "detachments": 2,
-    "keywords": 36
+    "keywords": 36,
+    "ruleSections": 102,
+    "resolvedKeywords": 19,
+    "identityKeywords": 11,
+    "unresolvedKeywords": 6
   },
   "errors": [],
   "warnings": [],
-  "explanations": {},
-  "unresolvedKeywords": []
+  "explanations": {
+    "unresolved-keyword": "unresolvedKeywords lists every keyword that is not a faction or unit name keyword and has no matching core rules section (faction specific weapon rules, unit types such as Infantry that the core rules use without a dedicated section)."
+  },
+  "unresolvedKeywords": [
+    {
+      "kind": "unit",
+      "keyword": "Infantry",
+      "uses": 5
+    },
+    {
+      "kind": "unit",
+      "keyword": "Character",
+      "uses": 2
+    },
+    {
+      "kind": "unit",
+      "keyword": "Battleline",
+      "uses": 2
+    },
+    {
+      "kind": "unit",
+      "keyword": "Mounted",
+      "uses": 2
+    },
+    {
+      "kind": "unit",
+      "keyword": "Grenades",
+      "uses": 1
+    },
+    {
+      "kind": "unit",
+      "keyword": "Fly",
+      "uses": 1
+    }
+  ]
 }
