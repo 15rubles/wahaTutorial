@@ -55,25 +55,30 @@ export function BuilderHeader({
         )}
       </div>
       <div className={styles.metric}>
-        <span className={styles.eyebrow}>Points</span>
+        <span className={`${styles.eyebrow} ${styles.metricLabel}`}>Points</span>
         <span className={`${styles.metricValue} num ${over ? styles.metricOver : ''}`} data-testid="points-total">
           {t.points}
           {!t.pointsComplete && <span title="Some units have no points in the data">*</span>}{' '}
           <span className={styles.metricLimit}>/ {t.pointsLimit ?? '-'}</span>
+          <span className={styles.metricUnit}> pts</span>
         </span>
       </div>
       <div className={styles.metric}>
-        <span className={styles.eyebrow}>Detachment pts</span>
+        <span className={`${styles.eyebrow} ${styles.metricLabel}`}>Detachment pts</span>
         <span className={`${styles.metricValue} num ${dpOver ? styles.metricOver : ''}`} data-testid="dp-total">
           {t.dp} <span className={styles.metricLimit}>/ {t.dpBudget ?? '-'}</span>
+          <span className={styles.metricUnit}> DP</span>
         </span>
       </div>
       <span className={`${styles.statusPill} ${t.legal ? styles.pillOk : styles.pillBad}`} role="status" data-testid="legal-status">
         {t.legal ? 'Legal' : `${t.errors} ${t.errors === 1 ? 'error' : 'errors'}`}
-        {t.warnings > 0 && ` · ${t.warnings} ${t.warnings === 1 ? 'warning' : 'warnings'}`}
+        {t.warnings > 0 && <span className={styles.pillExtra}>{` · ${t.warnings} ${t.warnings === 1 ? 'warning' : 'warnings'}`}</span>}
       </span>
-      <Button variant="primary" onClick={onExport}>
-        Export PDF
+      <Button variant="primary" onClick={onExport} aria-label="Export PDF">
+        <span className={styles.exportLong}>Export PDF</span>
+        <span className={styles.exportShort} aria-hidden="true">
+          PDF
+        </span>
       </Button>
     </header>
   );

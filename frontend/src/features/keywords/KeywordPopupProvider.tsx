@@ -1,22 +1,9 @@
 import { useCallback, useEffect, useLayoutEffect, useRef, useState, type ReactNode } from 'react';
 import { KeywordContext, type OpenKeyword } from '../../components/rules/KeywordContext';
+import { useIsMobile } from '../../lib/useMediaQuery';
 import { KeywordPopup } from './KeywordPopup';
 import { pop, push, truncate, type PopupEntry } from './stack';
 import styles from './keywords.module.css';
-
-const MOBILE = '(max-width: 1023px)';
-
-function useIsMobile(): boolean {
-  const [mobile, setMobile] = useState(() => typeof window !== 'undefined' && !!window.matchMedia?.(MOBILE).matches);
-  useEffect(() => {
-    const mq = window.matchMedia?.(MOBILE);
-    if (!mq) return;
-    const on = () => setMobile(mq.matches);
-    mq.addEventListener('change', on);
-    return () => mq.removeEventListener('change', on);
-  }, []);
-  return mobile;
-}
 
 /**
  * Makes every keyword clickable inside it (DESIGN.md 8). A click on a keyword outside the popup starts

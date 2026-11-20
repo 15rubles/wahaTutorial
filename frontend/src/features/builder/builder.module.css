@@ -858,3 +858,125 @@
 .paneFrame[hidden] {
   display: none;
 }
+
+/* ---- mobile (DESIGN.md 7.3) ---- */
+
+.exportShort {
+  display: none;
+}
+
+.metricUnit {
+  display: none;
+  color: var(--text-muted);
+  font-size: 13px;
+}
+
+@media (max-width: 1023px) {
+  .builder {
+    height: auto;
+    min-height: 0;
+  }
+
+  .header {
+    position: sticky;
+    top: 0;
+    z-index: 20;
+    padding: 8px 16px;
+    gap: 4px 10px;
+  }
+
+  .pillExtra {
+    display: none;
+  }
+
+  .titleBlock {
+    flex: 1 1 100%;
+  }
+
+  .listName,
+  .nameInput {
+    font-size: 17px;
+  }
+
+  .metric {
+    flex-direction: row;
+    align-items: baseline;
+    gap: 6px;
+  }
+
+  .metricLabel {
+    display: none;
+  }
+
+  .metricUnit {
+    display: inline;
+  }
+
+  .exportLong {
+    display: none;
+  }
+
+  .exportShort {
+    display: inline;
+  }
+
+  .statusPill {
+    padding: 4px 10px;
+    font-size: 12px;
+  }
+
+  .metricValue {
+    font-size: 16px;
+  }
+
+  .metricLimit {
+    font-size: 13px;
+  }
+
+  .header > button {
+    margin-left: auto;
+    min-height: 44px;
+    padding: 6px 12px;
+    font-size: 14px;
+  }
+
+  .banner {
+    padding: 10px 16px;
+  }
+
+  .listBody {
+    padding: 0;
+    gap: 16px;
+  }
+
+  .plus {
+    width: 44px;
+    height: 44px;
+  }
+
+  .addName {
+    min-height: 44px;
+  }
+
+  .changeBtn {
+    min-height: 40px;
+    padding: 6px 12px;
+  }
+
+  .filter {
+    min-height: 36px;
+  }
+
+  .entry {
+    min-height: 60px;
+  }
+
+  .select,
+  .count {
+    min-height: 44px;
+  }
+
+  .statGrid {
+    gap: 3px;
+  }
+}

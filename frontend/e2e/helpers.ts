@@ -25,3 +25,25 @@ export async function createList(page: Page, name: string) {
   await page.getByRole('button', { name: 'Create list' }).click();
   await expect(page.getByTestId('points-total')).toBeVisible();
 }
+
+/** On phones the builder shows one pane at a time: switch to it when the tab bar is there. */
+export async function openTab(page: Page, name: 'Add' | 'List' | 'Details') {
+  const tab = page.getByRole('tab', { name });
+  if (await tab.isVisible()) await tab.click();
+}
+
+/** The Details pane (a region on desktop, a tab panel on phones). */
+export function details(page: Page) {
+  return page.locator('section[aria-label="Details"]');
+}
+
+/** The configuration panel starts collapsed on phones. */
+export async function openConfig(page: Page) {
+  const expand = page.getByRole('button', { name: 'Expand configuration' });
+  if (await expand.isVisible()) await expand.click();
+}
+
+export async function noHorizontalScroll(page: Page) {
+  const overflow = await page.evaluate(() => document.documentElement.scrollWidth - document.documentElement.clientWidth);
+  expect(overflow).toBeLessThanOrEqual(1);
+}

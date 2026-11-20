@@ -10,7 +10,9 @@ import { BuilderHeader } from './BuilderHeader';
 import { ConfigPanel } from './ConfigPanel';
 import { DataBanner } from './DataBanner';
 import { DetailsPane } from './DetailsPane';
+import { MobileLayout } from './MobileLayout';
 import { Panes } from './Panes';
+import { useIsMobile } from '../../lib/useMediaQuery';
 import { useSavePrefs } from './prefs';
 import { RosterSections } from './RosterSections';
 import { useBuilderUi } from './store';
@@ -31,6 +33,7 @@ export function BuilderPage() {
   const select = useBuilderUi((s) => s.select);
   const savePrefs = useSavePrefs();
   const [exportOpen, setExportOpen] = useState(false);
+  const mobile = useIsMobile();
 
   useEffect(() => {
     select(null);
@@ -57,20 +60,13 @@ export function BuilderPage() {
       <DataBanner roster={r} />
       {mutationError && <Notice>{errorMessage(mutationError)}</Notice>}
       {exportOpen && <ExportDialog rosterId={r.id} onClose={() => setExportOpen(false)} />}
-      <Panes
-        add={
-          sheets.isPending ? (
-            <LoadingState />
-          ) : (
-            <AddUnitsPane
-              roster={r}
-              datasheets={sheets.data}
-              adding={m.addEntry.isPending}
-              onAdd={(key) => m.addEntry.mutate({ datasheetKey: key })}
-            />
-          )
-        }
-        list={
+      {(() => {
+        const add = sheets.isPending ? (
+          <LoadingState />
+        ) : (
+          <AddUnitsPane roster={r} datasheets={sheets.data} adding={m.addEntry.isPending} onAdd={(key) => m.addEntry.mutate({ datasheetKey: key })} />
+        );
+        const list = (
           <div className={styles.listBody}>
             <ConfigPanel
               roster={r}
@@ -78,13 +74,14 @@ export function BuilderPage() {
               config={config.data}
               detachments={detachments.data ?? []}
               dispositions={dispositions.data ?? []}
-              defaultOpen={r.detachments.length === 0 || r.entries.length === 0}
+              defaultOpen={!mobile && (r.detachments.length === 0 || r.entries.length === 0)}
             />
             <RosterSections roster={r} datasheets={sheets.data} />
           </div>
-        }
-        details={<DetailsPane roster={r} detachments={detachments.data ?? []} />}
-      />
+        );
+        const details = <DetailsPane roster={r} detachments={detachments.data ?? []} />;
+        return mobile ? <MobileLayout add={add} list={list} details={details} /> : <Panes add={add} list={list} details={details} />;
+      })()}
     </div>
     </KeywordPopupProvider>
   );

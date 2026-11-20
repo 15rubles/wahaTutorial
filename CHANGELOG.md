@@ -1,5 +1,13 @@
 # Changelog
 
+## M8 - Mobile
+
+- Below 1024px the builder shows one pane at a time with a bottom tab bar (Add / List / Details); selecting a unit opens Details; panes stay mounted so search and scroll survive tab switches.
+- Compact sticky header: name, points, DP, legal status and a PDF button on one row; configuration panel collapsed by default.
+- Keyword popups open as a bottom sheet that can be dragged (or tapped) up to full height; the export dialog is full screen on phones.
+- Touch targets of at least 44px; no horizontal page scrolling (weapon tables scroll inside their own box).
+- Playwright runs every flow in a desktop and a 390px phone project (the pane resize test is desktop only).
+
 ## M7 - PDF export
 
 - `GET /api/rosters/{id}/export-data`: everything the PDF needs in one payload; export presets (`/api/me/export-presets`).

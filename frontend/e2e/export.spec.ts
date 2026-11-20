@@ -1,6 +1,6 @@
 import { readFileSync } from 'node:fs';
 import { expect, test, type Page } from '@playwright/test';
-import { createList, signIn } from './helpers';
+import { createList, openConfig, openTab, signIn } from './helpers';
 
 /** react-pdf writes page objects uncompressed, so pages can be counted from the bytes. */
 function pageCount(pdf: Buffer): number {
@@ -15,9 +15,11 @@ async function download(page: Page): Promise<Buffer> {
 test('export a PDF with all sections, then with sections turned off', async ({ page }) => {
   await signIn(page);
   await createList(page, `Export ${Date.now()}`);
+  await openConfig(page);
   await page.getByRole('button', { name: 'Change Detachment' }).click();
   await page.getByLabel(/Pilgrimage of Iron/).check();
   await page.getByRole('button', { name: 'Save detachments' }).click();
+  await openTab(page, 'Add');
   await page.getByRole('button', { name: 'Add Rust Prophet' }).click();
   await page.getByRole('button', { name: 'Add Pilgrim Warband' }).click();
 

@@ -1,11 +1,12 @@
 import { expect, test } from '@playwright/test';
-import { createList, signIn } from './helpers';
+import { createList, details, noHorizontalScroll, openTab, signIn } from './helpers';
 
 test('create list, add 3 units, set warlord, see points update', async ({ page }) => {
   await signIn(page);
   await createList(page, `E2E ${Date.now()}`);
   const points = page.getByTestId('points-total');
   await expect(points).toContainText('0');
+  await openTab(page, 'Add');
 
   await page.getByPlaceholder('Search datasheets').fill('prophet');
   await expect(page.getByRole('button', { name: 'Add Pilgrim Warband' })).toHaveCount(0);
@@ -16,16 +17,22 @@ test('create list, add 3 units, set warlord, see points update', async ({ page }
   await expect(points).toContainText('170');
   await page.getByRole('button', { name: 'Add Pilgrim Warband' }).click();
   await expect(points).toContainText('265');
+  await openTab(page, 'List');
   await expect(page.locator('[data-testid^="entry-"]')).toHaveCount(3);
+  await noHorizontalScroll(page);
 
   await expect(page.getByText('Choose a warlord')).toBeVisible();
   await page.getByTestId('entry-rust-pilgrims:rust-prophet').click();
-  await page.getByLabel('Warlord').check();
+  // Selecting a unit shows its details (on phones it switches to the Details tab).
+  await details(page).getByLabel('Warlord').check();
+  await noHorizontalScroll(page);
+  await openTab(page, 'List');
   await expect(page.getByTestId('entry-rust-pilgrims:rust-prophet')).toContainText('WARLORD');
   await expect(page.getByText('Choose a warlord')).toHaveCount(0);
 });
 
-test('panes resize, collapse and survive a reload together with the list', async ({ page }) => {
+test('panes resize, collapse and survive a reload together with the list', async ({ page, isMobile }) => {
+  test.skip(isMobile, 'Phones show one pane at a time');
   await signIn(page);
   await createList(page, `Panes ${Date.now()}`);
   await page.getByRole('button', { name: 'Add Rust Prophet' }).click();

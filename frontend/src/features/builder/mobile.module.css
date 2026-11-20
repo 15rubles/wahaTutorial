@@ -1,0 +1,48 @@
+.mobile {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  padding-bottom: calc(64px + env(safe-area-inset-bottom));
+}
+
+.panel {
+  padding: 16px;
+  min-width: 0;
+}
+
+.panel[hidden] {
+  display: none;
+}
+
+.tabBar {
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 30;
+  background: var(--panel);
+  border-top: 1px solid var(--border);
+  padding-bottom: env(safe-area-inset-bottom);
+}
+
+.tabList {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+}
+
+.tab {
+  min-height: 56px;
+  border: 0;
+  background: transparent;
+  color: var(--text-muted);
+  font-size: 15px;
+  font-weight: 700;
+  cursor: pointer;
+  border-top: 3px solid transparent;
+}
+
+.tabOn {
+  color: var(--sage-text);
+  border-top-color: var(--sage);
+  background: var(--sage-tint);
+}

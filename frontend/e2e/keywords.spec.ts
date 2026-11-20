@@ -1,13 +1,15 @@
 import { expect, test } from '@playwright/test';
-import { createList, signIn } from './helpers';
+import { createList, details as detailsPane, openTab, signIn } from './helpers';
 
 test('weapon ability popup, nested 3-level chain, back and escape', async ({ page }) => {
   await signIn(page);
   await createList(page, `Keywords ${Date.now()}`);
+  await openTab(page, 'Add');
   await page.getByRole('button', { name: 'Add Rust Prophet' }).click();
+  await openTab(page, 'List');
   await page.getByTestId('entry-rust-pilgrims:rust-prophet').click();
 
-  const details = page.getByRole('region', { name: 'Details' });
+  const details = detailsPane(page);
   await details.getByRole('button', { name: 'Rending Edge 2' }).click();
   const popup = page.getByRole('dialog', { name: 'Rules' });
   await expect(popup.getByRole('heading', { name: 'Rending Edge' })).toBeVisible();
