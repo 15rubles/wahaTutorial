@@ -23,7 +23,7 @@ public final class CoreData {
     private final Map<String, ForceDisposition> forceDispositions = new LinkedHashMap<>();
     private final List<Stratagem> coreStratagems = new ArrayList<>();
 
-    CoreData(long versionId, List<GameEntity> entities) {
+    public CoreData(long versionId, List<GameEntity> entities) {
         this.versionId = versionId;
         for (GameEntity e : entities) {
             switch (e) {

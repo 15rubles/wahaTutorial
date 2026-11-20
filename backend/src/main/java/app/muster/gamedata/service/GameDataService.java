@@ -74,6 +74,14 @@ public class GameDataService {
         return data;
     }
 
+    /** Factions any army may add when "unaligned" units are shown (allegiance UNALIGNED in the data). */
+    public List<FactionData> unaligned(long versionId) {
+        return core(versionId).factions().stream()
+                .filter(f -> f.allegiance().map(a -> a == app.muster.gamedata.model.Allegiance.UNALIGNED).orElse(false))
+                .map(f -> faction(versionId, f.key()))
+                .toList();
+    }
+
     public void invalidate(long versionId) {
         synchronized (cache) {
             cache.keySet().removeIf(k -> k.startsWith(versionId + "|"));

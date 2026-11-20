@@ -38,7 +38,7 @@ public final class FactionData {
     private final List<ArmyRule> armyRules = new ArrayList<>();
     private final List<FactionOption> factionOptions = new ArrayList<>();
 
-    FactionData(CoreData core, List<Faction> lineage, List<GameEntity> entities) {
+    public FactionData(CoreData core, List<Faction> lineage, List<GameEntity> entities) {
         this.core = core;
         this.lineage = List.copyOf(lineage);
         for (GameEntity e : entities) {

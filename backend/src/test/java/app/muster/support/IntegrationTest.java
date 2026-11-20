@@ -34,6 +34,16 @@ public abstract class IntegrationTest {
         return c;
     }
 
+    /** Imports the three invented sources (BattleScribe, Wahapedia, MFM) and activates the result. */
+    public static long importAllAndActivate(TestClient admin) {
+        admin.multipart("/api/admin/imports/battlescribe", "file", "bs.zip", Fixtures.battleScribeZip()).expectStatus(201);
+        admin.multipart("/api/admin/imports/wahapedia", "file", "waha.zip", Fixtures.wahapediaZip()).expectStatus(201);
+        long v = admin.multipart("/api/admin/imports/mfm", "file", "mfm.pdf", Fixtures.mfmPdf(Fixtures.MFM_LINES))
+                .expectStatus(201).json().get("versionId").asLong();
+        admin.post("/api/admin/data-versions/" + v + "/activate", "").expectStatus(200);
+        return v;
+    }
+
     private static int counter = 0;
 
     /** Registers a new user with a fresh invite and returns their signed-in client. */

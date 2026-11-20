@@ -10,16 +10,6 @@ import org.junit.jupiter.api.Test;
 
 class MergedDataIT extends IntegrationTest {
 
-    /** Imports all three invented sources and activates the result. */
-    public static long importAllAndActivate(TestClient admin) {
-        admin.multipart("/api/admin/imports/battlescribe", "file", "bs.zip", Fixtures.battleScribeZip()).expectStatus(201);
-        admin.multipart("/api/admin/imports/wahapedia", "file", "waha.zip", Fixtures.wahapediaZip()).expectStatus(201);
-        long v = admin.multipart("/api/admin/imports/mfm", "file", "mfm.pdf", Fixtures.mfmPdf(Fixtures.MFM_LINES))
-                .expectStatus(201).json().get("versionId").asLong();
-        admin.post("/api/admin/data-versions/" + v + "/activate", "").expectStatus(200);
-        return v;
-    }
-
     @Test
     void mergesSourcesByPriorityAndReportsUnmatched() {
         TestClient admin = adminClient();

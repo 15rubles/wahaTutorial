@@ -149,7 +149,7 @@ class AuthFlowIT extends IntegrationTest {
         TestClient a = registeredUser("ra");
         TestClient b = registeredUser("rb");
         long aId = a.get("/api/me").json().get("id").asLong();
-        jdbc.update("INSERT INTO roster (owner_id, name) VALUES (?, 'A list')", aId);
+        jdbc.update("INSERT INTO roster (owner_id, name, faction_key) VALUES (?, 'A list', 'nowhere')", aId);
 
         assertThat(a.get("/api/rosters").expectStatus(200).json().findValuesAsText("name")).containsExactly("A list");
         assertThat(b.get("/api/rosters").expectStatus(200).json()).isEmpty();
