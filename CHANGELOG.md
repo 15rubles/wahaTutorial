@@ -1,5 +1,13 @@
 # Changelog
 
+## M6 - Keywords and nested popups
+
+- Rules text renders from linked tokens everywhere (abilities, enhancements, faction options, popups); keyword chips, weapon abilities and core abilities are clickable.
+- Popup stack: floating panel anchored near the click, kept inside the viewport; terms inside the popup push onto the stack, breadcrumb (clickable), Back, Esc closes everything, depth limit 10, no duplicate consecutive entries. On narrow screens the same stack opens as a bottom sheet that can be dragged to full height.
+- Plain unit and faction keywords show "no rules of its own" plus the rules in the data that mention them; missing entries say "No definition in the database yet" with an admin-only "Add definition" form (stored as an override, never generated).
+- Selecting a unit expands a collapsed Details pane.
+- Playwright: weapon ability, then two nested terms (3 levels), Back, breadcrumb jump and Escape.
+
 ## M5 - Desktop builder UI
 
 - "My lists" page: create (faction grouped by allegiance, battle size), open, duplicate, delete with confirmation, legal and older-data badges.

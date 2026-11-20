@@ -1,3 +1,3 @@
 # CLAUDE.md
 
-Read DESIGN.md. Current milestone: M6.
+Read DESIGN.md. Current milestone: M7.

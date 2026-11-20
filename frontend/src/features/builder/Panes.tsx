@@ -6,6 +6,7 @@ import {
   type ImperativePanelGroupHandle,
   type ImperativePanelHandle,
 } from 'react-resizable-panels';
+import { useBuilderUi } from './store';
 import { DEFAULT_PANES, readLocalPanes, usePrefs, useSavePrefs, validPanes, writeLocalPanes } from './prefs';
 import styles from './builder.module.css';
 
@@ -53,6 +54,12 @@ export function Panes({ add, list, details }: { add: ReactNode; list: ReactNode;
     appliedServer.current = true;
     if (server.join() !== initial.join()) group.current?.setLayout(server);
   }, [prefs.data, initial]);
+
+  // Selecting a unit opens the Details pane if it was collapsed.
+  const selection = useBuilderUi((s) => s.selection);
+  useEffect(() => {
+    if (selection && detailsRef.current?.isCollapsed()) detailsRef.current.expand();
+  }, [selection]);
 
   const pct = (px: number) => Math.min(45, (px / Math.max(width, 1)) * 100);
   const rail = pct(RAIL_PX);

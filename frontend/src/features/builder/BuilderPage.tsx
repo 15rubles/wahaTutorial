@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import { ErrorState, LoadingState, Notice, errorMessage } from '../../components/ui/States';
+import { KeywordPopupProvider } from '../keywords/KeywordPopupProvider';
 import { useBattleSizes, useDetachments, useFactionConfig, useForceDispositions } from '../game/api';
 import { useRoster, useRosterMutations } from '../rosters/api';
 import { AddUnitsPane } from './AddUnitsPane';
@@ -43,6 +44,7 @@ export function BuilderPage() {
   const mutationError = [m.addEntry, m.config].find((x) => x.isError)?.error;
 
   return (
+    <KeywordPopupProvider version={version}>
     <div className={styles.builder}>
       <BuilderHeader
         key={r.name}
@@ -83,6 +85,7 @@ export function BuilderPage() {
         details={<DetailsPane roster={r} detachments={detachments.data ?? []} />}
       />
     </div>
+    </KeywordPopupProvider>
   );
 }
 
