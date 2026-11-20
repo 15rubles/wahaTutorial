@@ -9,6 +9,8 @@ import java.util.Locale;
  */
 public final class Keys {
 
+    static final int MAX_SLUG = 80;
+
     private Keys() {}
 
     /** "Lord of Virulence" -> "lord-of-virulence", "Kor'sarro Khan" -> "korsarro-khan". */
@@ -22,7 +24,13 @@ public final class Keys {
         n = n.replaceAll("\\[legends]", " ");
         n = n.replaceAll("[^a-z0-9]+", "-");
         n = n.replaceAll("^-+|-+$", "");
-        return n.isEmpty() ? "unnamed" : n;
+        if (n.isEmpty()) return "unnamed";
+        if (n.length() > MAX_SLUG) {
+            // Long names (for example unit compositions) keep a readable prefix plus a stable hash.
+            String hash = Integer.toHexString(n.hashCode() & 0x7fffffff);
+            n = n.substring(0, MAX_SLUG - hash.length() - 1).replaceAll("-+$", "") + "-" + hash;
+        }
+        return n;
     }
 
     /** Name comparison that ignores case, accents, punctuation and plural "s". */

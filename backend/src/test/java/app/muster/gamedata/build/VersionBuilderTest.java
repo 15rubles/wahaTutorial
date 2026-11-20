@@ -252,4 +252,20 @@ class VersionBuilderTest {
         assertThat(r.report().issues()).anyMatch(i -> i.category().equals("key-aligned"));
         assertThat(r.report().issues()).noneMatch(i -> i.category().equals("unmatched"));
     }
+
+    @Test
+    void tiersFromAnotherSourceAreDroppedWhenPointsComeFromTheMfm() {
+        SourceSet.Builder wa = new SourceSet.Builder(Source.WAHAPEDIA, collector());
+        wa.add(sheet(Optional.of("Battleline"), List.of()), null);
+        wa.add(new UnitSizeOption(Keys.unitSize(SHEET, 10), SHEET, "10 models", 10, Optional.of(95),
+                List.of(new app.muster.gamedata.model.PointsTier(1, Optional.of(2), 95, Optional.empty()),
+                        new app.muster.gamedata.model.PointsTier(3, Optional.empty(), 105, Optional.empty()))), null);
+        var withMfm = build(List.of(), Optional.empty(), wa.build(), mfm());
+        UnitSizeOption u = find(withMfm, UnitSizeOption.class, Keys.unitSize(SHEET, 10));
+        assertThat(u.points()).contains(95);
+        assertThat(find(withMfm, UnitSizeOption.class, Keys.unitSize(SHEET, 10)).tiers()).isEmpty();
+        assertThat(u.pointsFor(3, Optional.empty())).contains(95);
+        var wahaOnly = build(List.of(), Optional.empty(), wa.build());
+        assertThat(find(wahaOnly, UnitSizeOption.class, Keys.unitSize(SHEET, 10)).pointsFor(3, Optional.empty())).contains(105);
+    }
 }

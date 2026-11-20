@@ -159,11 +159,12 @@ class RosterIT extends IntegrationTest {
         assertThat(before.at("/version/outdated").asBoolean()).isFalse();
         int oldPoints = before.at("/totals/points").asInt();
 
-        // A points fix, then a new active version.
+        // A new MFM with a different price, imported and activated.
         TestClient admin = adminClient();
-        admin.put("/api/admin/overrides", "[{\"type\":\"UNIT_SIZE\",\"key\":\"rust-pilgrims:rust-prophet:size:1\",\"field\":\"points\",\"value\":99,\"note\":\"\"}]")
-                .expectStatus(200);
-        long v = admin.post("/api/admin/data-versions/rebuild", "").expectStatus(201).json().at("/version/id").asLong();
+        java.util.List<String> lines = new java.util.ArrayList<>(app.muster.support.Fixtures.MFM_LINES);
+        lines.replaceAll(l -> l.startsWith("Rust Prophet") ? "Rust Prophet .......... 1 model .......... 99 pts" : l);
+        long v = admin.multipart("/api/admin/imports/mfm", "file", "mfm2.pdf", app.muster.support.Fixtures.mfmPdf(lines))
+                .expectStatus(201).json().get("versionId").asLong();
         admin.post("/api/admin/data-versions/" + v + "/activate", "").expectStatus(200);
 
         JsonNode now = user.get("/api/rosters/" + id).json();

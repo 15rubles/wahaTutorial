@@ -92,3 +92,24 @@ DESIGN.md asks for a PDF importer. For 11th edition the Munitorum Field Manual a
 (Wahapedia's source list links mfm.warhammer-community.com), and Wahapedia's export already carries the
 same points. The PDF importer is implemented for the classic layout (faction headings, "N models ... X pts"
 lines, detachment enhancement lists) and tested with an invented PDF only.
+
+## D13 - Overrides change the active version immediately
+
+A points or text fix made in the admin editor rebuilds the ACTIVE (and DRAFT) versions in place, so
+every list on the current data sees it at once. The "points changed since this list was built" banner is
+about new imports: a list stays on the version it was built on until its owner presses "Update to current
+data". Archived versions never change.
+
+## D14 - Per-copy tiers only travel with their own points
+
+When the MFM (or an override) wins on a unit size's points, tiers from another source are dropped and the
+flat price applies to every copy. Mixing one source's first-copy price with another source's later-copy
+prices would produce numbers that appear in no source.
+
+## D15 - Roster checks
+
+Structural input errors (unknown unit, size, detachment, enhancement, wargear option, attaching a unit to
+itself) are refused with 400. Everything about legality is reported as violations and never blocks an
+edit, so a list can be built in any order. Rules and their data-driven limits are listed in
+`app.muster.roster.rules`; a limit missing from the data skips the check (sometimes with an INFO
+violation) instead of guessing.

@@ -1,5 +1,13 @@
 # Changelog
 
+## M4 - Rosters + validation engine
+
+- Rosters with detachments, entries (size, wargear, enhancement, warlord, leader attachment, order), configuration (battle size, faction options, force disposition, show/hide flags) and the data version they were built on. Users only ever see their own rosters.
+- Pricing with 11th edition per-copy tiers, wargear costs and enhancement points; missing points are reported, never guessed.
+- Validation rules, each its own class with valid and failing fixtures: points limit, detachment budget (with the single-detachment allowance), unique tags, datasheet limits (epic hero, battleline, dedicated transport), battleline minimum, warlord, enhancements (eligibility, upgrades, limits, one per attached unit), leader / support attachment, wargear, faction and unaligned units, legends, force disposition, faction options.
+- Every mutation returns the roster with points, DP, enhancement count and all violations. Duplicate, delete, "update to current data" with a points diff, user preferences.
+- Checked against the real data: a legal 1985 point Death Guard Strike Force list built through the API only.
+
 ## M3 - Wahapedia + MFM importers, merge, admin editor
 
 - Wahapedia importer for the 11th edition CSV export (records spanning lines, columns by header name): factions and chapter sub-factions, datasheets with profiles, keywords, leaders, abilities, weapons, wargear options, per-copy points tiers and wargear costs, detachments with DP and force dispositions, detachment rules, enhancements (upgrades, eligible units), stratagems with When / Target / Effect / Restrictions and structured phases.

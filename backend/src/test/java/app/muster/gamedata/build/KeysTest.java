@@ -14,6 +14,9 @@ class KeysTest {
         assertThat(Keys.slug("Émber Wärden")).isEqualTo("ember-warden");
         assertThat(Keys.slug("Scrap Walker [Legends]")).isEqualTo("scrap-walker");
         assertThat(Keys.slug("!!!")).isEqualTo("unnamed");
+        String longName = "1 Sergeant with a very long weapon description, 2 Veterans with other very long weapon descriptions and knives";
+        assertThat(Keys.slug(longName)).hasSizeLessThanOrEqualTo(80).isEqualTo(Keys.slug(longName));
+        assertThat(Keys.slug(longName)).isNotEqualTo(Keys.slug(longName + " and forks"));
     }
 
     @Test

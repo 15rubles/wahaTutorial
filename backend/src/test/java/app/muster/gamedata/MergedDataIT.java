@@ -24,12 +24,12 @@ class MergedDataIT extends IntegrationTest {
 
         TestClient user = registeredUser("merge");
         JsonNode warband = user.get("/api/datasheets/rust-pilgrims:pilgrim-warband").expectStatus(200).json();
-        // Points: MFM (100) beats Wahapedia (95) beats BattleScribe (90); tiers still come from Wahapedia.
+        // Points: MFM (100) beats Wahapedia (95) beats BattleScribe (90); Wahapedia tiers do not apply to MFM points.
         JsonNode ten = null;
         for (JsonNode s : warband.get("sizes")) if (s.get("models").asInt() == 10) ten = s;
         assertThat(ten).isNotNull();
         assertThat(ten.get("points").asInt()).isEqualTo(100);
-        assertThat(ten.get("tiers")).hasSize(2);
+        assertThat(ten.has("tiers") && ten.get("tiers").size() > 0).isFalse();
         // Wargear options: BattleScribe's constraints win over Wahapedia's text-only option.
         assertThat(warband.get("wargear")).hasSize(1);
         assertThat(warband.at("/wargear/0/perModels").asInt()).isEqualTo(10);

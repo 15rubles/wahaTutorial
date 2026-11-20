@@ -307,9 +307,24 @@ public final class VersionBuilder {
                 if (!field.equals("key")) w.provenance.put(field, from);
             }
         }
+        dropStaleTiers(type, w);
         bySource.forEach((s, item) -> item.externalId().ifPresent(id -> w.externalIds.put(s, id)));
         w.source = MergePolicy.priority(type, "name").stream().filter(bySource::containsKey).findFirst().orElseThrow();
         return w;
+    }
+
+    /**
+     * Per-copy tiers only belong with the points of the same source: when another source (or an
+     * override) wins on points, the tiers are dropped and the flat price applies to every copy.
+     */
+    private static void dropStaleTiers(EntityType type, Working w) {
+        if (type != EntityType.UNIT_SIZE || !w.data.has("tiers")) return;
+        Source points = w.provenance.get("points");
+        Source tiers = w.provenance.get("tiers");
+        if (points != null && tiers != null && points != tiers) {
+            w.data.remove("tiers");
+            w.provenance.remove("tiers");
+        }
     }
 
     static boolean isPresent(JsonNode v) {
@@ -361,6 +376,7 @@ public final class VersionBuilder {
             }
             if (setPath(w.data, o.field(), o.value())) {
                 w.provenance.put(o.field().split("\\.")[0], Source.MANUAL);
+                dropStaleTiers(o.type(), w);
                 applied++;
             } else {
                 issues.add(new Issue(Level.WARNING, "override-bad-field",
