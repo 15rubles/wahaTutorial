@@ -112,6 +112,8 @@ class WahapediaImporterTest {
         List<Ability> prophet = all(Ability.class).stream().filter(a -> a.ownerKey().equals("rust-pilgrims:rust-prophet")).toList();
         assertThat(prophet).extracting(Ability::name).contains("Shock Strike", "Feel No Pain 5+", "Faith in Rust", "Rusted Sermon");
         assertThat(prophet.stream().filter(a -> a.name().equals("Feel No Pain 5+")).findFirst().orElseThrow().glossaryId()).contains("g:feel-no-pain");
+        assertThat(prophet.stream().filter(a -> a.name().equals("Shock Strike")).findFirst().orElseThrow().text().plain())
+                .isEqualTo("During the Declare Battle Formations step, this unit can be set up in reserve.");
         ArmyRule rule = get(ArmyRule.class, "rust-pilgrims:rule:faith-in-rust");
         assertThat(rule.text().plain()).contains("Command phase");
         Ability damaged = get(Ability.class, "rust-pilgrims:scrap-walker:ab:damaged");

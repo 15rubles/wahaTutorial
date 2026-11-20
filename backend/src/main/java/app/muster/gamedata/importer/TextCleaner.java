@@ -28,7 +28,8 @@ public final class TextCleaner {
     public static String html(String html) {
         if (html == null || html.isBlank()) return "";
         Document doc = Jsoup.parseBodyFragment(html);
-        doc.select("script, style, .tooltip_templates, .noprint").remove();
+        // Ability heading boxes ("DEEP STRIKE 24.09"), section codes and flavour text are not rules text.
+        doc.select("script, style, .tooltip_templates, .noprint, .abNameWrap, .h_number, .ShowFluff, .abLegend").remove();
         StringBuilder sb = new StringBuilder();
         walk(doc.body(), sb);
         return tidy(sb.toString().replace("■", "•"));

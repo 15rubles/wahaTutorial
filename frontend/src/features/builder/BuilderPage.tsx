@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import { ErrorState, LoadingState, Notice, errorMessage } from '../../components/ui/States';
+import { ExportDialog } from '../export/ExportDialog';
 import { KeywordPopupProvider } from '../keywords/KeywordPopupProvider';
 import { useBattleSizes, useDetachments, useFactionConfig, useForceDispositions } from '../game/api';
 import { useRoster, useRosterMutations } from '../rosters/api';
@@ -55,7 +56,7 @@ export function BuilderPage() {
       />
       <DataBanner roster={r} />
       {mutationError && <Notice>{errorMessage(mutationError)}</Notice>}
-      {exportOpen && <ExportSlot onClose={() => setExportOpen(false)} />}
+      {exportOpen && <ExportDialog rosterId={r.id} onClose={() => setExportOpen(false)} />}
       <Panes
         add={
           sheets.isPending ? (
@@ -86,19 +87,5 @@ export function BuilderPage() {
       />
     </div>
     </KeywordPopupProvider>
-  );
-}
-
-/** Replaced by the export dialog in M7. */
-function ExportSlot({ onClose }: { onClose: () => void }) {
-  return (
-    <Notice tone="info">
-      <span>
-        PDF export is not built yet.{' '}
-        <button type="button" className={styles.linkBtn} onClick={onClose}>
-          Close
-        </button>
-      </span>
-    </Notice>
   );
 }

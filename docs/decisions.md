@@ -113,3 +113,12 @@ itself) are refused with 400. Everything about legality is reported as violation
 edit, so a list can be built in any order. Rules and their data-driven limits are listed in
 `app.muster.roster.rules`; a limit missing from the data skips the check (sometimes with an INFO
 violation) instead of guessing.
+
+## D16 - PDF rendering details
+
+- Fonts in the PDF are WOFF files (Atkinson from Fontsource, IBM Plex Mono from IBM's own package): react-pdf's font
+  parser fails on the subset Plex Mono files of other packages.
+- No line height is set at page level: in react-pdf 4, a page-level line height together with the fixed page
+  number footer breaks the layout of long sections. Paragraph spacing comes from margins.
+- Cards are kept on one page unless they are taller than a page; react-pdf cannot place an unbreakable block that
+  does not fit, so very long unit cards and glossary entries are allowed to continue on the next page.

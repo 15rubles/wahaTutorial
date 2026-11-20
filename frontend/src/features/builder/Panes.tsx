@@ -58,7 +58,12 @@ export function Panes({ add, list, details }: { add: ReactNode; list: ReactNode;
   // Selecting a unit opens the Details pane if it was collapsed.
   const selection = useBuilderUi((s) => s.selection);
   useEffect(() => {
-    if (selection && detailsRef.current?.isCollapsed()) detailsRef.current.expand();
+    if (!selection || !laidOut()) return;
+    try {
+      if (detailsRef.current?.isCollapsed()) detailsRef.current.expand();
+    } catch {
+      // Layout not measured yet; nothing to expand.
+    }
   }, [selection]);
 
   const pct = (px: number) => Math.min(45, (px / Math.max(width, 1)) * 100);

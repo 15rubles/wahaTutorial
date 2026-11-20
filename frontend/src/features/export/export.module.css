@@ -1,0 +1,265 @@
+.overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 40;
+  background: rgba(20, 20, 20, 0.6);
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  padding: 48px 16px;
+  overflow: auto;
+}
+
+.dialog {
+  width: 100%;
+  max-width: 860px;
+  background: var(--panel);
+  border: 1px solid var(--border-strong);
+  border-radius: var(--radius-l);
+  outline: none;
+  display: flex;
+  flex-direction: column;
+}
+
+.head {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px 16px;
+  border-bottom: 1px solid var(--divider);
+}
+
+.title {
+  margin: 0;
+  font-size: 18px;
+}
+
+.close {
+  width: 36px;
+  height: 36px;
+  border: 0;
+  border-radius: var(--radius-s);
+  background: transparent;
+  color: var(--text-muted);
+  cursor: pointer;
+}
+
+.close:hover {
+  background: var(--raised);
+}
+
+.body {
+  display: grid;
+  grid-template-columns: minmax(0, 1.6fr) minmax(220px, 1fr);
+  gap: 20px;
+  padding: 16px;
+}
+
+.options {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.group {
+  border: 1px solid var(--border);
+  border-radius: var(--radius-m);
+  padding: 10px 12px;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.legend {
+  padding: 0 4px;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+}
+
+.inline {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px;
+}
+
+.check {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 32px;
+  font-size: 14px;
+}
+
+.check input,
+.sectionLabel input {
+  width: 18px;
+  height: 18px;
+  accent-color: var(--sage);
+}
+
+.segmented {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.segLabel {
+  font-size: 13px;
+  color: var(--text-muted);
+}
+
+.segRow {
+  display: inline-flex;
+  border: 1px solid var(--border-strong);
+  border-radius: var(--radius-m);
+  overflow: hidden;
+}
+
+.seg {
+  padding: 6px 14px;
+  min-height: 36px;
+  display: inline-flex;
+  align-items: center;
+  cursor: pointer;
+  font-size: 14px;
+  color: var(--text-muted);
+}
+
+.seg:focus-within {
+  outline: 2px solid var(--sage);
+  outline-offset: -2px;
+}
+
+.segOn {
+  background: var(--sage-tint);
+  color: var(--sage-text);
+}
+
+.sections {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.section {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 4px 8px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-s);
+  background: var(--raised);
+}
+
+.dragging {
+  opacity: 0.6;
+  border-style: dashed;
+}
+
+.grip {
+  color: var(--text-muted);
+  cursor: grab;
+  letter-spacing: -2px;
+}
+
+.sectionLabel {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 36px;
+  font-size: 14px;
+}
+
+.arrow {
+  width: 32px;
+  height: 32px;
+  border: 1px solid var(--border-strong);
+  border-radius: var(--radius-s);
+  background: transparent;
+  color: var(--text);
+  cursor: pointer;
+}
+
+.arrow:disabled {
+  opacity: 0.35;
+  cursor: default;
+}
+
+.side {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.estimate {
+  background: var(--raised);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-m);
+  padding: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.estimateLabel {
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+}
+
+.estimateValue {
+  font-size: 20px;
+}
+
+.presets {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.presetRow {
+  display: flex;
+  gap: 6px;
+}
+
+.select {
+  flex: 1;
+  min-width: 0;
+  min-height: 36px;
+  padding: 6px 8px;
+  border-radius: var(--radius-s);
+  border: 1px solid var(--border-strong);
+  background: var(--raised);
+  color: var(--text);
+  font-size: 14px;
+}
+
+.saved {
+  font-size: 13px;
+  color: var(--sage-text);
+}
+
+@media (max-width: 720px) {
+  .overlay {
+    padding: 0;
+  }
+
+  .dialog {
+    min-height: 100%;
+    border-radius: 0;
+  }
+
+  .body {
+    grid-template-columns: 1fr;
+  }
+}

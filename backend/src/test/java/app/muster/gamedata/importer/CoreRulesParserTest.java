@@ -35,8 +35,8 @@ class CoreRulesParserTest {
     @Test
     void numberedHeadingsBecomeRuleTerms() {
         assertThat(g("g:engagement").kind()).isEqualTo(GlossaryKind.RULE_TERM);
-        assertThat(g("g:engagement").text().plain()).contains("within 1\"");
-        assertThat(g("g:critical-strike").text().plain()).contains("unmodified Hit Roll of 6");
+        assertThat(g("g:engagement").text().plain()).isEqualTo("A model is engaged if it is within 1\" of an enemy model.");
+        assertThat(g("g:critical-strike").text().plain()).isEqualTo("An unmodified Hit Roll of 6 is a Critical Strike.");
         assertThat(g("g:hit-roll").term()).isEqualTo("Hit Roll");
         assertThat(r.glossary()).noneMatch(x -> x.key().equals("g:battle-basics"));
     }

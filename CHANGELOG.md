@@ -1,5 +1,14 @@
 # Changelog
 
+## M7 - PDF export
+
+- `GET /api/rosters/{id}/export-data`: everything the PDF needs in one payload; export presets (`/api/me/export-presets`).
+- PDF built in the browser with `@react-pdf/renderer`, Atkinson Hyperlegible and IBM Plex Mono embedded, light print palette, every section on a new page, footer with list name, data version date and page x of y.
+- Sections (toggle and reorder by drag or arrow buttons): summary, army and detachment rules, unit cards (never split unless taller than a page; leaders before their unit; hide untaken wargear), enhancements, stratagems grouped by phase with CP badge and When / Target / Effect / Restrictions (core and other-detachment options), phase cheat sheet ("My turn" / "Opponent's turn", inferred tags marked with a dot), keyword glossary (used terms plus one level of referenced terms).
+- Export dialog: paper size, text size, include points, page estimate, presets, last-used settings remembered.
+- Core rules import: FAQ and "see also" boxes left out, text right after headings kept; ability headings, section numbers and flavour text stripped from rules text.
+- Checked on the real data: a 6-unit Death Guard list exports to 25 readable pages; turning sections off removes them (Playwright).
+
 ## M6 - Keywords and nested popups
 
 - Rules text renders from linked tokens everywhere (abilities, enhancements, faction options, popups); keyword chips, weapon abilities and core abilities are clickable.

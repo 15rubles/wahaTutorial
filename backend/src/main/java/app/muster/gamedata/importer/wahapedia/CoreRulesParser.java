@@ -40,7 +40,7 @@ public final class CoreRulesParser {
 
     public static Result parse(String html, ImportReport.Collector report) {
         Document doc = Jsoup.parse(html);
-        doc.select("script, style, .ShowFluff, .tooltip_templates, .NoPrint, noscript").remove();
+        doc.select("script, style, .ShowFluff, .tooltip_templates, .NoPrint, noscript, .faqErrataSpoiler, .CornerSeeAlso").remove();
         Map<String, GlossaryEntry> glossary = new LinkedHashMap<>();
 
         for (Element block : doc.select("div.abWrap")) {
@@ -91,16 +91,20 @@ public final class CoreRulesParser {
         return new Result(new ArrayList<>(glossary.values()), sizes);
     }
 
-    /** Text between a heading and the next heading, in document order. */
+    /** Text between a heading and the next heading, in document order (text nodes included). */
     private static String sectionText(Element heading, Element next) {
         StringBuilder html = new StringBuilder();
-        Element e = heading.nextElementSibling();
+        org.jsoup.nodes.Node n = heading.nextSibling();
         int guard = 0;
-        while (e != null && e != next && guard++ < 200) {
-            if (next != null && e.getAllElements().contains(next)) break;
-            if (e.is("h2, h3")) break;
-            html.append(e.outerHtml());
-            e = e.nextElementSibling();
+        while (n != null && guard++ < 400) {
+            if (n instanceof Element e) {
+                if (e == next || e.is("h2, h3") || (next != null && e.getAllElements().contains(next))) break;
+                // Ability blocks are glossary entries of their own.
+                if (!e.is(".abWrap") && e.select(".abWrap").isEmpty()) html.append(e.outerHtml());
+            } else if (n instanceof org.jsoup.nodes.TextNode t) {
+                html.append(org.jsoup.nodes.Entities.escape(t.getWholeText()));
+            }
+            n = n.nextSibling();
         }
         return TextCleaner.html(html.toString());
     }
