@@ -61,3 +61,97 @@
   font-weight: 700;
   flex: 1 1 200px;
 }
+
+.rowMain {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  flex: 1 1 220px;
+  min-width: 0;
+}
+
+.name {
+  font-weight: 700;
+  color: var(--text);
+  text-decoration: none;
+}
+
+.name:hover {
+  text-decoration: underline;
+}
+
+.meta {
+  font-size: 13px;
+  color: var(--text-muted);
+}
+
+.points {
+  font-size: 14px;
+}
+
+.pill {
+  padding: 2px 10px;
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.ok {
+  background: var(--sage-tint);
+  color: var(--sage-text);
+}
+
+.bad {
+  background: var(--warn-bg);
+  color: var(--warn-text);
+}
+
+.info {
+  background: var(--lilac-chip);
+  color: var(--lilac-text);
+}
+
+.actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.form {
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-l);
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  max-width: 520px;
+}
+
+.formTitle {
+  margin: 0;
+  font-size: 16px;
+}
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  font-size: 13px;
+  color: var(--text-muted);
+}
+
+.select {
+  min-height: 44px;
+  padding: 8px 10px;
+  border-radius: var(--radius-m);
+  border: 1px solid var(--border-strong);
+  background: var(--raised);
+  color: var(--text);
+  font-size: 15px;
+}
+
+.formActions {
+  display: flex;
+  gap: 8px;
+}

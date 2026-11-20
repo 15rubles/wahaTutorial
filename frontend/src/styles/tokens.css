@@ -39,3 +39,16 @@
   --radius-m: 10px;
   --radius-l: 12px;
 }
+
+/* Extra muted role tints in the same style (DESIGN.md 7.1: "pick muted tints for other roles"). */
+:root {
+  --sky-tint: #3c4752;
+  --sky-text: #d2e2f0;
+  --sand-tint: #4d473a;
+  --sand-text: #ece0c4;
+  --rose-tint: #523d44;
+  --rose-text: #f3d3dc;
+  --stone-tint: #444240;
+  --stone-text: #e4e0da;
+  --select-marker: #8fb084;
+}

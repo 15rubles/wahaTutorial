@@ -44,9 +44,12 @@ export type Datasheet = {
   maxCopies?: number;
   composition?: string;
   loadout?: string;
+  support: boolean;
+  wargearPoints: { name: string; points: number }[];
 };
 
-export type UnitSizeOption = { key: string; datasheet: string; name: string; models: number; points?: number };
+export type PointsTier = { fromCopy: number; toCopy?: number; points: number; context?: string };
+export type UnitSizeOption = { key: string; datasheet: string; name: string; models: number; points?: number; tiers?: PointsTier[] };
 
 export type Weapon = {
   key: string;
@@ -95,6 +98,7 @@ export type Detachment = {
   ruleText: RulesText;
   restrictions?: string;
   forceDispositions: string[];
+  dpByKeyword: Record<string, number>;
 };
 
 export type Enhancement = {
@@ -107,6 +111,9 @@ export type Enhancement = {
   forbiddenKeywords: string[];
   text: RulesText;
   tags: PhaseTags;
+  upgrade: boolean;
+  eligibleDatasheets: string[];
+  grantsLeaderOf: string[];
 };
 
 export type Stratagem = {

@@ -41,6 +41,12 @@ cd frontend && npm test          # Vitest + React Testing Library
 cd frontend && npm run typecheck
 ```
 
+End-to-end (Playwright) against a running stack; it imports the invented fixture data and registers a fresh user:
+
+```bash
+cd frontend && E2E_BASE_URL=http://localhost:5173 E2E_ADMIN_USER=admin E2E_ADMIN_PASSWORD=... npm run e2e
+```
+
 ## Layout
 
 ```

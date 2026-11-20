@@ -1,5 +1,15 @@
 # Changelog
 
+## M5 - Desktop builder UI
+
+- "My lists" page: create (faction grouped by allegiance, battle size), open, duplicate, delete with confirmation, legal and older-data badges.
+- Builder matching the "A1 dark" mockup: header with list name (rename inline), faction and battle size, Points and DP as plain numbers, legal status pill, Export PDF button.
+- Three resizable panes (min 220 / 420 / 300 px), double-click a handle to reset, collapse side panes to a rail; sizes saved in user prefs and localStorage.
+- Configuration panel: battle size, faction options, detachments with DP badge and remaining budget, force disposition (only those the chosen detachments offer), show/hide options.
+- Add units pane with search, role filters and role groups; roster sections by role with counts, subtotals, warlord tag, sub-lines and problem markers; details pane with size, warlord, enhancement, leader attachment, wargear counts, datasheet (stats, weapons, abilities with phase tags) and the unit's violations.
+- Banner with the points diff and "Update to current data" when a list uses older data.
+- Playwright: create list, add 3 units, set warlord, points update; panes resize, collapse and survive a reload. Run with `npm run e2e` against a running stack.
+
 ## M4 - Rosters + validation engine
 
 - Rosters with detachments, entries (size, wargear, enhancement, warlord, leader attachment, order), configuration (battle size, faction options, force disposition, show/hide flags) and the data version they were built on. Users only ever see their own rosters.

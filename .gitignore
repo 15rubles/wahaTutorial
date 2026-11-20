@@ -22,3 +22,6 @@ frontend/playwright-report/
 .vscode/
 *.iml
 .DS_Store
+
+# e2e run state
+frontend/e2e/.user.json

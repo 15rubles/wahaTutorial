@@ -1,5 +1,6 @@
 import { Navigate, type RouteObject } from 'react-router-dom';
 import { AppShell } from '../components/AppShell/AppShell';
+import { BuilderPage } from '../features/builder/BuilderPage';
 import { AdminLayout } from '../features/admin/AdminLayout';
 import { DataPage } from '../features/admin/DataPage';
 import { EditorPage } from '../features/admin/EditorPage';
@@ -37,6 +38,14 @@ export const routes: RouteObject[] = [
         element: (
           <RequireAuth>
             <RosterListPage />
+          </RequireAuth>
+        ),
+      },
+      {
+        path: '/rosters/:id',
+        element: (
+          <RequireAuth>
+            <BuilderPage />
           </RequireAuth>
         ),
       },
