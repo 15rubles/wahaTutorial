@@ -15,8 +15,34 @@ spring:
   mvc:
     problemdetails:
       enabled: false
+  session:
+    jdbc:
+      initialize-schema: never
+      table-name: SPRING_SESSION
+    timeout: 14d
+  jackson:
+    default-property-inclusion: non_absent
 
 server:
   port: 8080
   shutdown: graceful
   forward-headers-strategy: framework
+  servlet:
+    session:
+      timeout: 14d
+      cookie:
+        name: MUSTER_SESSION
+        http-only: true
+        secure: ${COOKIE_SECURE:true}
+        same-site: lax
+
+muster:
+  auth:
+    max-failed-logins: 10
+    lock-duration: 15m
+    invite-default-validity: 7d
+    cookie-secure: ${COOKIE_SECURE:true}
+    admin:
+      username: ${ADMIN_USERNAME:}
+      password: ${ADMIN_PASSWORD:}
+      email: ${ADMIN_EMAIL:}

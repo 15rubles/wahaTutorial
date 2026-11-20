@@ -6,11 +6,12 @@ import { routes } from '../app/routes';
 export function renderApp(path = '/') {
   const queryClient = new QueryClient({ defaultOptions: { queries: { retry: false } } });
   const router = createMemoryRouter(routes, { initialEntries: [path] });
-  return render(
+  const utils = render(
     <QueryClientProvider client={queryClient}>
       <RouterProvider router={router} />
     </QueryClientProvider>,
   );
+  return { ...utils, router, queryClient };
 }
 
 export function mockFetchJson(status: number, body: unknown) {
