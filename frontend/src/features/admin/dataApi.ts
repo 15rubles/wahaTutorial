@@ -1,6 +1,14 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { apiGet, apiSend } from '../../api/client';
-import type { ImportResult, SourceImportSummary, VersionReport, VersionSummary } from '../../api/gameTypes';
+import type {
+  EntityType,
+  ImportResult,
+  PhaseTags,
+  Source,
+  SourceImportSummary,
+  VersionReport,
+  VersionSummary,
+} from '../../api/gameTypes';
 
 export const versionsKey = ['admin', 'versions'] as const;
 
@@ -60,6 +68,95 @@ export function useRebuildDraft() {
   const invalidate = useInvalidateData();
   return useMutation({
     mutationFn: () => apiSend<VersionSummary>('POST', '/api/admin/data-versions/rebuild'),
+    onSuccess: invalidate,
+  });
+}
+
+// ---- editor, overrides, phase review ----
+
+
+export type Listing = { type: EntityType; key: string; name: string; faction?: string; parent?: string; source: Source };
+export type OverrideRow = {
+  id: number;
+  type: EntityType;
+  key: string;
+  field: string;
+  value: unknown;
+  note: string;
+  createdBy?: string;
+  updatedAt: string;
+};
+export type EntityDetail = {
+  stored: { entity: Record<string, unknown>; source: Source; provenance: Record<string, Source>; externalIds: Record<string, string> };
+  overrides: OverrideRow[];
+};
+export type OverrideInput = { type: EntityType; key: string; field: string; value: unknown; note: string };
+
+export function useEntityList(params: { type?: EntityType; faction?: string; q?: string }) {
+  const search = new URLSearchParams();
+  if (params.type) search.set('type', params.type);
+  if (params.faction) search.set('faction', params.faction);
+  if (params.q) search.set('q', params.q);
+  search.set('limit', '300');
+  return useQuery({
+    queryKey: ['admin', 'entities', params],
+    queryFn: ({ signal }) => apiGet<Listing[]>(`/api/admin/entities?${search.toString()}`, signal),
+  });
+}
+
+export function useEntity(type: EntityType | undefined, key: string | undefined) {
+  return useQuery({
+    queryKey: ['admin', 'entity', type, key],
+    queryFn: ({ signal }) => apiGet<EntityDetail>(`/api/admin/entities/${type}/${encodeURIComponent(key ?? '')}`, signal),
+    enabled: !!type && !!key,
+  });
+}
+
+export function useSaveOverrides() {
+  const invalidate = useInvalidateData();
+  return useMutation({
+    mutationFn: (edits: OverrideInput[]) => apiSend<OverrideRow[]>('PUT', '/api/admin/overrides', edits),
+    onSuccess: invalidate,
+  });
+}
+
+export function useDeleteOverride() {
+  const invalidate = useInvalidateData();
+  return useMutation({
+    mutationFn: (id: number) => apiSend<void>('DELETE', `/api/admin/overrides/${id}`),
+    onSuccess: invalidate,
+  });
+}
+
+export type ReviewItem = { type: EntityType; key: string; name: string; faction?: string; tags: PhaseTags; text: string };
+export type ReviewPage = { total: number; offset: number; items: ReviewItem[] };
+export type ReviewState = 'all' | 'inferred' | 'empty';
+
+export function usePhaseReview(params: { faction?: string; type?: EntityType; state: ReviewState; offset: number }) {
+  const search = new URLSearchParams({ state: params.state, offset: String(params.offset), limit: '25' });
+  if (params.faction) search.set('faction', params.faction);
+  if (params.type) search.set('type', params.type);
+  return useQuery({
+    queryKey: ['admin', 'review', params],
+    queryFn: ({ signal }) => apiGet<ReviewPage>(`/api/admin/review/phase-tags?${search.toString()}`, signal),
+  });
+}
+
+export function useConfirmPhaseTags() {
+  const invalidate = useInvalidateData();
+  return useMutation({
+    mutationFn: (items: { type: EntityType; key: string; tags: PhaseTags }[]) =>
+      apiSend<void>('POST', '/api/admin/review/phase-tags/confirm', items),
+    onSuccess: invalidate,
+  });
+}
+
+export type FetchResult = { imported: ImportResult; files: { name: string; downloaded: boolean; fetchedAt: string }[] };
+
+export function useFetchWahapedia() {
+  const invalidate = useInvalidateData();
+  return useMutation({
+    mutationFn: (refresh: boolean) => apiSend<FetchResult>('POST', `/api/admin/imports/wahapedia/fetch?refresh=${refresh}`),
     onSuccess: invalidate,
   });
 }

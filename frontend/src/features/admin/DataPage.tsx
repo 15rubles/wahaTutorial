@@ -4,6 +4,7 @@ import { ErrorState, LoadingState, Notice, errorMessage } from '../../components
 import { formatDateTime } from '../../lib/format';
 import { useActivateVersion, useDataVersions, useRebuildDraft } from './dataApi';
 import { ImportCard } from './ImportCard';
+import { WahapediaCard } from './WahapediaCard';
 import styles from './Admin.module.css';
 
 export function DataPage() {
@@ -23,6 +24,13 @@ export function DataPage() {
           title="BattleScribe"
           accept=".zip"
           help="A .zip with one .gst and the .cat files (plain or zipped)."
+        />
+        <WahapediaCard />
+        <ImportCard
+          source="mfm"
+          title="Munitorum Field Manual"
+          accept=".pdf"
+          help="The official points PDF. Points from it win over every other source; rows that match no unit are listed in the report."
         />
       </div>
 

@@ -1,0 +1,6 @@
+﻿faction_id|name|id|type|cp_cost|legend|turn|phase|detachment|detachment_id|description|
+RP|IRON WILL|700|Pilgrimage of Iron – Battle Tactic Stratagem|1|Fluff.|Either player’s turn|Shooting or Fight phase|Pilgrimage of Iron|500|<b>WHEN:</b> Your opponent’s Shooting phase or the Fight phase.<br><br><b>TARGET:</b> One <span class="kwb">RUST PILGRIMS</span> unit.<br><br><b>EFFECT:</b> Until the end of the phase,
+your unit has Feel No Pain 5+.<br><br><b>RESTRICTIONS:</b> Once per phase.|
+|COMMAND RE-ROLL|701|Core – Strategic Ploy Stratagem|1|Fluff.|Either player’s turn|Any phase|||<b>WHEN:</b> In any phase.<br><br><b>TARGET:</b> One unit.<br><br><b>EFFECT:</b> Re-roll one roll.|
+|BREACH|702|Boarding Actions – Battle Tactic Stratagem|1||Your turn|Shooting phase|Hull Breach|502|<b>WHEN:</b> Your Shooting phase.|
+|NORMAL MOVE|703|Movement Ability||||Ability "Move"|||<b>MAXIMUM DISTANCE:</b> Your unit’s M characteristic.|

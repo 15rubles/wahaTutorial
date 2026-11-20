@@ -7,6 +7,9 @@ import app.muster.gamedata.build.ImportReport;
 import app.muster.gamedata.build.SourceSet;
 import app.muster.gamedata.build.VersionReport;
 import app.muster.gamedata.importer.battlescribe.BattleScribeImporter;
+import app.muster.gamedata.importer.mfm.MfmImporter;
+import app.muster.gamedata.importer.wahapedia.WahapediaFetcher;
+import app.muster.gamedata.importer.wahapedia.WahapediaImporter;
 import app.muster.gamedata.service.DataPipelineService;
 import app.muster.gamedata.store.DataVersionRepository;
 import app.muster.gamedata.store.DataVersionRow;
@@ -29,16 +32,25 @@ import org.springframework.web.multipart.MultipartFile;
 public class AdminDataController {
 
     private final BattleScribeImporter battleScribe;
+    private final WahapediaImporter wahapedia;
+    private final WahapediaFetcher fetcher;
+    private final MfmImporter mfm;
     private final DataPipelineService pipeline;
     private final DataVersionRepository versions;
     private final SourceImportRepository imports;
 
     public AdminDataController(
             BattleScribeImporter battleScribe,
+            WahapediaImporter wahapedia,
+            WahapediaFetcher fetcher,
+            MfmImporter mfm,
             DataPipelineService pipeline,
             DataVersionRepository versions,
             SourceImportRepository imports) {
         this.battleScribe = battleScribe;
+        this.wahapedia = wahapedia;
+        this.fetcher = fetcher;
+        this.mfm = mfm;
         this.pipeline = pipeline;
         this.versions = versions;
         this.imports = imports;
@@ -74,6 +86,32 @@ public class AdminDataController {
     @ResponseStatus(HttpStatus.CREATED)
     public ImportResult importBattleScribe(@CurrentUser AuthUser me, @RequestParam("file") MultipartFile file) {
         SourceSet set = battleScribe.importZip(bytes(file));
+        return finish(pipeline.importAndBuild(set, List.of(fileName(file)), Optional.of(me.id())));
+    }
+
+    @PostMapping("/imports/wahapedia")
+    @ResponseStatus(HttpStatus.CREATED)
+    public ImportResult importWahapedia(@CurrentUser AuthUser me, @RequestParam("file") MultipartFile file) {
+        SourceSet set = wahapedia.importZip(bytes(file));
+        return finish(pipeline.importAndBuild(set, List.of(fileName(file)), Optional.of(me.id())));
+    }
+
+    public record FetchResult(ImportResult imported, List<WahapediaFetcher.FetchedFile> files) {}
+
+    /** Downloads the export into the local cache (only files not cached yet, or all when refresh=true) and imports it. */
+    @PostMapping("/imports/wahapedia/fetch")
+    @ResponseStatus(HttpStatus.CREATED)
+    public FetchResult fetchWahapedia(@CurrentUser AuthUser me, @RequestParam(defaultValue = "false") boolean refresh) {
+        WahapediaFetcher.Result fetched = fetcher.fetch(refresh);
+        SourceSet set = wahapedia.parse(fetched.files());
+        List<String> names = List.of("wahapedia-cache (" + fetched.files().size() + " files)");
+        return new FetchResult(finish(pipeline.importAndBuild(set, names, Optional.of(me.id()))), fetched.log());
+    }
+
+    @PostMapping("/imports/mfm")
+    @ResponseStatus(HttpStatus.CREATED)
+    public ImportResult importMfm(@CurrentUser AuthUser me, @RequestParam("file") MultipartFile file) {
+        SourceSet set = mfm.importPdf(bytes(file));
         return finish(pipeline.importAndBuild(set, List.of(fileName(file)), Optional.of(me.id())));
     }
 

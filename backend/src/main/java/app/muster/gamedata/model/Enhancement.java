@@ -12,10 +12,28 @@ public record Enhancement(
         List<String> requiredKeywords,
         List<String> forbiddenKeywords,
         RulesText text,
-        PhaseTags tags)
+        PhaseTags tags,
+        boolean upgrade,
+        List<String> eligibleDatasheets,
+        List<String> grantsLeaderOf)
         implements GameEntity {
 
+    public Enhancement(
+            String key,
+            String detachment,
+            String faction,
+            String name,
+            Optional<Integer> points,
+            List<String> requiredKeywords,
+            List<String> forbiddenKeywords,
+            RulesText text,
+            PhaseTags tags) {
+        this(key, detachment, faction, name, points, requiredKeywords, forbiddenKeywords, text, tags, false, List.of(), List.of());
+    }
+
     public Enhancement {
+        eligibleDatasheets = eligibleDatasheets == null ? List.of() : List.copyOf(eligibleDatasheets);
+        grantsLeaderOf = grantsLeaderOf == null ? List.of() : List.copyOf(grantsLeaderOf);
         requiredKeywords = requiredKeywords == null ? List.of() : List.copyOf(requiredKeywords);
         forbiddenKeywords = forbiddenKeywords == null ? List.of() : List.copyOf(forbiddenKeywords);
         text = text == null ? RulesText.EMPTY : text;

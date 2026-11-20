@@ -1,0 +1,19 @@
+﻿datasheet_id|line|description|cost|
+100|1|YOUR UNIT COSTS||
+100|2|1 model|75|
+101|1|YOUR 1ST TO 2ND UNITS COST||
+101|2|10 models|95|
+101|3|20 models|185|
+101|4|YOUR 3RD+ UNIT COSTS||
+101|5|10 models|105|
+101|6|20 models|195|
+101|7|WARGEAR OPTIONS||
+101|8|per Rust Cannon|5|
+102|1|<div class="dsHeaderAoI">Rust Pilgrims Detachment</div>||
+102|2|YOUR UNIT COSTS||
+102|3|1 model|85|
+102|4|<div class="dsHeaderAoI">Assigned Agent</div>||
+102|5|YOUR UNIT COSTS||
+102|6|1 model|100|
+103|1|YOUR UNIT COSTS||
+103|2|1 model|130|

@@ -102,9 +102,10 @@ class GameDataIT extends IntegrationTest {
         assertThat(linksCritical).isTrue();
 
         assertThat(user.get("/api/glossary/search?q=shock").json().findValuesAsText("key")).contains("g:shock-strike");
-        JsonNode sizes = user.get("/api/battle-sizes").json();
-        assertThat(sizes.get(0).get("name").asText()).isEqualTo("Skirmish");
-        assertThat(sizes.get(1).get("name").asText()).isEqualTo("Grand Clash");
+        java.util.List<String> sizeNames = new java.util.ArrayList<>();
+        user.get("/api/battle-sizes").json().forEach(b -> sizeNames.add(b.get("name").asText()));
+        assertThat(sizeNames).contains("Skirmish", "Grand Clash");
+        assertThat(sizeNames.indexOf("Skirmish")).isLessThan(sizeNames.indexOf("Grand Clash"));
 
         JsonNode dets = user.get("/api/factions/rust-pilgrims/detachments").expectStatus(200).json();
         assertThat(dets.findValuesAsText("name")).contains("Pilgrimage of Iron", "Ember Host");

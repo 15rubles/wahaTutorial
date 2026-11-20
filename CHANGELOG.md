@@ -1,5 +1,14 @@
 # Changelog
 
+## M3 - Wahapedia + MFM importers, merge, admin editor
+
+- Wahapedia importer for the 11th edition CSV export (records spanning lines, columns by header name): factions and chapter sub-factions, datasheets with profiles, keywords, leaders, abilities, weapons, wargear options, per-copy points tiers and wargear costs, detachments with DP and force dispositions, detachment rules, enhancements (upgrades, eligible units), stratagems with When / Target / Effect / Restrictions and structured phases.
+- Core rules page parser: weapon and core abilities, rule terms, battle size table and army construction limits.
+- Polite Wahapedia fetcher (robots.txt, 1 request per second, User-Agent, cache in `data-sources/wahapedia-cache`, conditional refresh) behind an admin button; zip upload as an alternative.
+- Munitorum Field Manual PDF importer (PDFBox).
+- Merge: MFM rows re-matched across parent and chapter factions, key alignment between sources, per-source sets for unit sizes and wargear options. The rules text linker is word-indexed (a full build of the real data takes under 2 seconds).
+- Admin: data editor with per-field provenance, overrides with notes (validated, applied on top of every build), new battle sizes / force dispositions / glossary entries, phase tag review with bulk confirm.
+
 ## M2 - Domain model + BattleScribe importer
 
 - Game data model as typed records (factions, army rules, faction options, datasheets, unit sizes, weapons, wargear options, abilities, detachments, enhancements, stratagems, battle sizes, force dispositions, glossary) stored per data version with stable keys (see `docs/decisions.md`).

@@ -76,8 +76,11 @@ public final class VersionBuilder {
             }
         }
 
-        Map<Key, Map<Source, SourceSet.Item>> grouped = group(input.sources());
-        pickUnitSizes(grouped);
+        KeyAligner.Result aligned = KeyAligner.align(input.sources());
+        issues.addAll(aligned.issues());
+        Map<Key, Map<Source, SourceSet.Item>> grouped = group(aligned.sources());
+        pickChildSets(grouped, EntityType.UNIT_SIZE, "points");
+        pickChildSets(grouped, EntityType.WARGEAR_OPTION, "choices");
         dropUnmatched(grouped);
 
         Map<Key, Working> merged = new LinkedHashMap<>();
@@ -164,27 +167,27 @@ public final class VersionBuilder {
     }
 
     /**
-     * Which unit sizes exist comes from the highest priority points source that lists sizes for the
-     * datasheet. Sizes only another source knows are dropped (and reported).
+     * Which unit sizes (or wargear options) a datasheet has comes from the highest priority source
+     * that lists any for it. Entries only a lower priority source knows are dropped and reported.
      */
-    private void pickUnitSizes(Map<Key, Map<Source, SourceSet.Item>> grouped) {
+    private void pickChildSets(Map<Key, Map<Source, SourceSet.Item>> grouped, EntityType type, String priorityField) {
         Map<String, Set<Source>> sourcesPerSheet = new HashMap<>();
         for (var e : grouped.entrySet()) {
-            if (e.getKey().type() != EntityType.UNIT_SIZE) continue;
+            if (e.getKey().type() != type) continue;
             String sheet = e.getValue().values().iterator().next().data().path("datasheet").asText();
             sourcesPerSheet.computeIfAbsent(sheet, x -> new HashSet<>()).addAll(e.getValue().keySet());
         }
         for (var e : grouped.entrySet()) {
-            if (e.getKey().type() != EntityType.UNIT_SIZE) continue;
+            if (e.getKey().type() != type) continue;
             String sheet = e.getValue().values().iterator().next().data().path("datasheet").asText();
             Set<Source> available = sourcesPerSheet.get(sheet);
-            Source best = MergePolicy.priority(EntityType.UNIT_SIZE, "points").stream()
+            Source best = MergePolicy.priority(type, priorityField).stream()
                     .filter(available::contains)
                     .findFirst()
                     .orElseThrow();
             if (!e.getValue().containsKey(best)) {
-                issues.add(new Issue(Level.INFO, "unit-size-dropped",
-                        "Unit size " + e.getKey().key() + " is not listed by " + best + ", dropped",
+                issues.add(new Issue(Level.INFO, type.name().toLowerCase().replace('_', '-') + "-dropped",
+                        e.getKey().key() + " is not listed by " + best + ", dropped",
                         Optional.empty(), Optional.of(e.getKey().key())));
                 e.getValue().clear();
             }
@@ -192,22 +195,63 @@ public final class VersionBuilder {
         grouped.values().removeIf(Map::isEmpty);
     }
 
-    /** Points-only rows (MFM) must match an entity another source knows; otherwise they are reported. */
+    /**
+     * Points-only rows (MFM) must match an entity another source knows. A row filed under a related
+     * faction (parent or chapter) is moved to the matching entity first; anything still unmatched is
+     * reported, never silently dropped.
+     */
     private void dropUnmatched(Map<Key, Map<Source, SourceSet.Item>> grouped) {
-        Set<String> known = new HashSet<>();
+        Map<String, String> parent = new HashMap<>();
         for (var e : grouped.entrySet()) {
-            if (e.getValue().keySet().stream().anyMatch(s -> s != Source.MFM)) known.add(e.getKey().id());
+            if (e.getKey().type() != EntityType.FACTION) continue;
+            for (SourceSet.Item i : e.getValue().values()) {
+                if (i.data().hasNonNull("parentKey")) parent.putIfAbsent(e.getKey().key(), i.data().get("parentKey").asText());
+            }
         }
+        Set<String> known = new HashSet<>();
+        Map<String, String> byLineageName = new HashMap<>();
+        for (var e : grouped.entrySet()) {
+            if (e.getValue().keySet().stream().noneMatch(s -> s != Source.MFM)) continue;
+            known.add(e.getKey().id());
+            if (e.getKey().type() == EntityType.DATASHEET || e.getKey().type() == EntityType.ENHANCEMENT) {
+                byLineageName.putIfAbsent(e.getKey().type() + "|" + lineageName(e.getKey().key(), parent), e.getKey().key());
+            }
+        }
+        List<Map.Entry<Key, SourceSet.Item>> moves = new ArrayList<>();
         var it = grouped.entrySet().iterator();
         while (it.hasNext()) {
             var e = it.next();
             if (!e.getValue().keySet().equals(Set.of(Source.MFM))) continue;
             Key k = e.getKey();
-            ObjectNode data = e.getValue().get(Source.MFM).data();
-            boolean matched = switch (k.type()) {
-                case UNIT_SIZE -> known.contains(new Key(EntityType.DATASHEET, data.path("datasheet").asText()).id());
-                default -> false;
-            };
+            SourceSet.Item item = e.getValue().get(Source.MFM);
+            ObjectNode data = item.data();
+            boolean matched = k.type() == EntityType.UNIT_SIZE
+                    && known.contains(new Key(EntityType.DATASHEET, data.path("datasheet").asText()).id());
+            if (!matched && k.type() == EntityType.UNIT_SIZE) {
+                String sheet = data.path("datasheet").asText();
+                String target = byLineageName.get(EntityType.DATASHEET + "|" + lineageName(sheet, parent));
+                if (target != null) {
+                    ObjectNode moved = data.deepCopy();
+                    moved.put("datasheet", target);
+                    String newKey = target + k.key().substring(sheet.length());
+                    moved.put("key", newKey);
+                    moves.add(Map.entry(new Key(k.type(), newKey), new SourceSet.Item(k.type(), newKey, moved, item.externalId())));
+                    it.remove();
+                    continue;
+                }
+            }
+            if (!matched && k.type() == EntityType.ENHANCEMENT) {
+                String target = byLineageName.get(EntityType.ENHANCEMENT + "|" + lineageName(k.key(), parent));
+                if (target != null) {
+                    ObjectNode moved = data.deepCopy();
+                    moved.put("key", target);
+                    moved.remove("detachment");
+                    moved.remove("faction");
+                    moves.add(Map.entry(new Key(k.type(), target), new SourceSet.Item(k.type(), target, moved, item.externalId())));
+                    it.remove();
+                    continue;
+                }
+            }
             if (!matched) {
                 String what = k.type() == EntityType.UNIT_SIZE ? data.path("datasheet").asText() : k.key();
                 issues.add(new Issue(Level.WARNING, "unmatched",
@@ -217,6 +261,22 @@ public final class VersionBuilder {
                 it.remove();
             }
         }
+        for (var m : moves) {
+            grouped.computeIfAbsent(m.getKey(), x -> new EnumMap<>(Source.class)).putIfAbsent(Source.MFM, m.getValue());
+        }
+    }
+
+    /** "blood-angels:sanguinary-guard" -> "space-marines|sanguinary-guard" (root faction + rest of key). */
+    private static String lineageName(String key, Map<String, String> parent) {
+        int colon = key.indexOf(':');
+        if (colon < 0) return key;
+        String f = key.substring(0, colon);
+        for (int n = 0; n < 6 && parent.containsKey(f); n++) f = parent.get(f);
+        String rest = key.substring(colon + 1);
+        // Plural or singular unit names should still match.
+        String[] parts = rest.split(":");
+        parts[0] = Keys.matchName(parts[0].replace('-', ' '));
+        return f + "|" + String.join(":", parts);
     }
 
     private static Working merge(EntityType type, Map<Source, SourceSet.Item> bySource) {

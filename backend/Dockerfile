@@ -8,7 +8,7 @@ COPY src src
 RUN ./mvnw -B -q package -DskipTests
 
 FROM eclipse-temurin:21-jre-alpine
-RUN addgroup -S muster && adduser -S muster -G muster
+RUN addgroup -S -g 1000 muster && adduser -S -u 1000 muster -G muster && mkdir -p /app/data-sources && chown muster:muster /app/data-sources
 WORKDIR /app
 COPY --from=build /src/target/muster-backend-*.jar app.jar
 USER muster

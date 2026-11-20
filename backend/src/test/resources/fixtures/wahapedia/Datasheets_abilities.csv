@@ -1,0 +1,7 @@
+﻿datasheet_id|line|ability_id|model|name|description|type|parameter|
+100|1|900||||Core||
+100|2|901||||Core|5+|
+100|3|950||||Faction||
+100|4|||Rusted Sermon|While this model is leading a unit, weapons in that unit have <span class="kwb">[RENDING EDGE 1]</span> in your opponent's Fight phase.|Datasheet||
+101|1|950||||Faction||
+101|2|||Volley|In your Shooting phase, pick one <span class="kwb">INFANTRY</span> unit.|Datasheet||

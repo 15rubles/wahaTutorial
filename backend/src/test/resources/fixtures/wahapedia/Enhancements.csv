@@ -1,0 +1,4 @@
+﻿faction_id|name|id|cost|detachment|detachment_id|upgrade|legend|description|support_leader|
+RP|Relic of Rust|800|25|Pilgrimage of Iron|500|false|Fluff|<span class="kwb">RUST</span> <span class="kwb">PILGRIMS</span> model only. The bearer's melee weapons gain <span class="kwb">[RENDING EDGE 1]</span> in the Fight phase.||
+RP|Banner of Iron|801|10|Pilgrimage of Iron|500|true|Fluff|Pilgrim Warband unit only.|<span class="kwb">LEADER:</span> <a class="kwbOne" href="/x/Pilgrim-Warband">PILGRIM WARBAND</a>|
+RP|Hull Charm|802|15|Hull Breach|502|false||Model only.||

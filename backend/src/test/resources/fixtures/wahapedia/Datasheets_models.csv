@@ -1,0 +1,5 @@
+﻿datasheet_id|line|name|M|T|Sv|inv_sv|inv_sv_descr|W|Ld|OC|base_size|base_size_descr|
+100|1|Rust Prophet|6"|4|3+|5||5|6+|1|40mm||
+101|1|Pilgrim|6"|3|5+|-||1|7+|2|28mm||
+102|1|Ember Keeper|6"|4|3+|||4|6+|1|40mm||
+103|1|Scrap Walker|8"|9|3+|||10|7+|3|||

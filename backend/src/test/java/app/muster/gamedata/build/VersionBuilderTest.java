@@ -226,4 +226,30 @@ class VersionBuilderTest {
         assertThat(r.entities()).isEmpty();
         assertThat(r.report().issues()).anyMatch(i -> i.category().equals("orphan"));
     }
+
+    @Test
+    void sameUnitUnderParentAndChapterIsAlignedToTheChapterKey() {
+        SourceSet.Builder bs = new SourceSet.Builder(Source.BATTLESCRIBE, collector());
+        bs.add(new app.muster.gamedata.model.Faction(F, "Rust Pilgrims", Optional.empty(), Optional.empty()), null);
+        bs.add(new app.muster.gamedata.model.Faction("ember-wardens", "Ember Wardens", Optional.of(F), Optional.empty()), null);
+        bs.add(new Datasheet("ember-wardens:ember-keeper", "ember-wardens", "Ember Keeper", Optional.of("Character"), List.of(), List.of(), List.of(),
+                false, List.of(), Optional.empty(), Optional.empty(), Optional.empty()), null);
+        SourceSet.Builder wa = new SourceSet.Builder(Source.WAHAPEDIA, collector());
+        wa.add(new Datasheet(F + ":ember-keeper", F, "Ember Keeper", Optional.of("Infantry Character"), List.of(), List.of(), List.of(),
+                false, List.of(), Optional.empty(), Optional.empty(), Optional.empty()), null);
+        wa.add(new UnitSizeOption(F + ":ember-keeper:size:1", F + ":ember-keeper", "1 model", 1, Optional.of(85)), null);
+        SourceSet.Builder mfm = new SourceSet.Builder(Source.MFM, collector());
+        mfm.addPartial(EntityType.UNIT_SIZE, F + ":ember-keepers:size:1",
+                node(Map.of("datasheet", F + ":ember-keepers", "name", "1 model", "models", 1, "points", 90)), null);
+
+        var r = build(List.of(), Optional.empty(), bs.build(), wa.build(), mfm.build());
+        Datasheet d = find(r, Datasheet.class, "ember-wardens:ember-keeper");
+        assertThat(d.role()).contains("Infantry Character");
+        assertThat(d.faction()).isEqualTo("ember-wardens");
+        assertThat(r.entities()).noneMatch(b -> b.key().equals(F + ":ember-keeper"));
+        // The MFM row filed under the parent faction (with a plural name) still lands on the chapter unit.
+        assertThat(find(r, UnitSizeOption.class, "ember-wardens:ember-keeper:size:1").points()).contains(90);
+        assertThat(r.report().issues()).anyMatch(i -> i.category().equals("key-aligned"));
+        assertThat(r.report().issues()).noneMatch(i -> i.category().equals("unmatched"));
+    }
 }

@@ -1,0 +1,7 @@
+﻿id|name|faction_id|source_id|legend|role|loadout|transport|virtual|is_support|leader_head|leader_footer|damaged_w|damaged_description|link|
+100|Rust Prophet|RP|1|A prophet of rust.|Infantry Character|<b>This model is equipped with:</b> scrap pistol; censer maul.||false|false|This model can lead:|||||
+101|Pilgrim Warband|RP|1||Battleline|Every model has a rust rifle.||false|false||||||
+102|Ember Keeper|RP|1||Infantry Character|||false|false||||||
+103|Scrap Walker|RP|2||Vehicle||This model has a transport capacity of
+6 models.|false|false|||1-3|While this model has 1-3 wounds left, subtract 1 from hit rolls.||
+104|Example Thing|RP|1||Infantry|||true|false||||||

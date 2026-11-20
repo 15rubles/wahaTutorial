@@ -55,3 +55,40 @@ BattleScribe library catalogues are not factions. Units a faction imports from a
 (`importRootEntries`) are listed under that faction. A non-library catalogue imported with root entries
 becomes the faction's parent (for example a chapter and its parent faction); the chapter sees the
 parent's units.
+
+## D8 - 11th edition points: per-copy tiers and pricing contexts
+
+The 11th edition data prices later copies of a datasheet differently ("your 1st to 2nd units cost",
+"your 3rd+ unit costs") and some units have separate prices per context (for example a price inside
+their own faction's detachment and another as an assigned agent). `UnitSizeOption.tiers` keeps the full
+list; `points` is the price of the first copy. The n-th copy of a datasheet in a roster is priced with
+the tier that covers n, in roster order. Where a size has pricing contexts, the first context is used when
+the unit belongs to the army's own faction lineage and the last one otherwise.
+
+## D9 - Chapters as sub-factions in Wahapedia data
+
+Wahapedia files chapter units under their parent faction. Keywords listed in `Detachments_chapter_dp`
+are treated as chapters: a sub-faction is created (parent = the detachment's faction) and units with that
+faction keyword are filed under it, which matches BattleScribe's catalogue layout. A key aligner in the
+builder also moves any unit found under both a parent and a child faction to the child's key.
+
+## D10 - Battle sizes and construction limits come from the core rules page
+
+The battle size table (points, DP, enhancement limit, unit limit) and the notes around it (Battleline and
+Dedicated Transport double the unit limit, Epic Heroes have a unit limit of 1, up to three of the same
+Upgrade, a single 3 DP detachment in Incursion) are read from the core rules page into
+`BattleSize.limits`. If a note is not found, the limit is absent and the report says so; the validation
+rules then skip that check instead of guessing.
+
+## D11 - Other game modes are skipped
+
+Boarding Actions detachments, their enhancements and stratagems are skipped (listed as info in the report).
+11th edition "Movement Ability" / "Shooting Ability" rows (normal move, advance move, pile-in move...)
+are core rule terms and become glossary entries, not stratagems.
+
+## D12 - Munitorum Field Manual
+
+DESIGN.md asks for a PDF importer. For 11th edition the Munitorum Field Manual appears to be a website
+(Wahapedia's source list links mfm.warhammer-community.com), and Wahapedia's export already carries the
+same points. The PDF importer is implemented for the classic layout (faction headings, "N models ... X pts"
+lines, detachment enhancement lists) and tested with an invented PDF only.

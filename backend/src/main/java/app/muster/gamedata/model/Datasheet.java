@@ -16,10 +16,30 @@ public record Datasheet(
         List<String> leaderOf,
         Optional<Integer> maxCopies,
         Optional<String> composition,
-        Optional<String> loadout)
+        Optional<String> loadout,
+        boolean support,
+        List<WargearCost> wargearPoints)
         implements GameEntity {
 
+    public Datasheet(
+            String key,
+            String faction,
+            String name,
+            Optional<String> role,
+            List<String> keywords,
+            List<String> factionKeywords,
+            List<StatProfile> profiles,
+            boolean legends,
+            List<String> leaderOf,
+            Optional<Integer> maxCopies,
+            Optional<String> composition,
+            Optional<String> loadout) {
+        this(key, faction, name, role, keywords, factionKeywords, profiles, legends, leaderOf, maxCopies, composition, loadout,
+                false, List.of());
+    }
+
     public Datasheet {
+        wargearPoints = wargearPoints == null ? List.of() : List.copyOf(wargearPoints);
         keywords = keywords == null ? List.of() : List.copyOf(keywords);
         factionKeywords = factionKeywords == null ? List.of() : List.copyOf(factionKeywords);
         profiles = profiles == null ? List.of() : List.copyOf(profiles);

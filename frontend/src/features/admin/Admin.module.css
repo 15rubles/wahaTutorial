@@ -260,3 +260,209 @@
   color: var(--text-muted);
   word-break: break-all;
 }
+
+.split {
+  display: grid;
+  grid-template-columns: minmax(240px, 1fr) minmax(0, 2fr);
+  gap: 16px;
+  align-items: start;
+}
+
+@media (max-width: 900px) {
+  .split {
+    grid-template-columns: 1fr;
+  }
+}
+
+.listCol {
+  max-height: 70vh;
+  overflow: auto;
+  background: var(--panel-side);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-l);
+}
+
+.detailCol {
+  min-width: 0;
+}
+
+.pickList {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.pick {
+  width: 100%;
+  text-align: left;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding: 8px 12px;
+  min-height: 44px;
+  border: 0;
+  border-bottom: 1px solid var(--divider);
+  background: transparent;
+  cursor: pointer;
+}
+
+.pick:hover {
+  background: var(--raised);
+}
+
+.pickOn {
+  background: var(--sage-tint);
+  box-shadow: inset 4px 0 0 var(--sage);
+}
+
+.stack {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  font-size: 14px;
+  color: var(--text-muted);
+}
+
+.textarea {
+  width: 100%;
+  padding: 10px 12px;
+  border-radius: var(--radius-m);
+  border: 1px solid var(--border-strong);
+  background: var(--raised);
+  color: var(--text);
+  font-family: var(--font-ui);
+  font-size: 14px;
+  line-height: 1.5;
+  resize: vertical;
+}
+
+.fieldRow {
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-m);
+  padding: 8px 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.fieldHead {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.fieldHead > button {
+  margin-left: auto;
+}
+
+.fieldName {
+  font-family: var(--font-num);
+  font-size: 13px;
+  color: var(--lilac-text);
+}
+
+.value {
+  margin: 0;
+  white-space: pre-wrap;
+  word-break: break-word;
+  font-family: var(--font-ui);
+  font-size: 14px;
+  color: var(--text-body);
+  max-height: 260px;
+  overflow: auto;
+}
+
+.src_MANUAL {
+  background: var(--butter);
+  color: var(--butter-ink);
+}
+
+.src_WAHAPEDIA {
+  background: var(--lilac-chip);
+  color: var(--lilac-text);
+}
+
+.src_BATTLESCRIBE {
+  background: var(--peach-tint);
+  color: var(--peach-text);
+}
+
+.src_MFM {
+  background: var(--sage-tint);
+  color: var(--sage-text);
+}
+
+.tagEditor {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+}
+
+.fieldset {
+  border: 0;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+}
+
+.chipToggle {
+  display: inline-flex;
+  align-items: center;
+  min-height: 32px;
+  padding: 4px 10px;
+  border-radius: 999px;
+  border: 1px solid var(--border-strong);
+  font-size: 13px;
+  cursor: pointer;
+  color: var(--text-muted);
+}
+
+.chipToggle:focus-within {
+  outline: 2px solid var(--sage);
+}
+
+.chipOn {
+  background: var(--sage-tint);
+  border-color: #56664f;
+  color: var(--sage-text);
+}
+
+.reviewList {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.reviewItem {
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-m);
+  padding: 10px 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.reviewHead {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+}
+
+.reviewText {
+  margin: 0;
+  font-size: 14px;
+  line-height: 1.55;
+  color: var(--text-body);
+  white-space: pre-line;
+  max-height: 140px;
+  overflow: auto;
+}

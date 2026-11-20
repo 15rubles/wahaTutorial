@@ -41,6 +41,11 @@ server:
         same-site: lax
 
 muster:
+  data-sources-dir: ${DATA_SOURCES_DIR:./data-sources}
+  wahapedia:
+    base-url: https://wahapedia.ru/wh40k11ed/
+    user-agent: "Muster/1.0 (private non-commercial army builder)"
+    min-interval: 1s
   auth:
     max-failed-logins: 10
     lock-duration: 15m

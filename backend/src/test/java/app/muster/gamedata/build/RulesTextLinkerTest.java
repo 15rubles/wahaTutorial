@@ -52,6 +52,9 @@ class RulesTextLinkerTest {
         assertThat(linker.resolve("Rending Edge 1")).contains("g:rending-edge");
         assertThat(linker.resolve("anti-infantry 4+")).contains("g:anti");
         assertThat(linker.resolve("Unknown Thing")).isEmpty();
+        assertThat(linker.resolve("Rending Edge 1: non-MONSTER/VEHICLE")).contains("g:rending-edge");
+        assertThat(linker.resolve("Anti-monster/Vehicle")).contains("g:anti");
+        assertThat(linker.resolve("ANTI-non-MONSTER/VEHICLE 4+")).contains("g:anti");
     }
 
     @Test

@@ -3,6 +3,8 @@ import styles from './Admin.module.css';
 
 const tabs = [
   { to: '/admin/data', label: 'Data' },
+  { to: '/admin/editor', label: 'Editor' },
+  { to: '/admin/review', label: 'Phase review' },
   { to: '/admin/invites', label: 'Invites' },
 ];
 

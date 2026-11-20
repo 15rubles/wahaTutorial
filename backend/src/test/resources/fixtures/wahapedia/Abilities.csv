@@ -1,0 +1,5 @@
+﻿id|name|legend|faction_id|description|
+900|Shock Strike|Fluff.||During the Declare Battle Formations step, this unit can be set up in reserve.|
+901|Feel No Pain|Fluff.||Each time this model would lose a wound, roll one D6:
+if the result equals or exceeds the number shown, that wound is not lost.|
+950|Faith in Rust|Fluff.|RP|At the start of your Command phase, each <span class="kwb">RUST PILGRIMS</span> unit regains its faith.|

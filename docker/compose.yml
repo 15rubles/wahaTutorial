@@ -27,6 +27,10 @@ services:
       ADMIN_PASSWORD: ${ADMIN_PASSWORD:-}
       ADMIN_EMAIL: ${ADMIN_EMAIL:-}
       COOKIE_SECURE: ${COOKIE_SECURE:-true}
+      DATA_SOURCES_DIR: /app/data-sources
+    volumes:
+      # Raw import files and the Wahapedia cache (gitignored, never committed).
+      - ../data-sources:/app/data-sources
     depends_on:
       db:
         condition: service_healthy

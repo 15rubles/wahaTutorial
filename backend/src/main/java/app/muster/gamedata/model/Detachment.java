@@ -12,10 +12,25 @@ public record Detachment(
         Optional<String> ruleName,
         RulesText ruleText,
         Optional<String> restrictions,
-        List<String> forceDispositions)
+        List<String> forceDispositions,
+        java.util.Map<String, Integer> dpByKeyword)
         implements GameEntity {
 
+    public Detachment(
+            String key,
+            String faction,
+            String name,
+            Optional<Integer> dpCost,
+            List<String> uniqueTags,
+            Optional<String> ruleName,
+            RulesText ruleText,
+            Optional<String> restrictions,
+            List<String> forceDispositions) {
+        this(key, faction, name, dpCost, uniqueTags, ruleName, ruleText, restrictions, forceDispositions, java.util.Map.of());
+    }
+
     public Detachment {
+        dpByKeyword = dpByKeyword == null ? java.util.Map.of() : java.util.Map.copyOf(dpByKeyword);
         uniqueTags = uniqueTags == null ? List.of() : List.copyOf(uniqueTags);
         forceDispositions = forceDispositions == null ? List.of() : List.copyOf(forceDispositions);
         ruleText = ruleText == null ? RulesText.EMPTY : ruleText;
