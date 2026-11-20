@@ -8,6 +8,7 @@
 - Healthchecks for every service (`/healthz` on Caddy, `/api/health` on the backend, `pg_isready`, backup freshness). Structured JSON logs (ECS) from the backend, JSON access logs from Caddy.
 - Real data: Legends twins of current datasheets get their own key; older duplicate core stratagems are skipped in favour of the current wording. The full Wahapedia import now has one warning left (a datasheet without costs in the export).
 - Playwright: a friend registers from an invite link (desktop and phone); the whole suite also passes against the production build.
+- The admin account follows `.env` at every start: a changed `ADMIN_PASSWORD` applies on restart and clears a lockout; a missing admin is logged loudly.
 - `docs/deploy.md`: setup, data import, invites, backups and restore, updates, logs.
 
 ## M8 - Mobile

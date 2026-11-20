@@ -83,6 +83,13 @@ public class AppUser {
         return createdAt;
     }
 
+    /** Sets a new password hash and clears any lockout (used by the admin bootstrap). */
+    void resetPassword(String passwordHash) {
+        this.passwordHash = passwordHash;
+        this.failedLogins = 0;
+        this.lockedUntil = null;
+    }
+
     void applyLoginState(LoginLockPolicy.State state) {
         this.failedLogins = state.failedLogins();
         this.lockedUntil = state.lockedUntil().orElse(null);

@@ -52,6 +52,19 @@ Admin, Data:
    overrides that survive re-imports). Force dispositions have no rules text in the Wahapedia export; add it
    in the editor.
 
+### Can't sign in as admin?
+
+The backend checks the admin account at every start: it creates it if missing, and if `ADMIN_PASSWORD`
+changed it sets the new password and clears a lockout. So fix `.env` and restart the backend:
+
+```bash
+docker compose -f compose.yaml -f docker/compose.prod.yml up -d backend
+docker compose -f compose.yaml -f docker/compose.prod.yml logs backend | grep -i admin
+```
+
+`NO ADMIN ACCOUNT` in the log means the variables did not reach the backend (no `.env` next to
+`compose.yaml`, or a typo in the names).
+
 ## 5. Invite friends
 
 Admin, Invites: create a code, press "Copy link" and send it. The link opens the register page with the

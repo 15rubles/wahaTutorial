@@ -9,7 +9,10 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
-/** Creates the first admin from ADMIN_USERNAME / ADMIN_PASSWORD when no admin exists yet. */
+/**
+ * Keeps the admin account in line with ADMIN_USERNAME / ADMIN_PASSWORD: creates it when missing, and
+ * when it exists, applies a changed password and clears a lockout. Runs at every start.
+ */
 @Component
 public class AdminBootstrap implements ApplicationRunner {
 
@@ -30,18 +33,29 @@ public class AdminBootstrap implements ApplicationRunner {
     @Override
     @Transactional
     public void run(ApplicationArguments args) {
-        if (users.existsByRole(Role.ADMIN)) return;
         AuthProperties.Admin admin = props.admin();
         if (admin == null || isBlank(admin.username()) || isBlank(admin.password())) {
-            log.warn("No admin account exists and ADMIN_USERNAME / ADMIN_PASSWORD are not set");
-            return;
-        }
-        if (users.existsByUsernameIgnoreCase(admin.username())) {
-            log.warn("ADMIN_USERNAME '{}' already exists as a regular user, not promoting it", admin.username());
+            if (!users.existsByRole(Role.ADMIN)) {
+                log.warn("NO ADMIN ACCOUNT: set ADMIN_USERNAME and ADMIN_PASSWORD (in .env) and restart the backend");
+            }
             return;
         }
         if (admin.password().length() < 10) {
-            log.warn("ADMIN_PASSWORD must have at least 10 characters, admin not created");
+            log.warn("NO ADMIN CHANGE: ADMIN_PASSWORD must have at least 10 characters");
+            return;
+        }
+        var existing = users.findByUsernameIgnoreCase(admin.username());
+        if (existing.isPresent()) {
+            AppUser user = existing.get();
+            if (user.getRole() != Role.ADMIN) {
+                log.warn("ADMIN_USERNAME '{}' already exists as a regular user, not promoting it", admin.username());
+                return;
+            }
+            // .env is the source of truth for the admin password: a changed ADMIN_PASSWORD applies on restart.
+            if (!encoder.matches(admin.password(), user.getPasswordHash()) || user.getLockedUntil().isPresent()) {
+                user.resetPassword(encoder.encode(admin.password()));
+                log.info("Admin account '{}': password set from ADMIN_PASSWORD, lockout cleared", user.getUsername());
+            }
             return;
         }
         String email = isBlank(admin.email()) ? admin.username() + "@localhost" : admin.email();
