@@ -1,0 +1,65 @@
+# Production overrides for the home server. Paths below are relative to the repository root. Use with the base file:
+#   docker compose -f compose.yaml -f docker/compose.prod.yml up -d --build
+# Needs a .env with SITE_ADDRESS (your domain), POSTGRES_PASSWORD, ADMIN_USERNAME, ADMIN_PASSWORD.
+
+services:
+  db:
+    restart: always
+    environment:
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?set POSTGRES_PASSWORD in .env}
+
+  backend:
+    restart: always
+    environment:
+      DB_PASSWORD: ${POSTGRES_PASSWORD:?set POSTGRES_PASSWORD in .env}
+      COOKIE_SECURE: "true"
+      # One JSON object per log line (Elastic Common Schema), easy to grep and ship.
+      LOGGING_STRUCTURED_FORMAT_CONSOLE: ecs
+      JAVA_TOOL_OPTIONS: "-XX:MaxRAMPercentage=70"
+    logging:
+      driver: json-file
+      options: { max-size: "20m", max-file: "5" }
+
+  frontend:
+    restart: always
+    environment:
+      SITE_ADDRESS: ${SITE_ADDRESS:?set SITE_ADDRESS (your domain) in .env}
+    ports: !override
+      - "80:80"
+      - "443:443"
+      - "443:443/udp"
+    volumes:
+      - caddy-data:/data
+      - caddy-config:/config
+    logging:
+      driver: json-file
+      options: { max-size: "20m", max-file: "5" }
+
+  backup:
+    image: postgres:16-alpine
+    restart: always
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      PGHOST: db
+      PGDATABASE: ${POSTGRES_DB:-muster}
+      PGUSER: ${POSTGRES_USER:-muster}
+      PGPASSWORD: ${POSTGRES_PASSWORD:?set POSTGRES_PASSWORD in .env}
+      BACKUP_DIR: /backups
+      BACKUP_KEEP_DAYS: ${BACKUP_KEEP_DAYS:-14}
+      BACKUP_AT: ${BACKUP_AT:-03:15}
+    volumes:
+      - ${BACKUP_PATH:-./backups}:/backups
+      - ./docker/backup:/scripts:ro
+    entrypoint: ["/bin/sh", "/scripts/backup-loop.sh"]
+    healthcheck:
+      test: ["CMD", "/bin/sh", "/scripts/check-recent.sh"]
+      interval: 1h
+      timeout: 10s
+      start_period: 30s
+      retries: 1
+
+volumes:
+  caddy-data:
+  caddy-config:

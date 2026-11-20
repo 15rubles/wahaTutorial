@@ -1,5 +1,15 @@
 # Changelog
 
+## M9 - Deploy and hardening
+
+- Production compose file (`docker/compose.prod.yml`): Caddy with automatic HTTPS for `SITE_ADDRESS`, ports 80/443, certificate volume, restart policies, log rotation.
+- Security headers from Caddy: Content-Security-Policy, HSTS, nosniff, frame denial, referrer and permissions policies; long-lived caching for hashed assets only.
+- Nightly `pg_dump` backups with 14-day retention, an initial dump at first start, a freshness healthcheck, and a restore script. Backup and restore tested end to end (data deleted, restored, app working).
+- Healthchecks for every service (`/healthz` on Caddy, `/api/health` on the backend, `pg_isready`, backup freshness). Structured JSON logs (ECS) from the backend, JSON access logs from Caddy.
+- Real data: Legends twins of current datasheets get their own key; older duplicate core stratagems are skipped in favour of the current wording. The full Wahapedia import now has one warning left (a datasheet without costs in the export).
+- Playwright: a friend registers from an invite link (desktop and phone); the whole suite also passes against the production build.
+- `docs/deploy.md`: setup, data import, invites, backups and restore, updates, logs.
+
 ## M8 - Mobile
 
 - Below 1024px the builder shows one pane at a time with a bottom tab bar (Add / List / Details); selecting a unit opens Details; panes stay mounted so search and scroll survive tab switches.

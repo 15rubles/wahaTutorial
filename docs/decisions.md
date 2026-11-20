@@ -122,3 +122,15 @@ violation) instead of guessing.
   number footer breaks the layout of long sections. Paragraph spacing comes from margins.
 - Cards are kept on one page unless they are taller than a page; react-pdf cannot place an unbreakable block that
   does not fit, so very long unit cards and glossary entries are allowed to continue on the next page.
+
+## D17 - CSP allows 'wasm-unsafe-eval'
+
+The PDF export lays out pages with a WebAssembly engine (yoga, used by @react-pdf/renderer). Browsers need
+`'wasm-unsafe-eval'` to compile it; this does not allow JavaScript `eval`. `connect-src data:` lets it load
+the inlined module.
+
+## D18 - Legends twins and superseded stratagems
+
+When a Legends datasheet has the same name as a current one, its key gets a " legends" suffix so both exist.
+When Wahapedia lists the same core stratagem twice, the entry with the higher id (the newer wording) wins and
+the older one is reported as info, not merged.

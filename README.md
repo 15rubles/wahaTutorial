@@ -11,6 +11,10 @@ docker compose up --build
 
 Open http://localhost:8088. The header pill shows "Server online" once the backend and database are up. Change the port with `HTTP_PORT` in `.env`.
 
+## Deploy
+
+See [docs/deploy.md](docs/deploy.md): HTTPS with Caddy, backups and restore, logs, inviting friends.
+
 ## Develop locally
 
 Requirements: Java 21, Node 22, Docker (for Postgres and Testcontainers).

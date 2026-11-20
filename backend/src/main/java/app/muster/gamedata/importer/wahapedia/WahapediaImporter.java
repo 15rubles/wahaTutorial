@@ -215,6 +215,11 @@ public class WahapediaImporter {
             for (Row r : rows("Datasheets_leader")) leaders.computeIfAbsent(r.get("leader_id"), k -> new ArrayList<>()).add(r);
 
             List<Row> sheets = rows("Datasheets");
+            // A Legends datasheet sharing its name with a current one keeps a separate key.
+            java.util.Set<String> current = new java.util.HashSet<>();
+            for (Row r : sheets) {
+                if (!legendsSources.contains(r.get("source_id"))) current.add(r.get("faction_id") + "|" + Keys.slug(cleanName(r.get("name"))));
+            }
             // First pass: keys, so leaders can point at units listed later.
             Map<String, Row> byId = new LinkedHashMap<>();
             for (Row r : sheets) {
@@ -233,8 +238,11 @@ public class WahapediaImporter {
                         factionKey = chapter;
                     }
                 }
-                sheetKeyById.put(r.get("id"), Keys.datasheet(factionKey, cleanName(r.get("name"))));
-                nameByKey.put(Keys.datasheet(factionKey, cleanName(r.get("name"))), cleanName(r.get("name")));
+                boolean legendsTwin = legendsSources.contains(r.get("source_id"))
+                        && current.contains(r.get("faction_id") + "|" + Keys.slug(cleanName(r.get("name"))));
+                String keyName = cleanName(r.get("name")) + (legendsTwin ? " legends" : "");
+                sheetKeyById.put(r.get("id"), Keys.datasheet(factionKey, keyName));
+                nameByKey.put(Keys.datasheet(factionKey, keyName), cleanName(r.get("name")));
                 sheetNameById.put(r.get("id"), cleanName(r.get("name")));
                 byId.put(r.get("id"), r);
             }
@@ -594,7 +602,10 @@ public class WahapediaImporter {
         }
 
         void stratagems() {
-            for (Row s : rows("Stratagems")) {
+            // Newest rows first, so when the export lists a stratagem twice the current wording is kept.
+            List<Row> sorted = new ArrayList<>(rows("Stratagems"));
+            sorted.sort(Comparator.comparing((Row r) -> r.get("id")).reversed());
+            for (Row s : sorted) {
                 String type = s.get("type");
                 String name = CoreRulesParser.titleCase(TextCleaner.html(s.get("name")));
                 if (type.toLowerCase(Locale.ROOT).contains("boarding")) {
@@ -622,6 +633,10 @@ public class WahapediaImporter {
                 }
                 String key = detKey.map(d -> Keys.child(d, "strat", name)).orElseGet(() ->
                         factionKey.map(f -> Keys.child(f, "strat", name)).orElse(Keys.coreStratagem(name)));
+                if (out.contains(EntityType.STRATAGEM, key)) {
+                    report.info("superseded", "Older copy of stratagem '" + name + "' skipped (" + type + ")", factionKey.orElse("core"), s.get("id"));
+                    continue;
+                }
                 Map<String, String> parts = sections(s.get("description"));
                 Optional<PhaseTags> tags = PhaseInference.fromColumns(s.get("phase"), s.get("turn"));
                 if (tags.isEmpty() && !(s.get("phase").isEmpty() && s.get("turn").isEmpty())) {
