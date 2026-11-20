@@ -1,0 +1,24 @@
+# Game data never gets committed (DESIGN.md 0.2)
+data-sources/*
+!data-sources/.gitkeep
+
+# Local env
+.env
+*.local
+
+# Backend
+backend/target/
+*.class
+
+# Frontend
+frontend/node_modules/
+frontend/dist/
+frontend/coverage/
+frontend/test-results/
+frontend/playwright-report/
+
+# Editors / OS
+.idea/
+.vscode/
+*.iml
+.DS_Store

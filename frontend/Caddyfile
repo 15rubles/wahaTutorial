@@ -1,0 +1,14 @@
+# M0: plain HTTP inside the compose network. HTTPS for the home server comes in M9.
+:80 {
+	encode zstd gzip
+
+	handle /api/* {
+		reverse_proxy backend:8080
+	}
+
+	handle {
+		root * /srv
+		try_files {path} /index.html
+		file_server
+	}
+}

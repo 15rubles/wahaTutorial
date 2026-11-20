@@ -1,0 +1,4 @@
+# Lets `docker compose up` work from the repo root. The real file lives in docker/.
+name: muster
+include:
+  - docker/compose.yml

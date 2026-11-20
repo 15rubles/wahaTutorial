@@ -1,0 +1,41 @@
+/* Design tokens - DESIGN.md section 7.1 ("A1 dark" mockup). */
+:root {
+  /* surfaces */
+  --bg: #333333; /* page background */
+  --panel-side: #2f2f2f; /* left and right panes */
+  --panel: #3a3a3a; /* header, cards, roster sections */
+  --raised: #404040; /* inputs, stat boxes, tables */
+  --row-head: #444444; /* config label rows, table heads */
+  --border: #4a4a4a;
+  --divider: #424242;
+  --border-strong: #555555;
+
+  /* text */
+  --text: #f0eeea;
+  --text-muted: #bdbab4;
+  --text-body: #e0ddd8; /* long rules text */
+
+  /* pastel accents */
+  --sage: #a8c3a0; /* primary action, legal, selected */
+  --sage-ink: #1f2d1b; /* text on sage */
+  --sage-tint: #3f4a3e;
+  --sage-text: #d3e6ca;
+  --lilac: #cdc1ea;
+  --lilac-tint: #47425a; /* Characters section, detachment */
+  --lilac-chip: #4a4560; /* keyword chips, DP badge */
+  --lilac-text: #e2daf6;
+  --peach-tint: #52433b; /* Infantry section */
+  --peach-text: #f7d9c4;
+  --butter: #f3e3a6; /* Warlord tag */
+  --butter-ink: #3d3210;
+  --warn-bg: #54423a;
+  --warn-border: #8a6650;
+  --warn-text: #fae3d3;
+
+  /* type */
+  --font-ui: "Atkinson Hyperlegible", system-ui, sans-serif;
+  --font-num: "IBM Plex Mono", ui-monospace, monospace;
+  --radius-s: 6px;
+  --radius-m: 10px;
+  --radius-l: 12px;
+}
