@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<!-- Invented test fixture. Not real game data. -->
+<catalogue id="cat-ew" name="Imperium - Ember Wardens" revision="1" battleScribeVersion="2.03" library="false" gameSystemId="sys-tg" xmlns="http://www.battlescribe.net/schema/catalogueSchema">
+  <catalogueLinks>
+    <catalogueLink id="cl-parent" name="Imperium - Rust Pilgrims" targetId="cat-rp" type="catalogue" importRootEntries="true"/>
+  </catalogueLinks>
+  <entryLinks>
+    <entryLink id="el-keeper" name="Ember Keeper" targetId="se-keeper" type="selectionEntry"/>
+  </entryLinks>
+  <sharedSelectionEntries>
+    <selectionEntry id="se-keeper" name="Ember Keeper" type="model">
+      <costs><cost name="pts" typeId="ct-pts" value="85"/></costs>
+      <categoryLinks>
+        <categoryLink id="clk-k1" name="Character" targetId="cat-character" primary="true"/>
+        <categoryLink id="clk-k2" name="Faction: Rust Pilgrims" targetId="cat-f-rp" primary="false"/>
+      </categoryLinks>
+      <profiles>
+        <profile id="p-keeper" name="Ember Keeper" typeName="Unit" typeId="pt-unit">
+          <characteristics>
+            <characteristic name="M" typeId="m">6"</characteristic>
+            <characteristic name="T" typeId="t">4</characteristic>
+            <characteristic name="SV" typeId="sv">3+</characteristic>
+            <characteristic name="W" typeId="w">4</characteristic>
+            <characteristic name="LD" typeId="ld">6+</characteristic>
+            <characteristic name="OC" typeId="oc">1</characteristic>
+          </characteristics>
+        </profile>
+      </profiles>
+    </selectionEntry>
+  </sharedSelectionEntries>
+</catalogue>

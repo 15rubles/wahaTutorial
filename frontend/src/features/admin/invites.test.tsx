@@ -33,7 +33,7 @@ describe('admin invites', () => {
         return { status: 201, body: created };
       },
     });
-    renderApp('/admin');
+    renderApp('/admin/invites');
     expect(await screen.findByText('AAAA-BBBB-CCCC')).toBeInTheDocument();
     expect(screen.getByText('friend')).toBeInTheDocument();
 

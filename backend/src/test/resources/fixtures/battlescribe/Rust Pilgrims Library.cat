@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<!-- Invented test fixture. Not real game data. -->
+<catalogue id="cat-rplib" name="Rust Pilgrims Library" revision="1" battleScribeVersion="2.03" library="true" gameSystemId="sys-tg" xmlns="http://www.battlescribe.net/schema/catalogueSchema">
+  <entryLinks>
+    <entryLink id="el-hired" name="Hired Gun" targetId="se-hired" type="selectionEntry"/>
+  </entryLinks>
+  <sharedSelectionEntries>
+    <selectionEntry id="se-hired" name="Hired Gun" type="model">
+      <costs><cost name="pts" typeId="ct-pts" value="45"/></costs>
+      <categoryLinks>
+        <categoryLink id="clk-h1" name="Infantry" targetId="cat-infantry" primary="true"/>
+      </categoryLinks>
+      <profiles>
+        <profile id="p-hired" name="Hired Gun" typeName="Unit" typeId="pt-unit">
+          <characteristics>
+            <characteristic name="M" typeId="m">6"</characteristic>
+            <characteristic name="T" typeId="t">3</characteristic>
+            <characteristic name="SV" typeId="sv">4+</characteristic>
+            <characteristic name="W" typeId="w">3</characteristic>
+            <characteristic name="LD" typeId="ld">7+</characteristic>
+            <characteristic name="OC" typeId="oc">1</characteristic>
+          </characteristics>
+        </profile>
+      </profiles>
+    </selectionEntry>
+  </sharedSelectionEntries>
+</catalogue>

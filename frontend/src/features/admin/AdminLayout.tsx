@@ -1,7 +1,10 @@
 import { NavLink, Outlet } from 'react-router-dom';
 import styles from './Admin.module.css';
 
-const tabs = [{ to: '/admin/invites', label: 'Invites' }];
+const tabs = [
+  { to: '/admin/data', label: 'Data' },
+  { to: '/admin/invites', label: 'Invites' },
+];
 
 export function AdminLayout() {
   return (

@@ -1,6 +1,8 @@
 import { Navigate, type RouteObject } from 'react-router-dom';
 import { AppShell } from '../components/AppShell/AppShell';
 import { AdminLayout } from '../features/admin/AdminLayout';
+import { DataPage } from '../features/admin/DataPage';
+import { VersionReportPage } from '../features/admin/VersionReportPage';
 import { InvitesPage } from '../features/admin/InvitesPage';
 import { RedirectIfSignedIn, RequireAdmin, RequireAuth } from '../features/auth/guards';
 import { LoginPage } from '../features/auth/LoginPage';
@@ -46,7 +48,9 @@ export const routes: RouteObject[] = [
           </RequireAuth>
         ),
         children: [
-          { index: true, element: <Navigate to="invites" replace /> },
+          { index: true, element: <Navigate to="data" replace /> },
+          { path: 'data', element: <DataPage /> },
+          { path: 'data/versions/:id', element: <VersionReportPage /> },
           { path: 'invites', element: <InvitesPage /> },
         ],
       },

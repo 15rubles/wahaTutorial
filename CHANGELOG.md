@@ -1,5 +1,13 @@
 # Changelog
 
+## M2 - Domain model + BattleScribe importer
+
+- Game data model as typed records (factions, army rules, faction options, datasheets, unit sizes, weapons, wargear options, abilities, detachments, enhancements, stratagems, battle sizes, force dispositions, glossary) stored per data version with stable keys (see `docs/decisions.md`).
+- DataVersion lifecycle (DRAFT, ACTIVE, ARCHIVED) and ManualOverride table; overrides are applied on top of every build.
+- Version builder: field-level merge by source priority, unmatched points rows reported, phase inference, rules text linker, plain keyword glossary entries, glossary reverse index, diff against the active version.
+- BattleScribe importer for zipped `.gst` + `.cat` data (sizes and points from constraints and modifiers, wargear groups, leaders, detachments, enhancements, battle sizes, shared rules), with zip bomb and XXE protection.
+- Read API: factions, datasheets (with role and search filters), datasheet details, detachments, glossary, battle sizes. Admin API and pages: import, versions list, import report, activate.
+
 ## M1 - Auth
 
 - Invite-only registration (username, email, password, single-use invite code with expiry), login, logout, `GET /api/me`.

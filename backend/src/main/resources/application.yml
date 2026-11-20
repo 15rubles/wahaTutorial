@@ -20,6 +20,10 @@ spring:
       initialize-schema: never
       table-name: SPRING_SESSION
     timeout: 14d
+  servlet:
+    multipart:
+      max-file-size: 150MB
+      max-request-size: 150MB
   jackson:
     default-property-inclusion: non_absent
 

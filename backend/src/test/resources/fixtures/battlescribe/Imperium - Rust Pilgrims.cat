@@ -1,0 +1,247 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<!-- Invented test fixture. Not real game data. -->
+<catalogue id="cat-rp" name="Imperium - Rust Pilgrims" revision="1" battleScribeVersion="2.03" library="false" gameSystemId="sys-tg" xmlns="http://www.battlescribe.net/schema/catalogueSchema">
+  <catalogueLinks>
+    <catalogueLink id="cl-lib" name="Rust Pilgrims Library" targetId="cat-rplib" type="catalogue" importRootEntries="true"/>
+  </catalogueLinks>
+  <categoryEntries>
+    <categoryEntry id="cat-f-rp" name="Faction: Rust Pilgrims"/>
+  </categoryEntries>
+  <rules>
+    <rule id="ar-faith" name="Faith in Rust">
+      <description>At the start of your Command phase, each Rust Pilgrims unit with Shock Strike regains its faith.</description>
+    </rule>
+  </rules>
+  <entryLinks>
+    <entryLink id="el-prophet" name="Rust Prophet" targetId="se-prophet" type="selectionEntry">
+      <constraints>
+        <constraint id="c-prophet-max" type="max" value="1" field="selections" scope="roster" shared="true"/>
+      </constraints>
+    </entryLink>
+    <entryLink id="el-warband" name="Pilgrim Warband" targetId="se-warband" type="selectionEntry"/>
+    <entryLink id="el-walker" name="Scrap Walker [Legends]" targetId="se-walker" type="selectionEntry"/>
+  </entryLinks>
+  <selectionEntries>
+    <selectionEntry id="se-det" name="Detachment" type="upgrade">
+      <selectionEntryGroups>
+        <selectionEntryGroup id="seg-det" name="Detachment">
+          <selectionEntries>
+            <selectionEntry id="se-det-iron" name="Pilgrimage of Iron" type="upgrade">
+              <costs><cost name="Detachment Points" typeId="ct-dp" value="1"/></costs>
+              <rules>
+                <rule id="dr-iron" name="Iron Faith">
+                  <description>Each time a unit from your army is selected to shoot in your Shooting phase, it may re-roll one hit roll.</description>
+                </rule>
+              </rules>
+              <selectionEntryGroups>
+                <selectionEntryGroup id="seg-enh-iron" name="Enhancements">
+                  <selectionEntries>
+                    <selectionEntry id="se-enh-relic" name="Relic of Rust" type="upgrade">
+                      <costs><cost name="pts" typeId="ct-pts" value="20"/></costs>
+                      <profiles>
+                        <profile id="p-relic" name="Relic of Rust" typeName="Abilities" typeId="pt-ab">
+                          <characteristics>
+                            <characteristic name="Description" typeId="x">The bearer's melee weapons gain Rending Edge 1 in the Fight phase.</characteristic>
+                          </characteristics>
+                        </profile>
+                      </profiles>
+                      <modifiers>
+                        <modifier type="set" field="hidden" value="true">
+                          <conditions>
+                            <condition type="notInstanceOf" field="selections" scope="ancestor" value="1" childId="cat-character"/>
+                          </conditions>
+                        </modifier>
+                      </modifiers>
+                    </selectionEntry>
+                  </selectionEntries>
+                </selectionEntryGroup>
+              </selectionEntryGroups>
+            </selectionEntry>
+            <selectionEntry id="se-det-ember" name="Ember Host" type="upgrade">
+              <costs><cost name="Detachment Points" typeId="ct-dp" value="2"/></costs>
+              <rules>
+                <rule id="dr-ember" name="Kindled">
+                  <description>Units from your army gain Shock Strike.</description>
+                </rule>
+              </rules>
+            </selectionEntry>
+          </selectionEntries>
+        </selectionEntryGroup>
+      </selectionEntryGroups>
+    </selectionEntry>
+  </selectionEntries>
+  <sharedSelectionEntries>
+    <selectionEntry id="se-prophet" name="Rust Prophet" type="model">
+      <costs><cost name="pts" typeId="ct-pts" value="70"/></costs>
+      <categoryLinks>
+        <categoryLink id="clk-p1" name="Character" targetId="cat-character" primary="true"/>
+        <categoryLink id="clk-p2" name="Infantry" targetId="cat-infantry" primary="false"/>
+        <categoryLink id="clk-p3" name="Faction: Rust Pilgrims" targetId="cat-f-rp" primary="false"/>
+      </categoryLinks>
+      <profiles>
+        <profile id="p-prophet" name="Rust Prophet" typeName="Unit" typeId="pt-unit">
+          <characteristics>
+            <characteristic name="M" typeId="m">6"</characteristic>
+            <characteristic name="T" typeId="t">4</characteristic>
+            <characteristic name="SV" typeId="sv">3+</characteristic>
+            <characteristic name="W" typeId="w">5</characteristic>
+            <characteristic name="LD" typeId="ld">6+</characteristic>
+            <characteristic name="OC" typeId="oc">1</characteristic>
+          </characteristics>
+        </profile>
+        <profile id="p-prophet-leader" name="Leader" typeName="Abilities" typeId="pt-ab">
+          <characteristics>
+            <characteristic name="Description" typeId="d">This model can be attached to the following units:
+■ Pilgrim Warband</characteristic>
+          </characteristics>
+        </profile>
+        <profile id="p-prophet-inv" name="Invulnerable Save" typeName="Abilities" typeId="pt-ab">
+          <characteristics><characteristic name="Description" typeId="d">5+</characteristic></characteristics>
+        </profile>
+        <profile id="p-prophet-sermon" name="Rusted Sermon" typeName="Abilities" typeId="pt-ab">
+          <characteristics><characteristic name="Description" typeId="d">While this model is leading a unit, weapons in that unit have Rending Edge 1 in your opponent's Fight phase.</characteristic></characteristics>
+        </profile>
+      </profiles>
+      <infoLinks>
+        <infoLink id="il-shock" name="Shock Strike" targetId="r-shock" type="rule"/>
+      </infoLinks>
+      <selectionEntries>
+        <selectionEntry id="se-pistol" name="Scrap Pistol" type="upgrade">
+          <profiles>
+            <profile id="p-pistol" name="Scrap Pistol" typeName="Ranged Weapons" typeId="pt-ranged">
+              <characteristics>
+                <characteristic name="Range" typeId="r">12"</characteristic>
+                <characteristic name="A" typeId="a">1</characteristic>
+                <characteristic name="BS" typeId="bs">3+</characteristic>
+                <characteristic name="S" typeId="s">4</characteristic>
+                <characteristic name="AP" typeId="ap">0</characteristic>
+                <characteristic name="D" typeId="dd">1</characteristic>
+                <characteristic name="Keywords" typeId="k">Pistol</characteristic>
+              </characteristics>
+            </profile>
+          </profiles>
+        </selectionEntry>
+        <selectionEntry id="se-maul" name="Censer Maul" type="upgrade">
+          <profiles>
+            <profile id="p-maul" name="Censer Maul" typeName="Melee Weapons" typeId="pt-melee">
+              <characteristics>
+                <characteristic name="Range" typeId="r">Melee</characteristic>
+                <characteristic name="A" typeId="a">4</characteristic>
+                <characteristic name="WS" typeId="ws">2+</characteristic>
+                <characteristic name="S" typeId="s">6</characteristic>
+                <characteristic name="AP" typeId="ap">-1</characteristic>
+                <characteristic name="D" typeId="dd">2</characteristic>
+                <characteristic name="Keywords" typeId="k">Rending Edge 2</characteristic>
+              </characteristics>
+            </profile>
+          </profiles>
+        </selectionEntry>
+      </selectionEntries>
+    </selectionEntry>
+    <selectionEntry id="se-warband" name="Pilgrim Warband" type="unit">
+      <costs><cost name="pts" typeId="ct-pts" value="90"/></costs>
+      <modifiers>
+        <modifier type="set" field="ct-pts" value="180">
+          <conditions>
+            <condition type="atLeast" value="20" field="selections" scope="self" childId="model" shared="true" includeChildSelections="true"/>
+          </conditions>
+        </modifier>
+      </modifiers>
+      <categoryLinks>
+        <categoryLink id="clk-w1" name="Battleline" targetId="cat-battleline" primary="true"/>
+        <categoryLink id="clk-w2" name="Infantry" targetId="cat-infantry" primary="false"/>
+        <categoryLink id="clk-w3" name="Faction: Rust Pilgrims" targetId="cat-f-rp" primary="false"/>
+      </categoryLinks>
+      <profiles>
+        <profile id="p-pilgrim" name="Pilgrim" typeName="Unit" typeId="pt-unit">
+          <characteristics>
+            <characteristic name="M" typeId="m">6"</characteristic>
+            <characteristic name="T" typeId="t">3</characteristic>
+            <characteristic name="SV" typeId="sv">5+</characteristic>
+            <characteristic name="W" typeId="w">1</characteristic>
+            <characteristic name="LD" typeId="ld">7+</characteristic>
+            <characteristic name="OC" typeId="oc">2</characteristic>
+          </characteristics>
+        </profile>
+      </profiles>
+      <selectionEntries>
+        <selectionEntry id="se-pilgrim" name="Pilgrim" type="model">
+          <constraints>
+            <constraint id="c-pil-min" type="min" value="9" field="selections" scope="parent"/>
+            <constraint id="c-pil-max" type="max" value="19" field="selections" scope="parent"/>
+          </constraints>
+          <profiles>
+            <profile id="p-autogun" name="Rust Rifle" typeName="Ranged Weapons" typeId="pt-ranged">
+              <characteristics>
+                <characteristic name="Range" typeId="r">24"</characteristic>
+                <characteristic name="A" typeId="a">1</characteristic>
+                <characteristic name="BS" typeId="bs">4+</characteristic>
+                <characteristic name="S" typeId="s">3</characteristic>
+                <characteristic name="AP" typeId="ap">0</characteristic>
+                <characteristic name="D" typeId="dd">1</characteristic>
+                <characteristic name="Keywords" typeId="k">-</characteristic>
+              </characteristics>
+            </profile>
+          </profiles>
+        </selectionEntry>
+        <selectionEntry id="se-elder" name="Pilgrim Elder" type="model">
+          <constraints>
+            <constraint id="c-eld-min" type="min" value="1" field="selections" scope="parent"/>
+            <constraint id="c-eld-max" type="max" value="1" field="selections" scope="parent"/>
+          </constraints>
+        </selectionEntry>
+      </selectionEntries>
+      <selectionEntryGroups>
+        <selectionEntryGroup id="seg-heavy" name="Heavy Weapons">
+          <constraints>
+            <constraint id="c-heavy-min" type="min" value="0" field="selections" scope="parent"/>
+            <constraint id="c-heavy-max" type="max" value="1" field="selections" scope="parent"/>
+          </constraints>
+          <modifiers>
+            <modifier type="increment" field="c-heavy-max" value="1">
+              <repeats><repeat field="selections" scope="parent" value="10" repeats="1" childId="model" roundUp="false"/></repeats>
+            </modifier>
+          </modifiers>
+          <selectionEntries>
+            <selectionEntry id="se-cannon" name="Rust Cannon" type="upgrade">
+              <costs><cost name="pts" typeId="ct-pts" value="5"/></costs>
+              <profiles>
+                <profile id="p-cannon" name="Rust Cannon" typeName="Ranged Weapons" typeId="pt-ranged">
+                  <characteristics>
+                    <characteristic name="Range" typeId="r">36"</characteristic>
+                    <characteristic name="A" typeId="a">D3</characteristic>
+                    <characteristic name="BS" typeId="bs">4+</characteristic>
+                    <characteristic name="S" typeId="s">8</characteristic>
+                    <characteristic name="AP" typeId="ap">-2</characteristic>
+                    <characteristic name="D" typeId="dd">D6</characteristic>
+                    <characteristic name="Keywords" typeId="k">Heavy</characteristic>
+                  </characteristics>
+                </profile>
+              </profiles>
+            </selectionEntry>
+            <selectionEntry id="se-lance" name="Flame Lance" type="upgrade"/>
+          </selectionEntries>
+        </selectionEntryGroup>
+      </selectionEntryGroups>
+    </selectionEntry>
+    <selectionEntry id="se-walker" name="Scrap Walker" type="model">
+      <costs><cost name="pts" typeId="ct-pts" value="120"/></costs>
+      <categoryLinks>
+        <categoryLink id="clk-s1" name="Vehicle" targetId="cat-vehicle" primary="true"/>
+        <categoryLink id="clk-s2" name="Faction: Rust Pilgrims" targetId="cat-f-rp" primary="false"/>
+      </categoryLinks>
+      <profiles>
+        <profile id="p-walker" name="Scrap Walker" typeName="Unit" typeId="pt-unit">
+          <characteristics>
+            <characteristic name="M" typeId="m">8"</characteristic>
+            <characteristic name="T" typeId="t">9</characteristic>
+            <characteristic name="SV" typeId="sv">3+</characteristic>
+            <characteristic name="W" typeId="w">10</characteristic>
+            <characteristic name="LD" typeId="ld">7+</characteristic>
+            <characteristic name="OC" typeId="oc">3</characteristic>
+          </characteristics>
+        </profile>
+      </profiles>
+    </selectionEntry>
+  </sharedSelectionEntries>
+</catalogue>
